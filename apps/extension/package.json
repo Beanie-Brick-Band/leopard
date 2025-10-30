@@ -4,7 +4,7 @@
   "description": "Verify the legitamacy of student assignments by analyzing a granular version history of their work process. VSCode extension for the Leopard IDE.",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.105.0"
+    "vscode": "^1.99.3"
   },
   "categories": [
     "Other"
