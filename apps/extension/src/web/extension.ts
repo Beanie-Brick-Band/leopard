@@ -2,32 +2,102 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log(
-    'Congratulations, your extension "leopard" is now active in the web extension host!',
+let listeners: vscode.Disposable[] = [];
+
+export async function activate(context: vscode.ExtensionContext) {
+  const channel = vscode.window.createOutputChannel("eventlogger");
+
+  function timestamp() {
+    return new Date().toISOString();
+  }
+
+  listeners.push(
+    vscode.workspace.onDidOpenTextDocument((e) => {
+      channel.appendLine(`[${timestamp()}] ${e.uri.fsPath} - opened`);
+    }),
   );
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  const disposable = vscode.commands.registerCommand(
-    "leopard.helloWorld",
-    () => {
-      // The code you place here will be executed every time your command is executed
+  listeners.push(
+    vscode.workspace.onDidCloseTextDocument((e) => {
+      channel.appendLine(`[${timestamp()}] ${e.uri.fsPath} - closed`);
+    }),
+  );
 
-      // Display a message box to the user
-      vscode.window.showInformationMessage(
-        "Hello World from leopard in a web extension host!",
+  listeners.push(
+    vscode.workspace.onDidCreateFiles((e) => {
+      channel.appendLine(
+        `[${timestamp()}] ${e.files.map((file) => file.fsPath).join(", ")} - created`,
       );
-    },
+    }),
   );
 
-  context.subscriptions.push(disposable);
+  listeners.push(
+    vscode.workspace.onDidDeleteFiles((e) => {
+      channel.appendLine(
+        `[${timestamp()}] ${e.files.map((file) => file.fsPath).join(", ")} - deleted`,
+      );
+    }),
+  );
+
+  listeners.push(
+    vscode.workspace.onDidRenameFiles((e) => {
+      channel.appendLine(
+        `[${timestamp()}] ${e.files.map((file) => file.oldUri.fsPath).join(", ")} - ${e.files.map((file) => file.newUri.fsPath).join(", ")} - renamed`,
+      );
+    }),
+  );
+
+  listeners.push(
+    vscode.workspace.onDidSaveTextDocument((e) => {
+      channel.appendLine(`[${timestamp()}] ${e.uri.fsPath} - saved`);
+    }),
+  );
+
+  listeners.push(
+    vscode.workspace.onDidChangeTextDocument((e) => {
+      if (e.document.isDirty) {
+        channel.appendLine(
+          `[${timestamp()}] ${e.document.uri.fsPath} - ${e.contentChanges.map((change) => `${change.range.start.line}:${change.range.start.character} - ${change.range.end.line}:${change.range.end.character} - ${change.text}`).join(" --- ")}`,
+        );
+      }
+    }),
+  );
+
+  listeners.push(
+    vscode.window.onDidChangeTextEditorSelection((e) => {
+      channel.appendLine(
+        `[${timestamp()}] ${e.textEditor.document.uri.fsPath} - ${e.selections.map((selection) => `${selection.start.line}:${selection.start.character} - ${selection.end.line}:${selection.end.character}`).join(", ")} - selection changed`,
+      );
+    }),
+  );
+
+  listeners.push(
+    vscode.window.onDidChangeTerminalState((e) => {
+      channel.appendLine(
+        `[${timestamp()}] ${e.name} ${e.state.shell} - terminal state changed`,
+      );
+    }),
+  );
+
+  listeners.push(
+    vscode.window.onDidChangeTerminalShellIntegration((e) => {
+      channel.appendLine(
+        `[${timestamp()}] ${e.terminal.name} ${e.terminal.state.shell} - terminal shell integration changed`,
+      );
+    }),
+  );
+
+  listeners.push(
+    vscode.window.onDidEndTerminalShellExecution((e) => {
+      channel.appendLine(
+        `[${timestamp()}] ${e.terminal.name} ${e.exitCode} ${e.execution.commandLine.value} - command executed`,
+      );
+    }),
+  );
+
+  context.subscriptions.push(...listeners);
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+  listeners.forEach((listener) => listener.dispose());
+}
