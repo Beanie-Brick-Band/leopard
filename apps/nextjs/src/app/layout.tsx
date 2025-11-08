@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-
-import { cn } from "@acme/ui";
-import { ThemeProvider, ThemeToggle } from "@acme/ui/theme";
-import { Toaster } from "@acme/ui/toast";
+import { cn } from "@package/ui";
+import { ThemeProvider, ThemeToggle } from "@package/ui/theme";
+import { Toaster } from "@package/ui/toast";
 
 import { env } from "~/env";
 

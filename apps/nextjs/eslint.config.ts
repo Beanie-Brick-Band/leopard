@@ -1,8 +1,7 @@
+import { baseConfig, restrictEnvAccess } from "@package/eslint-config/base";
+import { nextjsConfig } from "@package/eslint-config/nextjs";
+import { reactConfig } from "@package/eslint-config/react";
 import { defineConfig } from "eslint/config";
-
-import { baseConfig, restrictEnvAccess } from "@acme/eslint-config/base";
-import { nextjsConfig } from "@acme/eslint-config/nextjs";
-import { reactConfig } from "@acme/eslint-config/react";
 
 export default defineConfig(
   {
