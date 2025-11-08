@@ -1,0 +1,21 @@
+{
+  "name": "@package/backend",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "convex dev",
+    "setup": "convex dev --until-success"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.19.0",
+  "dependencies": {
+    "convex": "^1.28.2"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}
