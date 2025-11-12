@@ -1,7 +1,9 @@
+import { env } from "../src/env";
+
 export default {
   providers: [
     {
-      domain: "http://localhost:3000",
+      domain: env.SITE_URL,
       applicationID: "convex",
     },
   ],
