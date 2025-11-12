@@ -13,7 +13,7 @@ catalog:
   eslint: ^9.38.0
   prettier: ^3.6.2
   tailwindcss: ^4.1.16
-  typescript: 5.9.3
+  typescript: ^5.9.3
   vite: 7.1.12
   zod: ^4.1.12
 
