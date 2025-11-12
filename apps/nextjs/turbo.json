@@ -8,7 +8,7 @@
     },
     "dev": {
       "persistent": true,
-      "env": ["CONVEX_URL"]
+      "env": ["NEXT_PUBLIC_CONVEX_URL"]
     }
   }
 }
