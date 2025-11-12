@@ -5,6 +5,8 @@ import { cn } from "@package/ui";
 import { ThemeProvider, ThemeToggle } from "@package/ui/theme";
 import { Toaster } from "@package/ui/toast";
 
+import { ConvexClientProvider } from "~/components/convex-client-provider";
+import { Navbar } from "~/components/navbar";
 import { env } from "~/env";
 
 import "~/app/styles.css";
@@ -56,13 +58,16 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           geistMono.variable,
         )}
       >
-        <ThemeProvider>
-          {props.children}
-          <div className="absolute right-4 bottom-4">
-            <ThemeToggle />
-          </div>
-          <Toaster />
-        </ThemeProvider>
+        <ConvexClientProvider>
+          <ThemeProvider>
+            <Navbar />
+            {props.children}
+            <div className="absolute right-4 bottom-4">
+              <ThemeToggle />
+            </div>
+            <Toaster />
+          </ThemeProvider>
+        </ConvexClientProvider>
       </body>
     </html>
   );

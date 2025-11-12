@@ -8,7 +8,7 @@ catalog:
   '@tailwindcss/postcss': ^4.1.16
   '@tailwindcss/vite': ^4.1.16
   '@tanstack/react-form': ^1.23.8
-  '@types/node': ^22.18.12
+  '@types/node': 22.18.12
   '@vitejs/plugin-react': 5.1.0
   eslint: ^9.38.0
   prettier: ^3.6.2
