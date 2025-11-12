@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Syne, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 
 import { cn } from "@package/ui";
-import { ThemeProvider, ThemeToggle } from "@package/ui/theme";
-import { Toaster } from "@package/ui/toast";
+import { ThemeProvider } from "@package/ui/theme";
 
 import { env } from "~/env";
 
@@ -12,38 +11,45 @@ import "~/app/styles.css";
 export const metadata: Metadata = {
   metadataBase: new URL(
     env.VERCEL_ENV === "production"
-      ? "https://turbo.t3.gg"
+      ? "https://leopard-ide.vercel.app"
       : "http://localhost:3000",
   ),
-  title: "Create T3 Turbo",
-  description: "Simple monorepo with shared backend for web & mobile apps",
+  title: "Leopard - Authentic Code, Verified Learning",
+  description: "A web-based platform designed for post-secondary institutions to ensure academic integrity in coding assignments. Leopard provides students with a modern IDE while capturing granular version history to verify the authenticity of their work.",
   openGraph: {
-    title: "Create T3 Turbo",
-    description: "Simple monorepo with shared backend for web & mobile apps",
-    url: "https://create-t3-turbo.vercel.app",
-    siteName: "Create T3 Turbo",
+    title: "Leopard - Authentic Code, Verified Learning",
+    description: "A web-based platform for ensuring academic integrity in coding assignments with version tracking and replay capabilities.",
+    url: "https://leopard-ide.vercel.app",
+    siteName: "Leopard",
   },
   twitter: {
     card: "summary_large_image",
-    site: "@jullerino",
-    creator: "@jullerino",
   },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { media: "(prefers-color-scheme: light)", color: "#fbbf24" },
+    { media: "(prefers-color-scheme: dark)", color: "#18181b" },
   ],
 };
 
-const geistSans = Geist({
+const syne = Syne({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  variable: "--font-heading",
+  display: "swap",
 });
-const geistMono = Geist_Mono({
+
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-geist-mono",
+  variable: "--font-sans-override",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono-override",
+  display: "swap",
 });
 
 export default function RootLayout(props: { children: React.ReactNode }) {
@@ -52,16 +58,13 @@ export default function RootLayout(props: { children: React.ReactNode }) {
       <body
         className={cn(
           "bg-background text-foreground min-h-screen font-sans antialiased",
-          geistSans.variable,
-          geistMono.variable,
+          syne.variable,
+          plusJakartaSans.variable,
+          jetbrainsMono.variable,
         )}
       >
         <ThemeProvider>
           {props.children}
-          <div className="absolute right-4 bottom-4">
-            <ThemeToggle />
-          </div>
-          <Toaster />
         </ThemeProvider>
       </body>
     </html>

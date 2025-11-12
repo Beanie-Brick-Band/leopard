@@ -87,7 +87,7 @@ export default function HomePage() {
                 <path fill="#f15a61" d="M43.1 31.7c-2.3-1-9.5-1-11.6 0c-.8.4 1.5 2.8 5.8 2.8s6.7-2.4 5.8-2.8"/>
               </svg>
               <div>
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent font-heading">
                   Leopard
                 </h1>
                 <div className="h-0.5 sm:h-1 w-20 sm:w-32 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full mt-1 sm:mt-2" />
@@ -97,6 +97,13 @@ export default function HomePage() {
             <p className="text-lg sm:text-xl md:text-2xl text-amber-500/90 font-light italic">
               Authentic Code, Verified Learning
             </p>
+
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-full w-fit">
+              <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+              <span className="text-xs sm:text-sm text-amber-500/90 font-medium tracking-wide">
+                COMING SOON
+              </span>
+            </div>
 
             <p className="text-sm sm:text-base text-zinc-300 leading-relaxed max-w-xl">
               A web-based platform designed for post-secondary institutions to ensure
@@ -110,7 +117,7 @@ export default function HomePage() {
           <div className="flex flex-col gap-4 sm:gap-6 lg:pr-12">
             <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 border border-amber-900/30 rounded-xl sm:rounded-2xl p-5 sm:p-8 hover:border-amber-600/50 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-900/20">
               <div className="text-amber-500 text-3xl sm:text-4xl mb-3 sm:mb-4">&lt;/&gt;</div>
-              <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent font-heading">
                 Web-Based IDE
               </h3>
               <p className="text-sm sm:text-base text-zinc-400">
@@ -121,7 +128,7 @@ export default function HomePage() {
 
             <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 border border-orange-900/30 rounded-xl sm:rounded-2xl p-5 sm:p-8 hover:border-orange-600/50 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl hover:shadow-orange-900/20 lg:ml-12">
               <div className="text-orange-500 text-3xl sm:text-4xl mb-3 sm:mb-4">⟲</div>
-              <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent font-heading">
                 Version Tracking
               </h3>
               <p className="text-sm sm:text-base text-zinc-400">
@@ -132,7 +139,7 @@ export default function HomePage() {
 
             <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 border border-red-900/30 rounded-xl sm:rounded-2xl p-5 sm:p-8 hover:border-red-600/50 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl hover:shadow-red-900/20 lg:ml-6">
               <div className="text-red-500 text-3xl sm:text-4xl mb-3 sm:mb-4">▶</div>
-              <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent font-heading">
                 Replay Viewer
               </h3>
               <p className="text-sm sm:text-base text-zinc-400">
