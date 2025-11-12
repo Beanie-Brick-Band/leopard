@@ -1,3 +1,5 @@
+import { TextReplayScrubberComponent } from "../components/scrubber";
+
 export default function HomePage() {
   return (
     <main className="container h-screen py-16">
@@ -8,6 +10,7 @@ export default function HomePage() {
         <p className="text-muted-foreground text-center text-2xl">
           A clean Next.js starter with TypeScript, Tailwind CSS, and more.
         </p>
+        <TextReplayScrubberComponent />
       </div>
     </main>
   );

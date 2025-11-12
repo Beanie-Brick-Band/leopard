@@ -19,6 +19,7 @@
     "next": "^16.0.0",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
+    "react-scrubber": "^2.1.0",
     "zod": "catalog:"
   },
   "devDependencies": {
