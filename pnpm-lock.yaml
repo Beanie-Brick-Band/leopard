@@ -113,6 +113,9 @@ importers:
       react-dom:
         specifier: catalog:react19
         version: 19.1.1(react@19.1.1)
+      react-scrubber:
+        specifier: ^2.1.0
+        version: 2.1.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -5568,6 +5571,12 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  react-scrubber@2.1.0:
+    resolution: {integrity: sha512-1drqw3sPHLy+20zh1t55EGJuX1cm7KiypcCdpqD6fOqDbH64uLVCo2OD/Fz3Wx1VTjK1Y4hxa+mvok0PaUmtrQ==}
+    peerDependencies:
+      react: 16 - 19
+      react-dom: 16 - 19
 
   react-style-singleton@2.2.3:
     resolution: {integrity: sha512-b6jSvxvVnyptAiLjbkWLE/lOnR4lfTtDAl+eUC7RZy+QQWc6wRzIV2CE6xBuMmDxc2qIihtDCZD5NPOFl7fRBQ==}
@@ -12706,6 +12715,12 @@ snapshots:
       use-sidecar: 1.1.3(@types/react@19.2.4)(react@19.2.0)
     optionalDependencies:
       '@types/react': 19.2.4
+
+  react-scrubber@2.1.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
+    dependencies:
+      object.fromentries: 2.0.8
+      react: 19.1.1
+      react-dom: 19.1.1(react@19.1.1)
 
   react-style-singleton@2.2.3(@types/react@19.2.4)(react@19.1.1):
     dependencies:
