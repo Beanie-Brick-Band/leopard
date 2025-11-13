@@ -10,7 +10,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "dotenv -e .env -- openapi-ts",
+    "generate": "dotenv -e ../../.env -e ../../.env.local -- openapi-ts",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "typecheck": "tsc --noEmit"
   },

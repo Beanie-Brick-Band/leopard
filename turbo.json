@@ -6,7 +6,7 @@
       "dependsOn": ["^topo"]
     },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "generate"],
       "outputs": [".cache/tsbuildinfo.json", "dist/**"]
     },
     "dev": {
@@ -43,6 +43,10 @@
     "ui-add": {
       "cache": false,
       "interactive": true
+    },
+    "generate": {
+      "cache": false,
+      "env": ["CODER_URL"]
     }
   },
   "globalEnv": ["CONVEX_URL", "AUTH_SECRET", "PORT"],
