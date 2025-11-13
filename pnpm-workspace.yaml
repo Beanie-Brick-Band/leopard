@@ -2,7 +2,11 @@ packages:
   - apps/*
   - packages/*
   - tooling/*
-  - docs/*
+  - docs
+  - "!docs/content"
+  - "!docs/scripts"
+  - "!docs/lib"
+  - "!docs/vault"
 
 catalog:
   "@eslint/js": ^9.38.0
