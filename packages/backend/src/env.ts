@@ -25,6 +25,5 @@ export const env = createEnv({
     SITE_URL: process.env.SITE_URL,
   },
   clientPrefix: "",
-  skipValidation:
-    !!process.env.CI || process.env.npm_lifecycle_event === "lint",
+  skipValidation: false,
 });
