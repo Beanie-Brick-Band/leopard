@@ -1,4 +1,7 @@
 "use client";
+
+import Link from "next/link";
+
 export default function HomePage() {
   return (
     <main className="relative min-h-screen overflow-x-hidden overflow-y-auto overscroll-contain bg-zinc-950 text-white">
@@ -179,6 +182,13 @@ export default function HomePage() {
               students with a modern IDE while capturing granular version
               history to verify the authenticity of their work.
             </p>
+
+            <Link
+              href="/app"
+              className="bg-foreground text-background w-fit rounded-sm px-8 py-2"
+            >
+              Open
+            </Link>
           </div>
 
           {/* Right side - Staggered Feature Cards */}
