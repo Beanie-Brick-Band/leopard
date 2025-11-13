@@ -29,5 +29,8 @@
     "turbo": "^2.5.8",
     "typescript": "catalog:"
   },
-  "prettier": "@package/prettier-config"
+  "prettier": "@package/prettier-config",
+  "dependencies": {
+    "convex": "^1.29.0"
+  }
 }
