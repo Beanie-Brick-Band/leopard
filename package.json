@@ -29,5 +29,13 @@
     "turbo": "^2.5.8",
     "typescript": "catalog:"
   },
-  "prettier": "@package/prettier-config"
+  "prettier": "@package/prettier-config",
+  "dependencies": {
+    "@t3-oss/env-core": "^0.13.8",
+    "convex": "^1.29.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
 }

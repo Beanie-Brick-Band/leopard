@@ -1,9 +1,17 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
+
+import { api } from "@package/backend/convex/_generated/api";
+import { ConvexHttpClient } from "convex/browser";
+
 import * as vscode from "vscode";
 
 export async function activate(context: vscode.ExtensionContext) {
   const channel = vscode.window.createOutputChannel("eventlogger");
+
+  const client = new ConvexHttpClient("https://scrupulous-basilisk-407.convex.cloud/");
+  const user = await client.query(api.auth.getCurrentUser, {});
+  channel.appendLine(`User: ${user ? user.email : "Not logged in"}`);
 
   function timestamp() {
     return new Date().toISOString();

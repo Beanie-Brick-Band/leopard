@@ -33,30 +33,6 @@ export default function HomePage() {
         </span>
       </a>
 
-      <style jsx>{`
-        @keyframes blob {
-          0%,
-          100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(150px, -100px) scale(1.3);
-          }
-          66% {
-            transform: translate(-100px, 150px) scale(0.8);
-          }
-        }
-        .animate-blob {
-          animation: blob 10s infinite ease-in-out;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
-
       <div className="relative z-10 container mx-auto flex min-h-screen flex-col justify-between px-4 py-4 pt-20 sm:px-6 sm:py-6 sm:pt-24">
         {/* Hero Section - Asymmetric Layout */}
         <div className="my-auto grid flex-1 items-center gap-6 sm:gap-8 lg:grid-cols-2">
