@@ -5,7 +5,12 @@
   "type": "module",
   "packageManager": "pnpm@10.19.0",
   "license": "MIT",
-  "description": "A basic Effect package",
+  "description": "TypeScript SDK for the Coder platform built with Effect",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/leopard.git",
+    "directory": "packages/coder"
+  },
   "scripts": {
     "codegen": "build-utils prepare-v2",
     "build": "pnpm build-esm && pnpm build-annotate && pnpm build-cjs && build-utils pack-v2",
@@ -23,6 +28,9 @@
     "changeset-publish": "pnpm build && TEST_DIST= pnpm vitest && changeset publish"
   },
   "dependencies": {
+    "@effect/platform": "^0.93.1",
+    "@effect/platform-node": "^0.100.0",
+    "@effect/schema": "^0.75.5",
     "effect": "^3.17.7"
   },
   "devDependencies": {
