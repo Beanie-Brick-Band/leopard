@@ -1,10 +1,9 @@
+import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod/v4";
 
-const envSchema = z.object({
-  CODER_URL: z.url(),
+export const env = createEnv({
+  server: {
+    CODER_URL: z.string().url(),
+  },
+  runtimeEnv: process.env,
 });
-
-export const env = envSchema.parse({
-  CODER_URL: process.env.CODER_URL,
-});
-
