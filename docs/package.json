@@ -20,16 +20,13 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@package/prettier-config": "workspace:*",
     "@tailwindcss/postcss": "^4.1.16",
     "@types/mdx": "^2.0.13",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "postcss": "^8.5.6",
-    "prettier": "catalog:",
     "tailwindcss": "^4.1.16",
     "typescript": "^5.9.3"
-  },
-  "prettier": "@package/prettier-config"
+  }
 }
