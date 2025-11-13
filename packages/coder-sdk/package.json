@@ -24,4 +24,7 @@
     "@types/node": "catalog:",
     "typescript": "catalog:"
   }
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
 }
