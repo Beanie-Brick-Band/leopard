@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Plus_Jakarta_Sans, Syne } from "next/font/google";
+import { Toaster } from "sonner";
 
 import { cn } from "@package/ui";
 import { ThemeProvider } from "@package/ui/theme";
@@ -9,6 +10,7 @@ import { env } from "~/env";
 import "~/app/styles.css";
 
 import { ConvexClientProvider } from "~/components/convex-client-provider";
+import Header from "~/components/header";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -68,7 +70,11 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         )}
       >
         <ConvexClientProvider>
-          <ThemeProvider>{props.children}</ThemeProvider>
+          <ThemeProvider>
+            <Header />
+            {props.children}
+            <Toaster />
+          </ThemeProvider>
         </ConvexClientProvider>
       </body>
     </html>

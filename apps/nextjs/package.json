@@ -17,11 +17,13 @@
     "@package/ui": "workspace:*",
     "@package/validators": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.8",
+    "@tanstack/react-form": "catalog:",
     "better-auth": "1.3.27",
     "convex": "^1.29.0",
     "next": "^16.0.0",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
+    "sonner": "^2.0.7",
     "zod": "catalog:"
   },
   "devDependencies": {
