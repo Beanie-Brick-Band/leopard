@@ -180,6 +180,15 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
+  apps/test:
+    dependencies:
+      '@package/coder-sdk':
+        specifier: workspace:*
+        version: link:../../packages/coder-sdk
+      tsx:
+        specifier: ^4.19.2
+        version: 4.20.6
+
   packages/backend:
     dependencies:
       convex:
