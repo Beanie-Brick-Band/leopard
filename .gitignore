@@ -47,5 +47,8 @@ dist/
 # tanstack
 .tanstack
 
+# generated fumadocs source
+.source
+
 # test app
 apps/test/*
