@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Schema } from "effect"
 
 /**
  * Schema for a role assigned to a user
@@ -6,7 +6,7 @@ import { Schema } from "effect";
 export class Role extends Schema.Class<Role>("Role")({
   display_name: Schema.String,
   name: Schema.String,
-  organization_id: Schema.NullOr(Schema.String),
+  organization_id: Schema.NullOr(Schema.String)
 }) {}
 
 /**
@@ -25,24 +25,24 @@ export class User extends Schema.Class<User>("User")({
   organization_ids: Schema.Array(Schema.String),
   roles: Schema.Array(Role),
   login_type: Schema.String,
-  theme_preference: Schema.String,
+  theme_preference: Schema.String
 }) {}
 
 /**
  * Schema for the list users response
  */
 export class GetUsersResponse extends Schema.Class<GetUsersResponse>(
-  "GetUsersResponse",
+  "GetUsersResponse"
 )({
   count: Schema.Number.pipe(Schema.int()),
-  users: Schema.Array(User),
+  users: Schema.Array(User)
 }) {}
 
 /**
  * Schema for list users query parameters
  */
 export class ListUsersParams extends Schema.Class<ListUsersParams>(
-  "ListUsersParams",
+  "ListUsersParams"
 )({
   /**
    * Search query to filter users by username or email
@@ -56,10 +56,10 @@ export class ListUsersParams extends Schema.Class<ListUsersParams>(
    * Number of users to skip for pagination
    */
   offset: Schema.optional(
-    Schema.Number.pipe(Schema.int(), Schema.nonNegative()),
+    Schema.Number.pipe(Schema.int(), Schema.nonNegative())
   ),
   /**
    * Filter by user status (e.g., "active", "suspended")
    */
-  status: Schema.optional(Schema.String),
+  status: Schema.optional(Schema.String)
 }) {}
