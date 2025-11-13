@@ -49,7 +49,10 @@
       "env": ["CODER_URL"]
     }
   },
-  "globalEnv": ["CONVEX_URL", "AUTH_SECRET", "PORT"],
+  "globalEnv": [
+    "CONVEX_DEPLOYMENT",
+    "SITE_URL"
+  ],
   "globalPassThroughEnv": [
     "NODE_ENV",
     "CI",
