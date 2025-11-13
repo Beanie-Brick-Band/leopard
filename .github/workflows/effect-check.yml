@@ -1,4 +1,4 @@
-name: Check
+name: Effect Check
 
 on:
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        uses: ./.github/actions/setup
+        uses: ./.github/actions/effect-setup
       - run: pnpm codegen
       - name: Check source state
         run: git add src && git diff-index --cached HEAD --exit-code src
@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        uses: ./.github/actions/setup
+        uses: ./.github/actions/effect-setup
       - run: pnpm check
 
   lint:
@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        uses: ./.github/actions/setup
+        uses: ./.github/actions/effect-setup
       - run: pnpm lint
 
   test:
@@ -53,5 +53,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        uses: ./.github/actions/setup
+        uses: ./.github/actions/effect-setup
       - run: pnpm test
+

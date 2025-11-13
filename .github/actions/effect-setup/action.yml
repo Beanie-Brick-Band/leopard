@@ -1,5 +1,5 @@
-name: Setup
-description: Perform standard setup and install dependencies using pnpm.
+name: Effect Setup
+description: Perform standard setup and install dependencies using pnpm for Effect packages.
 inputs:
   node-version:
     description: The version of Node.js to install
@@ -19,3 +19,4 @@ runs:
     - name: Install dependencies
       shell: bash
       run: pnpm install
+

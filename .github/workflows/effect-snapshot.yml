@@ -1,4 +1,4 @@
-name: Snapshot
+name: Effect Snapshot
 
 on:
   pull_request:
@@ -16,9 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        uses: ./.github/actions/setup
+        uses: ./.github/actions/effect-setup
       - name: Build package
         run: pnpm build
       - name: Create snapshot
         id: snapshot
         run: pnpx pkg-pr-new@0.0.24 publish --pnpm --comment=off
+
