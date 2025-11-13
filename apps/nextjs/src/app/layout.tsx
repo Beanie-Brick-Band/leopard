@@ -9,6 +9,7 @@ import { env } from "~/env";
 
 import "~/app/styles.css";
 
+import { AuthProvider } from "~/components/auth-provider";
 import { ConvexClientProvider } from "~/components/convex-client-provider";
 import Header from "~/components/header";
 
@@ -70,11 +71,13 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         )}
       >
         <ConvexClientProvider>
-          <ThemeProvider>
-            <Header />
-            {props.children}
-            <Toaster />
-          </ThemeProvider>
+          <AuthProvider>
+            <ThemeProvider>
+              <Header />
+              {props.children}
+              <Toaster />
+            </ThemeProvider>
+          </AuthProvider>
         </ConvexClientProvider>
       </body>
     </html>
