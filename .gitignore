@@ -46,3 +46,6 @@ dist/
 
 # tanstack
 .tanstack
+
+# generated fumadocs source
+.source
