@@ -2,7 +2,7 @@ import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
   input:
-    "https://raw.githubusercontent.com/coder/coder/refs/tags/v2.28.0/coderd/apidoc/swagger.json",
+    "./v2.28.0-swagger.json",
   output: "./src",
   plugins: [
     {
