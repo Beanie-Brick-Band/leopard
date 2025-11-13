@@ -18,24 +18,25 @@ pnpm add @package/coder
 ## Quick Start
 
 ```typescript
-import { makeCoderClient } from "@package/coder"
-import { Effect } from "effect"
+import { Effect } from "effect";
+
+import { makeCoderClient } from "@package/coder";
 
 const program = Effect.gen(function* () {
   const client = yield* makeCoderClient({
     baseUrl: "https://coder.example.com",
-    apiToken: process.env.CODER_API_TOKEN!
-  })
+    apiToken: process.env.CODER_API_TOKEN!,
+  });
 
-  const result = yield* client.users.listUsers({ limit: 10 })
+  const result = yield* client.users.listUsers({ limit: 10 });
 
-  console.log(`Found ${result.count} users`)
+  console.log(`Found ${result.count} users`);
   for (const user of result.users) {
-    console.log(`- ${user.username} (${user.email})`)
+    console.log(`- ${user.username} (${user.email})`);
   }
-})
+});
 
-Effect.runPromise(program)
+Effect.runPromise(program);
 ```
 
 ## Configuration
@@ -44,10 +45,10 @@ Effect.runPromise(program)
 
 ```typescript
 interface CoderClientOptions {
-  baseUrl: string      // Coder deployment URL
-  apiToken: string     // API authentication token
-  timeout?: number     // Request timeout in ms (default: 30000)
-  retries?: number     // Number of retries (default: 3)
+  baseUrl: string; // Coder deployment URL
+  apiToken: string; // API authentication token
+  timeout?: number; // Request timeout in ms (default: 30000)
+  retries?: number; // Number of retries (default: 3)
 }
 ```
 
@@ -60,12 +61,14 @@ interface CoderClientOptions {
 List all users in the Coder deployment.
 
 ```typescript
-const result = yield* client.users.listUsers({
-  q: "search-term",      // Search by username or email
-  limit: 25,             // Max results (default: 25, max: 100)
-  offset: 0,             // Pagination offset
-  status: "active"       // Filter by status
-})
+const result =
+  yield *
+  client.users.listUsers({
+    q: "search-term", // Search by username or email
+    limit: 25, // Max results (default: 25, max: 100)
+    offset: 0, // Pagination offset
+    status: "active", // Filter by status
+  });
 ```
 
 ## Architecture

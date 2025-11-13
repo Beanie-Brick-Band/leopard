@@ -1,8 +1,9 @@
-import { NodeHttpClient } from "@effect/platform-node"
-import { Effect, Layer } from "effect"
-import { CoderConfig, CoderConfigService } from "./Config.js"
-import { CoderHttpClientLive } from "./HttpClient.js"
-import { UsersService, UsersServiceLive } from "./services/Users.js"
+import { NodeHttpClient } from "@effect/platform-node";
+import { Effect, Layer } from "effect";
+
+import { CoderConfig, CoderConfigService } from "./Config.js";
+import { CoderHttpClientLive } from "./HttpClient.js";
+import { UsersService, UsersServiceLive } from "./services/Users.js";
 
 /**
  * Configuration options for creating a Coder client
@@ -11,22 +12,22 @@ export interface CoderClientOptions {
   /**
    * The base URL of the Coder deployment (e.g., "https://coder.example.com")
    */
-  baseUrl: string
+  baseUrl: string;
 
   /**
    * API token for authentication
    */
-  apiToken: string
+  apiToken: string;
 
   /**
    * Optional timeout in milliseconds for HTTP requests (default: 30000)
    */
-  timeout?: number
+  timeout?: number;
 
   /**
    * Optional number of retries for failed requests (default: 3)
    */
-  retries?: number
+  retries?: number;
 }
 
 /**
@@ -39,15 +40,15 @@ export const makeCoderLayer = (options: CoderClientOptions) => {
       baseUrl: options.baseUrl,
       apiToken: options.apiToken,
       ...(options.timeout !== undefined && { timeout: options.timeout }),
-      ...(options.retries !== undefined && { retries: options.retries })
-    })
-  )
+      ...(options.retries !== undefined && { retries: options.retries }),
+    }),
+  );
 
   return Layer.provideMerge(
     UsersServiceLive,
-    Layer.provideMerge(CoderHttpClientLive, configLayer)
-  ).pipe(Layer.provide(NodeHttpClient.layerUndici))
-}
+    Layer.provideMerge(CoderHttpClientLive, configLayer),
+  ).pipe(Layer.provide(NodeHttpClient.layerUndici));
+};
 
 /**
  * Creates a Coder SDK client with the specified configuration
@@ -69,18 +70,20 @@ export const makeCoderLayer = (options: CoderClientOptions) => {
  * ```
  */
 export const makeCoderClient = (options: CoderClientOptions) => {
-  const layer = makeCoderLayer(options)
+  const layer = makeCoderLayer(options);
 
-  return Effect.gen(function*() {
-    const users = yield* UsersService
+  return Effect.gen(function* () {
+    const users = yield* UsersService;
 
     return {
-      users
-    }
-  }).pipe(Effect.provide(layer))
-}
+      users,
+    };
+  }).pipe(Effect.provide(layer));
+};
 
 /**
  * Type of the Coder SDK client
  */
-export type CoderClient = Effect.Effect.Success<ReturnType<typeof makeCoderClient>>
+export type CoderClient = Effect.Effect.Success<
+  ReturnType<typeof makeCoderClient>
+>;

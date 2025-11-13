@@ -1,7 +1,8 @@
-import * as HttpClient from "@effect/platform/HttpClient"
-import * as HttpClientRequest from "@effect/platform/HttpClientRequest"
-import { Context, Effect, Layer } from "effect"
-import { CoderConfigService } from "./Config.js"
+import * as HttpClient from "@effect/platform/HttpClient";
+import * as HttpClientRequest from "@effect/platform/HttpClientRequest";
+import { Context, Effect, Layer } from "effect";
+
+import { CoderConfigService } from "./Config.js";
 
 /**
  * Tag for the Coder HTTP client service
@@ -16,9 +17,9 @@ export class CoderHttpClient extends Context.Tag("CoderHttpClient")<
  */
 export const CoderHttpClientLive = Layer.effect(
   CoderHttpClient,
-  Effect.gen(function*() {
-    const config = yield* CoderConfigService
-    const client = yield* HttpClient.HttpClient
+  Effect.gen(function* () {
+    const config = yield* CoderConfigService;
+    const client = yield* HttpClient.HttpClient;
 
     return client.pipe(
       HttpClient.mapRequest((req) =>
@@ -26,9 +27,9 @@ export const CoderHttpClientLive = Layer.effect(
           HttpClientRequest.prependUrl(`${config.baseUrl}/api/v2`),
           HttpClientRequest.setHeader("Coder-Session-Token", config.apiToken),
           HttpClientRequest.setHeader("Content-Type", "application/json"),
-          HttpClientRequest.setHeader("Accept", "application/json")
-        )
-      )
-    )
-  })
-)
+          HttpClientRequest.setHeader("Accept", "application/json"),
+        ),
+      ),
+    );
+  }),
+);

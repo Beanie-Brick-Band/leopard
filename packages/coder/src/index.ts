@@ -26,15 +26,15 @@
  * @packageDocumentation
  */
 
-export { makeCoderClient, makeCoderLayer } from "./Client.js"
-export type { CoderClient, CoderClientOptions } from "./Client.js"
+export { makeCoderClient, makeCoderLayer } from "./Client.js";
+export type { CoderClient, CoderClientOptions } from "./Client.js";
 
-export { CoderConfig, CoderConfigService } from "./Config.js"
+export { CoderConfig, CoderConfigService } from "./Config.js";
 
-export * from "./Errors.js"
+export * from "./Errors.js";
 
-export { UsersService, UsersServiceLive } from "./services/Users.js"
+export { UsersService, UsersServiceLive } from "./services/Users.js";
 
-export * from "./schemas/User.js"
+export * from "./schemas/User.js";
 
-export { CoderHttpClient, CoderHttpClientLive } from "./HttpClient.js"
+export { CoderHttpClient, CoderHttpClientLive } from "./HttpClient.js";
