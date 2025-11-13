@@ -10,13 +10,15 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "openapi-ts",
+    "build": "dotenv -e .env -- openapi-ts",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.87.3",
     "@package/tsconfig": "workspace:*",
-    "typescript": "catalog:"
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "zod": "catalog:"
   }
 }

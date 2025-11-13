@@ -1,4 +1,5 @@
 import { defineConfig } from "@hey-api/openapi-ts";
+import { env } from "./env";
 
 export default defineConfig({
   input:
@@ -7,7 +8,7 @@ export default defineConfig({
   plugins: [
     {
       name: '@hey-api/sdk',
-      baseUrl: "https://coder.nolapse.tech/api/v2",
+      baseUrl: `${env.CODER_URL}/api/v2`,
       auth: true,
 
     }
