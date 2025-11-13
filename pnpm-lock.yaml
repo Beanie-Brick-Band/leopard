@@ -267,6 +267,13 @@ importers:
         version: 5.9.3
 
   packages/coder-sdk:
+    dependencies:
+      '@t3-oss/env-core':
+        specifier: ^0.13.8
+        version: 0.13.8(arktype@2.1.20)(typescript@5.9.3)(valibot@1.0.0-beta.15(typescript@5.9.3))(zod@4.1.12)
+      zod:
+        specifier: 'catalog:'
+        version: 4.1.12
     devDependencies:
       '@hey-api/openapi-ts':
         specifier: ^0.87.3
@@ -280,9 +287,6 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      zod:
-        specifier: 'catalog:'
-        version: 4.1.12
 
   packages/ui:
     dependencies:

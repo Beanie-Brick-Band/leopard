@@ -15,15 +15,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@t3-oss/env-core": "catalog:",
+    "@t3-oss/env-core": "^0.13.8",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.87.3",
     "@package/tsconfig": "workspace:*",
-    "@types/node": "catalog:",
-    "typescript": "catalog:"
-  }
     "@types/node": "catalog:",
     "typescript": "catalog:"
   }
