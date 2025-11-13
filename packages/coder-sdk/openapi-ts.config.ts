@@ -7,11 +7,14 @@ export default defineConfig({
   output: "./src",
   plugins: [
     {
+      name: '@hey-api/client-fetch',
+      baseUrl: `${env.CODER_URL}/api/v2`,
+    },
+    {
       name: '@hey-api/sdk',
       baseUrl: `${env.CODER_URL}/api/v2`,
       auth: true,
 
     }
-    
   ]
 });
