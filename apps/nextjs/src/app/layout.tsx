@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Syne, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono, Plus_Jakarta_Sans, Syne } from "next/font/google";
 
 import { cn } from "@package/ui";
 import { ThemeProvider } from "@package/ui/theme";
@@ -15,10 +15,12 @@ export const metadata: Metadata = {
       : "http://localhost:3000",
   ),
   title: "Leopard - Authentic Code, Verified Learning",
-  description: "A web-based platform designed for post-secondary institutions to ensure academic integrity in coding assignments. Leopard provides students with a modern IDE while capturing granular version history to verify the authenticity of their work.",
+  description:
+    "A web-based platform designed for post-secondary institutions to ensure academic integrity in coding assignments. Leopard provides students with a modern IDE while capturing granular version history to verify the authenticity of their work.",
   openGraph: {
     title: "Leopard - Authentic Code, Verified Learning",
-    description: "A web-based platform for ensuring academic integrity in coding assignments with version tracking and replay capabilities.",
+    description:
+      "A web-based platform for ensuring academic integrity in coding assignments with version tracking and replay capabilities.",
     url: "https://leopard-ide.vercel.app",
     siteName: "Leopard",
   },
@@ -63,9 +65,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           jetbrainsMono.variable,
         )}
       >
-        <ThemeProvider>
-          {props.children}
-        </ThemeProvider>
+        <ThemeProvider>{props.children}</ThemeProvider>
       </body>
     </html>
   );

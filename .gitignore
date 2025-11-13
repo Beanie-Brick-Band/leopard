@@ -46,3 +46,6 @@ dist/
 
 # tanstack
 .tanstack
+
+# test app
+apps/test/*
