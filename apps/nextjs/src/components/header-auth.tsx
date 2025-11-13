@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { UserButton } from "@package/ui";
 import { Button } from "@package/ui/button";
 
 import { authClient } from "~/lib/auth-client";
@@ -13,13 +14,13 @@ function HeaderAuth() {
     return (
       <div>
         <Button>
-          <Link href="/login">Log In</Link>
+          <Link href="/auth/login">Log In</Link>
         </Button>
       </div>
     );
   }
 
-  return <div>Logged IN</div>;
+  return <UserButton size="icon" />;
 }
 
 export default HeaderAuth;
