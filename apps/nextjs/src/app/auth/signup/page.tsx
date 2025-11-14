@@ -63,24 +63,22 @@ export default function SignupPage() {
   });
 
   async function onSubmit(data: SignupFormValues) {
-    try {
-      const { error } = await authClient.signUp.email({
+    await authClient.signUp.email(
+      {
         email: data.email,
         password: data.password,
         name: data.name,
-      });
-
-      if (error) {
-        toast.error(error.message ?? "Failed to create account");
-        return;
-      }
-
-      toast.success("Account created successfully!");
-      router.push("/app");
-    } catch (err) {
-      toast.error("An unexpected error occurred");
-      console.error(err);
-    }
+      },
+      {
+        onSuccess: () => {
+          toast.success("Account created successfully!");
+          router.push("/app");
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message);
+        },
+      },
+    );
   }
 
   return (
@@ -185,7 +183,7 @@ export default function SignupPage() {
           <p className="text-muted-foreground text-center text-sm">
             Already have an account?{" "}
             <Link
-              href="/login"
+              href="/auth/login"
               className="text-primary font-medium hover:underline"
             >
               Sign in

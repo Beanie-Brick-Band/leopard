@@ -47,23 +47,21 @@ export default function LoginPage() {
   });
 
   async function onSubmit(data: LoginFormValues) {
-    try {
-      const { error } = await authClient.signIn.email({
+    await authClient.signIn.email(
+      {
         email: data.email,
         password: data.password,
-      });
-
-      if (error) {
-        toast.error(error.message ?? "Failed to sign in");
-        return;
-      }
-
-      toast.success("Successfully signed in!");
-      router.push("/app");
-    } catch (err) {
-      toast.error("An unexpected error occurred");
-      console.error(err);
-    }
+      },
+      {
+        onSuccess: () => {
+          toast.success("Successfully signed in!");
+          router.push("/app");
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message);
+        },
+      },
+    );
   }
 
   return (
