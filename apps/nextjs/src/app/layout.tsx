@@ -8,6 +8,8 @@ import { env } from "~/env";
 
 import "~/app/styles.css";
 
+import { ConvexClientProvider } from "~/components/convex-client-provider";
+
 export const metadata: Metadata = {
   metadataBase: new URL(
     env.VERCEL_ENV === "production"
@@ -65,7 +67,9 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           jetbrainsMono.variable,
         )}
       >
-        <ThemeProvider>{props.children}</ThemeProvider>
+        <ConvexClientProvider>
+          <ThemeProvider>{props.children}</ThemeProvider>
+        </ConvexClientProvider>
       </body>
     </html>
   );
