@@ -57,7 +57,7 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidChangeTextDocument((e) => {
       if (e.document.isDirty) {
         channel.appendLine(
-          `[${timestamp()}] ${e.document.uri.fsPath} - ${e.contentChanges.map((change) => `${change.range.start.line}:${change.range.start.character} - ${change.range.end.line}:${change.range.end.character} - ${change.text}`).join(" --- ")}`,
+          `[${timestamp()}] ${e.document.uri.fsPath} - ${e.contentChanges.map((change) => `${change.range.start.line}:${change.range.start.character} - ${change.range.end.line}:${change.range.end.character}; ${change.rangeOffset}:${change.rangeLength} - ${change.text}`).join(" --- ")}`,
         );
       }
     }),
@@ -94,8 +94,6 @@ export async function activate(context: vscode.ExtensionContext) {
       );
     }),
   );
-
-  context.subscriptions.push(...listeners);
 }
 
 export function deactivate() {
