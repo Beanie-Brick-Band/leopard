@@ -1,0 +1,51 @@
+# helmfile.yml
+# Minimal reproducible Helmfile for your Coder Kubernetes setup
+
+repositories:
+  - name: jetstack
+    url: https://charts.jetstack.io
+
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+  - name: coder-v2
+    url: https://helm.coder.com/v2
+
+  - name: traefik
+    url: https://traefik.github.io/charts
+
+releases:
+  # --- Cert Manager ---
+  - name: cert-manager
+    namespace: cert-manager
+    chart: jetstack/cert-manager
+    version: v1.19.1
+    values:
+      - ./ssl.yml
+
+  # --- PostgreSQL ---
+  - name: postgresql
+    namespace: coder
+    chart: bitnami/postgresql
+    version: 18.1.8
+
+  # --- Coder Core ---
+  - name: coder
+    namespace: coder
+    chart: coder-v2/coder
+    version: 2.28.0
+    values:
+      - ./values.yml              
+      - ./rbac.yml         # This is needed when the workspaces are running in a separated namespace         
+
+  # --- Traefik CRDs ---
+  - name: traefik-crd
+    namespace: kube-system
+    chart: traefik/traefik-crd
+    version: 34.2.1+up34.2.0
+
+  # --- Traefik Controller ---
+  - name: traefik
+    namespace: kube-system
+    chart: traefik/traefik
+    version: 34.2.1+up34.2.0
