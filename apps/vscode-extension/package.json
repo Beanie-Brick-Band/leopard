@@ -13,33 +13,6 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "contributes": {
-    "configuration": {
-      "title": "keylogger",
-      "properties": {
-        "keylogger.debounceMs": {
-          "type": "integer",
-          "default": 1000,
-          "description": "Debounce delay in milliseconds. If you set this to something greater than 0, the extension will buffer your input until the delay has elapsed and then log it out combined. The setting keylogger.textMaxLength will be applied to the resulting combined string."
-        },
-        "keylogger.minDelayMs": {
-          "type": "integer",
-          "default": -1,
-          "description": "The minimum delay between two events in milliseconds. Faster inputs are simply ignored. Set to <= 0 to log everything."
-        },
-        "keylogger.textMaxLength": {
-          "type": "integer",
-          "default": -1,
-          "description": "Set a maximum length of each captured text. Everything above is cut off. A value of 0 effectively omits the text body in the log. Set to -1 to not cut off anything."
-        },
-        "keylogger.outputFile": {
-          "type": "string",
-          "default": "",
-          "description": "Input a file path to log to, *additionally* to the output channel. Set to an empty string to not write out to any file."
-        }
-      }
-    }
-  },
   "scripts": {
     "test": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/extensionTests.js",
     "pretest": "pnpm run compile-web",
