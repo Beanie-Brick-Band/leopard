@@ -1,20 +1,56 @@
 "use client";
 
-import React, { Component } from "react";
-// Note: ScrubberProps is a TypeScript interface and is not used for JS projects
-import { Scrubber, ScrubberProps } from "react-scrubber";
+import React from "react";
+import { Scrubber } from "react-scrubber";
+import ShikiHighlighter from "react-shiki";
 
 import "react-scrubber/lib/scrubber.css";
 
-export const TextReplayScrubberComponent: React.FC<ScrubberProps> = () => {
-  const testToReplay =
-    "Display This Text Character by Character Based on Scrubber Position";
+export const TextReplayScrubberComponent: React.FC = () => {
+  const testToReplay = `def fizzbuzz(n):
+    for i in range(1, n + 1):
+        if i % 3 == 0 and i % 5 == 0:
+            print("FizzBuzz")
+        elif i % 3 == 0:
+            print("Fizz")
+        elif i % 5 == 0:
+            print("Buzz")
+        else:
+            print(i)
+
+fizzbuzz(100)
+
+# String concatenation implementation
+def fizzbuzz2(n):
+    result = []
+    for i in range(1, n + 1):
+        output = ""
+        if i % 3 == 0:
+            output += "Fizz"
+        if i % 5 == 0:
+            output += "Buzz"
+        result.append(output if output else str(i))
+    
+    for item in result:
+        print(item)
+
+fizzbuzz2(100)
+
+# Join implementation
+def fizzbuzz3(n):
+    fizz_buzz_map = {3: "Fizz", 5: "Buzz"}
+    
+    for i in range(1, n + 1):
+        output = "".join(word for divisor, word in fizz_buzz_map.items() if i % divisor == 0)
+        print(output or i)
+
+fizzbuzz3(100)`;
 
   const SNAP_RELEASE_THRESHOLD = 0.5; // when released within this distance, snap to marker
   const STICK_THRESHOLD = 0.5; // while dragging, within this distance the cursor will "stick"
   const STICK_HYSTERESIS = 1.0; // distance to leave a stick once engaged
 
-  const markers = [74, 88];
+  const markers = [30.7, 70.4];
 
   const markerPositions = markers.map((m) => ({
     start: m - 0.3,
@@ -33,15 +69,20 @@ export const TextReplayScrubberComponent: React.FC<ScrubberProps> = () => {
     stickingTo: null,
   });
 
-  const nearestMarker = (v: number) => {
-    if (!markers || markers.length === 0) return null;
-    let nearest = markers[0];
+  const nearestMarker = (
+    v: number,
+  ): { marker: number; distance: number } | null => {
+    if (markers.length === 0) return null;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    let nearest = markers[0]!;
     let best = Math.abs(v - nearest);
     for (let i = 1; i < markers.length; i++) {
-      const d = Math.abs(v - markers[i]);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const marker = markers[i]!;
+      const d = Math.abs(v - marker);
       if (d < best) {
         best = d;
-        nearest = markers[i];
+        nearest = marker;
       }
     }
     return { marker: nearest, distance: best };
@@ -55,9 +96,10 @@ export const TextReplayScrubberComponent: React.FC<ScrubberProps> = () => {
     // On release, if within SNAP_RELEASE_THRESHOLD of a marker, snap to it.
     const found = nearestMarker(value);
     if (found && found.distance <= SNAP_RELEASE_THRESHOLD) {
+      const markerValue = found.marker;
       setState((s) => ({
         ...s,
-        value: found.marker,
+        value: markerValue,
         state: "Scrub End",
         isScrubbing: false,
         stickingTo: null,
@@ -83,10 +125,10 @@ export const TextReplayScrubberComponent: React.FC<ScrubberProps> = () => {
       const found = nearestMarker(value);
       // If currently sticking to a marker, only release if we moved beyond hysteresis
       if (s.stickingTo != null) {
-        const dist = Math.abs(value - (s.stickingTo as number));
+        const dist = Math.abs(value - s.stickingTo);
         if (dist <= STICK_HYSTERESIS) {
           // Keep sticking
-          return { ...s, value: s.stickingTo as number, state: "Scrub Change" };
+          return { ...s, value: s.stickingTo, state: "Scrub Change" };
         } else {
           // Leave stick
           return { ...s, value, state: "Scrub Change", stickingTo: null };
@@ -112,9 +154,21 @@ export const TextReplayScrubberComponent: React.FC<ScrubberProps> = () => {
   const displayedText = testToReplay.slice(0, charCount);
 
   return (
-    <div className="w-full space-y-4">
-      <div className="min-h-[3rem] rounded border border-gray-200 bg-gray-50 p-4">
-        <p className="font-mono text-lg text-black">{displayedText}</p>
+    <div className="h-max w-full space-y-4">
+      <div className="flex h-[75vh] flex-col-reverse overflow-y-auto">
+        <ShikiHighlighter
+          language="python"
+          className="w-full grow [&>pre]:h-full"
+          theme={{
+            light: "github-light",
+            dark: "github-dark",
+          }}
+          defaultColor="light-dark()"
+          showLineNumbers={true}
+          showLanguage={true}
+        >
+          {displayedText}
+        </ShikiHighlighter>
       </div>
 
       <Scrubber
