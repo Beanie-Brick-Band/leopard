@@ -6,7 +6,7 @@
       "dependsOn": ["^topo"]
     },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "generate"],
       "outputs": [".cache/tsbuildinfo.json", "dist/**"]
     },
     "dev": {
@@ -43,15 +43,15 @@
     "ui-add": {
       "cache": false,
       "interactive": true
+    },
+    "generate": {
+      "cache": false,
+      "env": ["CODER_URL"]
     }
   },
   "globalEnv": [
-    "POSTGRES_URL",
-    "AUTH_DISCORD_ID",
-    "AUTH_DISCORD_SECRET",
-    "AUTH_REDIRECT_PROXY_URL",
-    "AUTH_SECRET",
-    "PORT"
+    "CONVEX_DEPLOYMENT",
+    "SITE_URL"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
