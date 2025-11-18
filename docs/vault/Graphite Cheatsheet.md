@@ -1,0 +1,60 @@
+# Starting a new branch
+
+```
+gt checkout main
+```
+
+Check out to main branch, Graphite will handle all branching by itself.
+
+# Creating your PR
+
+```
+gt add .
+```
+
+Adds all your current changes to your Graphite change. You can also specify which file individually by replacing `.` with the file name.
+
+```
+gt create -m "Feat(DB): Deleted Prod"
+```
+
+Creates a graphite change using all previously added files, similar to creating a commit. You can do this multiple times to add multiple changes before submitting your stack (creating a PR).
+Creates a graphite change using all previously added files, similar to creating a commit. You can do this multiple times to add multiple changes before submitting your stack (creating a PR).
+
+```
+gt ss
+```
+
+Submit stack to graphite. This creates a PR with all your graphite changes.
+
+```
+gt add .
+gt create -m "Hello world"
+gt ss
+```
+
+Above is a general guideline for creating a PR with your current changes.
+
+```
+gt add .
+gt modify
+gt ss
+```
+
+Above is a general guideline for updating an existing PR to address any needed changes.
+
+# Pulling changes in
+
+```
+gt stack restack
+```
+
+Rebases the stack so other people's work is applied into your branch.
+
+# Checking what files are tracked
+
+```
+gt status
+```
+
+Checks the status of all your files. This will list what has and has not been added to your graphite changes yet.
