@@ -59,6 +59,7 @@ jobs:
   semantic-commits-pr-lint:
     name: Run Semantic Commit PR Check
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     permissions:
       pull-requests: write
       contents: read

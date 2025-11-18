@@ -13,9 +13,12 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@convex-dev/better-auth": "0.9.7",
     "@package/ui": "workspace:*",
     "@package/validators": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.8",
+    "better-auth": "1.3.27",
+    "convex": "^1.29.0",
     "next": "^16.0.0",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
