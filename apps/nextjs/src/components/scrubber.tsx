@@ -155,7 +155,7 @@ fizzbuzz3(100)`;
 
   return (
     <div className="h-max w-full space-y-4">
-      <div className="flex h-[75vh] flex-col-reverse overflow-y-auto">
+      <div className="flex h-[75vh] flex-col-reverse overflow-y-auto rounded-md">
         <ShikiHighlighter
           language="python"
           className="w-full grow [&>pre]:h-full"
@@ -171,22 +171,24 @@ fizzbuzz3(100)`;
         </ShikiHighlighter>
       </div>
 
-      <Scrubber
-        min={0}
-        max={100}
-        value={state.value}
-        onScrubStart={handleScrubStart}
-        onScrubEnd={handleScrubEnd}
-        onScrubChange={handleScrubChange}
-        markers={markerPositions}
-      />
+      <div className="h-8">
+        <Scrubber
+          min={0}
+          max={100}
+          value={state.value}
+          onScrubStart={handleScrubStart}
+          onScrubEnd={handleScrubEnd}
+          onScrubChange={handleScrubChange}
+          markers={markerPositions}
+          className="[&_.bar]:h-4!"
+        />
+      </div>
 
-      <div className="mt-4 flex gap-8 text-center text-sm text-gray-600">
+      <div className="text-md mt-4 flex gap-8 text-center text-gray-300">
         <p>Position: {state.value.toFixed(1)}</p>
         <p>
-          Characters: {charCount}/{testToReplay.length}
+          Remaining Characters: {charCount}/{testToReplay.length}
         </p>
-        <p>State: {state.state}</p>
       </div>
     </div>
   );
