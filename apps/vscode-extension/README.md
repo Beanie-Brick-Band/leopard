@@ -6,6 +6,7 @@ This is the README for your extension "leopard". After writing up a brief descri
 
 1. Open vscode under the apps/extension directory
 2. Run vscode's debugger (or press the F5 key). This will open up a new vscode instance with the extension downloaded
+3. go to the output tab and select the output for eventlogger
 
 ## Features
 

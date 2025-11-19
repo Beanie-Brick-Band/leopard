@@ -9,16 +9,10 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
   "browser": "./dist/web/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "leopard.helloWorld",
-        "title": "Hello World"
-      }
-    ]
-  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "scripts": {
     "test": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/extensionTests.js",
     "pretest": "pnpm run compile-web",
