@@ -26,4 +26,15 @@
   body {
     letter-spacing: var(--tracking-normal);
   }
+  .scrubber .bar__thumb {
+    width: 16px !important;
+    height: 16px !important;
+    border-radius: 10px !important;
+  }
+  .scrubber.hover .bar__thumb {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 10px !important;
+
+  }
 }
