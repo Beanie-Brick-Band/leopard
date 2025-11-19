@@ -41,6 +41,9 @@ overrides:
   '@types/minimatch': 5.1.2
   vite: 7.1.12
 
+patchedDependencies:
+  '@types/vscode': patches/@types__vscode.patch
+
 publicHoistPattern:
   - '@ianvs/prettier-plugin-sort-imports'
   - prettier-plugin-tailwindcss

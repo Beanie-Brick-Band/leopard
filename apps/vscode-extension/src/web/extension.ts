@@ -70,6 +70,12 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
+    vscode.workspace.onDidAcceptCopy((e) => {
+      channel.appendLine(`[${timestamp()}] ${e.contents} - copy accepted`);
+    }),
+  );
+
+  context.subscriptions.push(
     vscode.window.onDidChangeTextEditorSelection((e) => {
       channel.appendLine(
         `[${timestamp()}] ${e.textEditor.document.uri.fsPath} - ${e.selections.map((selection) => `${selection.start.line}:${selection.start.character} - ${selection.end.line}:${selection.end.character}`).join(", ")} - selection changed`,
