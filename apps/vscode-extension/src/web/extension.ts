@@ -94,6 +94,8 @@ export async function activate(context: vscode.ExtensionContext) {
       );
     }),
   );
+
+  context.subscriptions.push(...listeners);
 }
 
 export function deactivate() {
