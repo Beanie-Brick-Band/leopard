@@ -301,6 +301,12 @@ importers:
       convex:
         specifier: ^1.29.0
         version: 1.29.0(react@19.2.0)
+      convex-helpers:
+        specifier: ^0.1.105
+        version: 0.1.105(@standard-schema/spec@1.0.0)(convex@1.29.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.1.12)
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       zod:
         specifier: 'catalog:'
         version: 4.1.12
@@ -3071,8 +3077,8 @@ packages:
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
-  convex-helpers@0.1.104:
-    resolution: {integrity: sha512-7CYvx7T3K6n+McDTK4ZQaQNNGBzq5aWezpjzsKbOxPXx7oNcTP9wrpef3JxeXWFzkByJv5hRCjseh9B7eNJ7Ig==}
+  convex-helpers@0.1.105:
+    resolution: {integrity: sha512-B6EUQsBpLFcXpa1g/9Zsc7EaFHdaeMlPLCa/snSD+4hRBFMWKJjT589dZ/0Z40taBOQWC2tb81ciTNr4ctJb2w==}
     hasBin: true
     peerDependencies:
       '@standard-schema/spec': ^1.0.0
@@ -3080,7 +3086,7 @@ packages:
       hono: ^4.0.5
       react: ^17.0.2 || ^18.0.0 || ^19.0.0
       typescript: ^5.5
-      zod: ^3.22.4 || ^4.0.15
+      zod: ^3.25.0 || ^4.0.0
     peerDependenciesMeta:
       '@standard-schema/spec':
         optional: true
@@ -3156,6 +3162,9 @@ packages:
   data-view-byte-offset@1.0.1:
     resolution: {integrity: sha512-BS8PfmtDGnrgYdOonGZQdLZslWIeCGFP9tpan0hi1Co2Zr2NKADsvGYA8XxuG/4UWgJ6Cjtv+YJnB6MM69QGlQ==}
     engines: {node: '>= 0.4'}
+
+  date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
   debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -6266,7 +6275,7 @@ snapshots:
       better-auth: 1.3.27(next@16.0.0(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       common-tags: 1.8.2
       convex: 1.29.0(react@19.1.1)
-      convex-helpers: 0.1.104(@standard-schema/spec@1.0.0)(convex@1.29.0(react@19.1.1))(react@19.1.1)(typescript@5.9.3)(zod@3.25.76)
+      convex-helpers: 0.1.105(@standard-schema/spec@1.0.0)(convex@1.29.0(react@19.1.1))(react@19.1.1)(typescript@5.9.3)(zod@3.25.76)
       jose: 6.1.1
       react: 19.1.1
       react-dom: 19.1.1(react@19.1.1)
@@ -6284,7 +6293,7 @@ snapshots:
       better-auth: 1.3.27(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       common-tags: 1.8.2
       convex: 1.29.0(react@19.2.0)
-      convex-helpers: 0.1.104(@standard-schema/spec@1.0.0)(convex@1.29.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@3.25.76)
+      convex-helpers: 0.1.105(@standard-schema/spec@1.0.0)(convex@1.29.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@3.25.76)
       jose: 6.1.1
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
@@ -9097,7 +9106,7 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
-  convex-helpers@0.1.104(@standard-schema/spec@1.0.0)(convex@1.29.0(react@19.1.1))(react@19.1.1)(typescript@5.9.3)(zod@3.25.76):
+  convex-helpers@0.1.105(@standard-schema/spec@1.0.0)(convex@1.29.0(react@19.1.1))(react@19.1.1)(typescript@5.9.3)(zod@3.25.76):
     dependencies:
       convex: 1.29.0(react@19.1.1)
     optionalDependencies:
@@ -9106,7 +9115,7 @@ snapshots:
       typescript: 5.9.3
       zod: 3.25.76
 
-  convex-helpers@0.1.104(@standard-schema/spec@1.0.0)(convex@1.29.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@3.25.76):
+  convex-helpers@0.1.105(@standard-schema/spec@1.0.0)(convex@1.29.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@3.25.76):
     dependencies:
       convex: 1.29.0(react@19.2.0)
     optionalDependencies:
@@ -9114,6 +9123,15 @@ snapshots:
       react: 19.2.0
       typescript: 5.9.3
       zod: 3.25.76
+
+  convex-helpers@0.1.105(@standard-schema/spec@1.0.0)(convex@1.29.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.1.12):
+    dependencies:
+      convex: 1.29.0(react@19.2.0)
+    optionalDependencies:
+      '@standard-schema/spec': 1.0.0
+      react: 19.2.0
+      typescript: 5.9.3
+      zod: 4.1.12
 
   convex@1.29.0(react@19.1.1):
     dependencies:
@@ -9179,6 +9197,8 @@ snapshots:
       call-bound: 1.0.4
       es-errors: 1.3.0
       is-data-view: 1.0.2
+
+  date-fns@4.1.0: {}
 
   debug@2.6.9:
     dependencies:

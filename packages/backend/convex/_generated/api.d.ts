@@ -10,9 +10,9 @@
 
 import type * as api_coder from "../api/coder.js";
 import type * as api_extension from "../api/extension.js";
-import type * as api_web from "../api/web.js";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
+import type * as web_index from "../web/index.js";
 
 import type {
   ApiFromModules,
@@ -23,9 +23,9 @@ import type {
 declare const fullApi: ApiFromModules<{
   "api/coder": typeof api_coder;
   "api/extension": typeof api_extension;
-  "api/web": typeof api_web;
   auth: typeof auth;
   http: typeof http;
+  "web/index": typeof web_index;
 }>;
 
 /**
