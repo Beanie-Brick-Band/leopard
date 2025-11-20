@@ -1,0 +1,67 @@
+diff --git a/index.d.ts b/index.d.ts
+index 011f68eec7df36a327a659402ab17d7de2020dc4..f6f33b6a5536fa4bf4ec2ce0f1b5a6c5ed04f261 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -13455,6 +13455,46 @@ declare module 'vscode' {
+ 		waitUntil(thenable: Thenable<any>): void;
+ 	}
+ 
++	/**
++	 * An event that is fired when a copy is detected
++	 */
++	export interface CopyEvent {
++		/**
++		 * The file that was copied
++		 */
++		uri: Uri;
++
++		/**
++		 * Contents of the copy
++		 */
++		contents: {
++			/**
++			 * The text that was copied
++			 */
++			plainText: string;
++
++			/**
++			 * The start of the user's selection at time of the copy
++			*/
++			// start: Position;
++
++			// /**
++			//  * The end of the user's selection at time of the copy
++			// */
++			// end: Position;
++
++			// /**
++			//  * The anchor of the user's selection at time of the copy
++			// */
++			// anchor: Position;
++
++			// /**
++			//  * The cursor position at hte time of the copy
++			// */
++			// active: Position;
++		}[];
++	}
++
+ 	/**
+ 	 * An event that is fired when files are going to be created.
+ 	 *
+@@ -14172,6 +14212,15 @@ declare module 'vscode' {
+ 		 */
+ 		export function registerTextDocumentContentProvider(scheme: string, provider: TextDocumentContentProvider): Disposable;
+ 
++		/**
++		 * An event that is emitted when text is copied to the clipboard.
++		 */
++		export const onDidAcceptCopy: Event<CopyEvent>;
++		/**
++		 * An event that is emitted when text is pasted from the clipboard.
++		 */
++		export const onDidAcceptPaste: Event<string>;
++
+ 		/**
+ 		 * An event that is emitted when a {@link TextDocument text document} is opened or when the language id
+ 		 * of a text document {@link languages.setTextDocumentLanguage has been changed}.
