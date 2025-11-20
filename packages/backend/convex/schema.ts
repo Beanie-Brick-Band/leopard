@@ -15,7 +15,7 @@ export default defineSchema({
   classroomStudentsRelations: defineTable({
     classroomId: v.id("classrooms"),
     studentId: v.string(), // map this to betterAuth user id
-  }),
+  }).index("studentId_classrooms", ["studentId", "classroomId"]),
   events: defineTable({
     changeDetails: v.object({}),
     eventType: v.string(),
