@@ -8,7 +8,13 @@ import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 
-const siteUrl = env.SITE_URL;
+const siteUrl = new URL(env.SITE_URL);
+const siteDomainWithoutProtocol = siteUrl.hostname;
+
+const trustedOrigins = [
+  siteDomainWithoutProtocol,
+  `coder.${siteDomainWithoutProtocol}`,
+];
 
 // The component client has methods needed for integrating Convex with Better Auth,
 // as well as helper methods for general use.
@@ -24,7 +30,7 @@ export const createAuth = (
     logger: {
       disabled: optionsOnly,
     },
-    baseURL: siteUrl,
+    baseURL: siteUrl.toString(),
     database: authComponent.adapter(ctx),
     // Configure simple, non-verified email/password to get started
     emailAndPassword: {
@@ -35,6 +41,13 @@ export const createAuth = (
       // The Convex plugin is required for Convex compatibility
       convex(),
     ],
+    advanced: {
+      crossSubDomainCookies: {
+        enabled: true,
+        domain: siteUrl.hostname,
+      },
+    },
+    trustedOrigins: trustedOrigins,
   });
 };
 
