@@ -1,26 +1,28 @@
 "use client";
 
 import Link from "next/link";
+import { Authenticated, Unauthenticated } from "convex/react";
 
-import { UserButton } from "@package/ui";
 import { Button } from "@package/ui/button";
 
-import { authClient } from "~/lib/auth-client";
-
 function HeaderAuth() {
-  const { data: session } = authClient.useSession();
-
-  if (!session?.user) {
-    return (
-      <div>
-        <Button>
-          <Link href="/auth/login">Log In</Link>
-        </Button>
-      </div>
-    );
-  }
-
-  return <UserButton size="icon" />;
+  return (
+    <div className="flex gap-2">
+      <Authenticated>
+        <Link href="/auth/sign-out" passHref>
+          <Button variant="secondary">Sign Out</Button>
+        </Link>
+        <Link href="/app" passHref>
+          <Button>Go to App</Button>
+        </Link>
+      </Authenticated>
+      <Unauthenticated>
+        <Link href="/auth/sign-in" passHref>
+          <Button>Sign In</Button>
+        </Link>
+      </Unauthenticated>
+    </div>
+  );
 }
 
 export default HeaderAuth;
