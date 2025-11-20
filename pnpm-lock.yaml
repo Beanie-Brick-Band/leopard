@@ -54,6 +54,13 @@ overrides:
 importers:
 
   .:
+    dependencies:
+      '@t3-oss/env-core':
+        specifier: ^0.13.8
+        version: 0.13.8(arktype@2.1.20)(typescript@5.9.3)(valibot@1.0.0-beta.15(typescript@5.9.3))(zod@4.1.12)
+      convex:
+        specifier: ^1.29.0
+        version: 1.29.0(react@19.2.0)
     devDependencies:
       '@package/prettier-config':
         specifier: workspace:*
@@ -154,6 +161,22 @@ importers:
         version: 5.9.3
 
   apps/vscode-extension:
+    dependencies:
+      '@package/backend':
+        specifier: workspace:*
+        version: link:../../packages/backend
+      '@package/prettier-config':
+        specifier: workspace:*
+        version: link:../../tooling/prettier
+      '@t3-oss/env-core':
+        specifier: ^0.13.8
+        version: 0.13.8(arktype@2.1.20)(typescript@5.9.3)(valibot@1.0.0-beta.15(typescript@5.9.3))(zod@4.1.12)
+      convex:
+        specifier: ^1.29.0
+        version: 1.29.0(react@19.2.0)
+      playwright:
+        specifier: ^1.56.1
+        version: 1.56.1
     devDependencies:
       '@esbuild-plugins/node-globals-polyfill':
         specifier: ^0.2.3
@@ -164,6 +187,9 @@ importers:
       '@types/mocha':
         specifier: ^10.0.10
         version: 10.0.10
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.18.12
       '@types/vscode':
         specifier: ^1.105.0
         version: 1.105.0

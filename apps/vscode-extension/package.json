@@ -4,7 +4,7 @@
   "description": "Verify the legitamacy of student assignments by analyzing a granular version history of their work process. VSCode extension for the Leopard IDE.",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.99.3"
+    "vscode": "^1.105.0"
   },
   "categories": [
     "Other"
@@ -26,10 +26,18 @@
     "lint": "eslint src",
     "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
   },
+  "dependencies": {
+    "@package/backend": "workspace:*",
+    "@package/prettier-config": "workspace:*",
+    "@t3-oss/env-core": "^0.13.8",
+    "convex": "^1.29.0",
+    "playwright": "^1.56.1"
+  },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
+    "@types/node": "catalog:",
     "@types/vscode": "^1.105.0",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",

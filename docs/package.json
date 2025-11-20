@@ -6,6 +6,7 @@
     "build": "next build",
     "dev": "next dev --port 3001",
     "format": "prettier --check . --ignore-path ../.gitignore",
+    "format:fix": "prettier --fix . --ignore-path ../.gitignore",
     "start": "next start",
     "postinstall": "fumadocs-mdx"
   },

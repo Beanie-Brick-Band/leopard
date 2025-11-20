@@ -1,8 +1,9 @@
 {
   "extends": "../../tooling/typescript/base.json",
   "compilerOptions": {
-    "types": ["node"]
+    "types": ["node"],
+    "allowJs": true
   },
-  "include": ["./convex/**/*", "./src/**/*"],
+  "include": ["./convex/**/*", "./src/**/*", "api"],
   "exclude": ["node_modules"]
 }
