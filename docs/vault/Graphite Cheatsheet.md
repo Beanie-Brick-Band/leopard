@@ -19,7 +19,6 @@ gt create -m "Feat(DB): Deleted Prod"
 ```
 
 Creates a graphite change using all previously added files, similar to creating a commit. You can do this multiple times to add multiple changes before submitting your stack (creating a PR).
-Creates a graphite change using all previously added files, similar to creating a commit. You can do this multiple times to add multiple changes before submitting your stack (creating a PR).
 
 ```
 gt ss
