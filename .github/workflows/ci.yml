@@ -56,6 +56,21 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+  next-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup
+        uses: ./tooling/github/setup
+
+      - name: Copy env
+        shell: bash
+        run: cp apps/nextjs/.env.example apps/nextjs/.env
+
+      - name: Build
+        run: pnpm turbo run build -F @package/nextjs
+
   semantic-commits-pr-lint:
     name: Run Semantic Commit PR Check
     runs-on: ubuntu-latest

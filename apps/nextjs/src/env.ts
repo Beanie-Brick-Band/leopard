@@ -55,5 +55,5 @@ function getConvexSiteUrl() {
     process.env.NEXT_PUBLIC_CONVEX_SITE_URL = derivedSiteUrl;
     return derivedSiteUrl;
   }
-  throw new Error("CONVEX_SITE_URL is not defined");
+  throw new Error("NEXT_PUBLIC_CONVEX_SITE_URL is not defined");
 }
