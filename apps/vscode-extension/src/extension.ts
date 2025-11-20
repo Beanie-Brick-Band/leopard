@@ -1,31 +1,31 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { ConvexHttpClient } from "convex/browser";
+// import { ConvexHttpClient } from "convex/browser";
 import * as vscode from "vscode";
 
-import { api } from "@package/backend/convex/_generated/api";
+// import { api } from "@package/backend/convex/_generated/api";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export async function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
   console.log('Congratulations, your extension "helpme" is now active!');
   const channel = vscode.window.createOutputChannel("eventlogger");
-  const client = new ConvexHttpClient("https://tough-gazelle-941.convex.cloud");
+  // const client = new ConvexHttpClient("https://tough-gazelle-941.convex.cloud");
 
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
   const disposable = vscode.commands.registerCommand(
     "helpme.helloWorld",
-    async () => {
-      try {
-      } catch (e) {
-        vscode.window.showInformationMessage(
-          `Error: ${JSON.stringify(e)} ${typeof e}`,
-        );
-      }
+    () => {
+      // try {
+      // } catch (e) {
+      //   vscode.window.showInformationMessage(
+      //     `Error: ${JSON.stringify(e)} ${typeof e}`,
+      //   );
+      // }
       // try {
       //   vscode.window.showInformationMessage(`Error: ${unused.parse("test")}`);
       // } catch (e) {
@@ -137,4 +137,5 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 // This method is called when your extension is deactivated
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export function deactivate() {}
