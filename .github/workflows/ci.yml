@@ -53,6 +53,10 @@ jobs:
       - name: Setup
         uses: ./tooling/github/setup
 
+      - name: Copy env
+        shell: bash
+        run: cp .env.example .env
+
       - name: Typecheck
         run: pnpm typecheck
 
@@ -66,10 +70,10 @@ jobs:
 
       - name: Copy env
         shell: bash
-        run: cp apps/nextjs/.env.example apps/nextjs/.env
+        run: cp .env.example .env && cp apps/nextjs/.env.example apps/nextjs/.env
 
       - name: Build
-        run: pnpm turbo run build -F @package/nextjs
+        run: CI=true pnpm turbo run build -F @package/nextjs
 
   semantic-commits-pr-lint:
     name: Run Semantic Commit PR Check

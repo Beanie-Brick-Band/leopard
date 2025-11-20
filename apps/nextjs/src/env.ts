@@ -15,6 +15,7 @@ export const env = createEnv({
    */
   server: {
     // Add your server-side env vars here
+    WEB_DEPLOYMENT_URL: z.string(),
   },
 
   /**
@@ -29,31 +30,13 @@ export const env = createEnv({
   /**
    * Destructure all variables from `process.env` to make sure they aren't tree-shaken away.
    */
-  experimental__runtimeEnv: {
+  runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
-    NEXT_PUBLIC_CONVEX_SITE_URL: getConvexSiteUrl(),
-
+    WEB_DEPLOYMENT_URL: process.env.WEB_DEPLOYMENT_URL,
+    NEXT_PUBLIC_CONVEX_SITE_URL: process.env.NEXT_PUBLIC_CONVEX_SITE_URL,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   skipValidation:
     !!process.env.CI || process.env.npm_lifecycle_event === "lint",
 });
-
-function getConvexSiteUrl() {
-  if (process.env.NEXT_PUBLIC_CONVEX_SITE_URL) {
-    return process.env.NEXT_PUBLIC_CONVEX_SITE_URL;
-  }
-
-  const derivedSiteUrl = process.env.NEXT_PUBLIC_CONVEX_URL?.replace(
-    ".cloud",
-    ".site",
-  );
-  // set it in process.env for other uses
-
-  if (derivedSiteUrl) {
-    process.env.NEXT_PUBLIC_CONVEX_SITE_URL = derivedSiteUrl;
-    return derivedSiteUrl;
-  }
-  throw new Error("NEXT_PUBLIC_CONVEX_SITE_URL is not defined");
-}

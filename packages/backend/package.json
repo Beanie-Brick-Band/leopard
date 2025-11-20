@@ -14,6 +14,7 @@
   "packageManager": "pnpm@10.19.0",
   "dependencies": {
     "@convex-dev/better-auth": "0.9.7",
+    "@package/coder-sdk": "workspace:^",
     "@t3-oss/env-core": "^0.13.8",
     "better-auth": "1.3.27",
     "convex": "^1.29.0",
