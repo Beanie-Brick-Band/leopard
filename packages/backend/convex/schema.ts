@@ -10,7 +10,11 @@ export default defineSchema({
     assignments: v.array(v.id("assignments")),
     className: v.string(),
     metadata: v.string(),
-    ownerId: v.id("users"),
+    ownerId: v.string(), // map this to betterAuth user id
+  }),
+  classroomStudentsRelations: defineTable({
+    classroomId: v.id("classrooms"),
+    studentId: v.string(), // map this to betterAuth user id
   }),
   events: defineTable({
     changeDetails: v.object({}),
@@ -28,20 +32,14 @@ export default defineSchema({
     assignmentId: v.id("assignments"),
     flags: v.array(v.id("flags")),
     grade: v.float64(),
-    studentId: v.id("users"),
+    studentId: v.string(), // map this to betterAuth user id
     submitted: v.boolean(),
     workspaceId: v.id("workspaces"),
   }),
-  users: defineTable({
-    classrooms: v.array(v.id("classrooms")),
-    email: v.string(),
-    name: v.string(),
-    userType: v.string(),
-  }),
-  workspaces: defineTable({ 
+  workspaces: defineTable({
     coderWorkspaceId: v.string(),
     coderSessionId: v.string(),
     coderSessionGeneratedTime: v.string(),
     watchedFlag: v.boolean(),
-   }),
+  }),
 });
