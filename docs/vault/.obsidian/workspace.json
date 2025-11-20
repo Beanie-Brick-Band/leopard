@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Convex Setup.md",
+                "file": "Graphite Cheatsheet.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Convex Setup"
+              "title": "Graphite Cheatsheet"
             }
           },
           {
@@ -35,8 +35,7 @@
               "title": "Graphite Cheatsheet"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -186,8 +185,8 @@
   },
   "active": "b49e5e8bb4111aa7",
   "lastOpenFiles": [
-    "Graphite Cheatsheet.md",
     "Convex Setup.md",
+    "Graphite Cheatsheet.md",
     "Leopard Welcome.md",
     "Welcome.md"
   ]
