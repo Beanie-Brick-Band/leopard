@@ -25,7 +25,6 @@
     "ui-add": "pnpm dlx shadcn@latest add && prettier src --write --list-different"
   },
   "dependencies": {
-    "@daveyplate/better-auth-ui": "^3.2.8",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/react-label": "^2.1.8",
