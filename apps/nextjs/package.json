@@ -10,7 +10,7 @@
     "lint": "eslint --flag unstable_native_nodejs_ts_config",
     "start": "pnpm with-env next start",
     "typecheck": "tsc --noEmit",
-    "with-env": "dotenv -e ../../.env --"
+    "with-env": "dotenv -e ../../.env -e ./.env --"
   },
   "dependencies": {
     "@convex-dev/better-auth": "0.9.7",

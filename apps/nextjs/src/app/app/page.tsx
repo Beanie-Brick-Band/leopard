@@ -1,5 +1,6 @@
 "use client";
 
+import { startTransition, useActionState, useEffect } from "react";
 import {
   Authenticated,
   AuthLoading,
@@ -14,23 +15,52 @@ import { api } from "@package/backend/convex/_generated/api";
 import { cn } from "@package/ui";
 import { Button } from "@package/ui/button";
 import { Separator } from "@package/ui/separator";
+import { Spinner } from "@package/ui/spinner";
+
+import { launchWorkspace } from "./actions";
 
 function AssignmentItem({
   assignmentId,
   isLast = false,
+  isEnrolled,
 }: {
   assignmentId: Id<"assignments">;
   isLast?: boolean;
+  isEnrolled: boolean;
 }) {
   const assignment = useQuery(api.web.assignment.getById, { id: assignmentId });
+  // We must use server actions to set appropriate cookies
+  const [state, action, pending] = useActionState(
+    () => launchWorkspace(assignmentId),
+    null,
+  );
+
+  useEffect(() => {
+    if (state) {
+      window.location.assign(state);
+    }
+  }, [state]);
 
   if (!assignment) return null;
 
   return (
     <div className={cn("border-t py-4 text-sm", isLast && "border-b")}>
-      <div className="font-medium">{assignment.name}</div>
-      <div className="text-muted-foreground text-xs">
-        Due: {new Date(assignment.dueDate).toLocaleDateString()}
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="font-medium">{assignment.name}</div>
+          <div className="text-muted-foreground text-xs">
+            Due: {new Date(assignment.dueDate).toLocaleDateString()}
+          </div>
+        </div>
+        {isEnrolled && (
+          <Button
+            onClick={() => {
+              startTransition(action);
+            }}
+          >
+            {pending ? <Spinner></Spinner> : "Launch Workspace"}
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -94,6 +124,7 @@ function Content() {
                               isLast={
                                 index === classroom.assignments.length - 1
                               }
+                              isEnrolled={true}
                             />
                           ))}
                         </div>
@@ -149,6 +180,7 @@ function Content() {
                               <AssignmentItem
                                 key={assignmentId}
                                 assignmentId={assignmentId}
+                                isEnrolled={false}
                               />
                             ))}
                           </div>
