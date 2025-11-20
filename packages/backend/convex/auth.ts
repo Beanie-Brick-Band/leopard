@@ -3,17 +3,20 @@ import { createClient } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { betterAuth } from "better-auth";
 
-import { env } from "../src/env";
 import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 
-const siteUrl = new URL(env.SITE_URL);
+if (!process.env.WEB_DEPLOYMENT_URL) {
+  throw new Error("WEB_DEPLOYMENT_URL is not set");
+}
+
+const siteUrl = new URL(process.env.WEB_DEPLOYMENT_URL!);
 const siteDomainWithoutProtocol = siteUrl.hostname;
 
 const trustedOrigins = [
   siteDomainWithoutProtocol,
-  `coder.${siteDomainWithoutProtocol}`,
+  `*.${siteDomainWithoutProtocol}`,
 ];
 
 // The component client has methods needed for integrating Convex with Better Auth,
