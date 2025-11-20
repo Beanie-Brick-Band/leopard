@@ -1,17 +1,43 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-
-import { api } from "@package/backend/convex/_generated/api";
 import { ConvexHttpClient } from "convex/browser";
-
 import * as vscode from "vscode";
 
-export async function activate(context: vscode.ExtensionContext) {
-  const channel = vscode.window.createOutputChannel("eventlogger");
+import { api } from "@package/backend/convex/_generated/api";
 
-  const client = new ConvexHttpClient("https://scrupulous-basilisk-407.convex.cloud/");
-  const user = await client.query(api.auth.getCurrentUser, {});
-  channel.appendLine(`User: ${user ? user.email : "Not logged in"}`);
+// This method is called when your extension is activated
+// Your extension is activated the very first time the command is executed
+export async function activate(context: vscode.ExtensionContext) {
+  // Use the console to output diagnostic information (console.log) and errors (console.error)
+  // This line of code will only be executed once when your extension is activated
+  console.log('Congratulations, your extension "helpme" is now active!');
+  const channel = vscode.window.createOutputChannel("eventlogger");
+  const client = new ConvexHttpClient("https://tough-gazelle-941.convex.cloud");
+
+  // The command has been defined in the package.json file
+  // Now provide the implementation of the command with registerCommand
+  // The commandId parameter must match the command field in package.json
+  const disposable = vscode.commands.registerCommand(
+    "helpme.helloWorld",
+    async () => {
+      try {
+      } catch (e) {
+        vscode.window.showInformationMessage(
+          `Error: ${JSON.stringify(e)} ${typeof e}`,
+        );
+      }
+      // try {
+      //   vscode.window.showInformationMessage(`Error: ${unused.parse("test")}`);
+      // } catch (e) {
+      //   vscode.window.showInformationMessage(`Error: ${JSON.stringify(e)}`);
+      // }
+      // The code you place here will be executed every time your command is executed
+      // Display a message box to the user
+      vscode.window.showInformationMessage("Hello World from helpme!");
+    },
+  );
+
+  context.subscriptions.push(disposable);
 
   function timestamp() {
     return new Date().toISOString();
@@ -69,11 +95,13 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
   );
 
-  context.subscriptions.push(
-    vscode.workspace.onDidAcceptCopy((e) => {
-      channel.appendLine(`[${timestamp()}] ${e.contents} - copy accepted`);
-    }),
-  );
+  // context.subscriptions.push(
+  //   vscode.workspace.onDidAcceptCopy((e) => {
+  //     channel.appendLine(
+  //       `[${timestamp()}] ${e.contents.map((content) => content.plainText).join("; ")} - copy accepted`,
+  //     );
+  //   }),
+  // );
 
   context.subscriptions.push(
     vscode.window.onDidChangeTextEditorSelection((e) => {
@@ -107,3 +135,6 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
   );
 }
+
+// This method is called when your extension is deactivated
+export function deactivate() {}
