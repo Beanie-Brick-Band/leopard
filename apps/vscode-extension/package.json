@@ -29,6 +29,7 @@
   "dependencies": {
     "@package/backend": "workspace:*",
     "@package/prettier-config": "workspace:*",
+    "@package/validators": "workspace:*",
     "@t3-oss/env-core": "^0.13.8",
     "convex": "^1.29.0"
   },

@@ -19,31 +19,31 @@ export const addBatchedChangesMutation = mutation({
   handler: async (ctx, args) => {
     const insertedIds = [];
 
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) {
-      console.log(args.changes);
-      return;
-    }
+    // const user = await authComponent.safeGetAuthUser(ctx);
+    // if (!user) {
+    //   console.log(args.changes);
+    //   return;
+    // }
 
-    // get active workspace for user
-    // fetch the worksace somehwere
-    const workspace = await ctx.runQuery(
-      internal.web.assignment.getUserActiveWorkspace,
-      {
-        userId: user._id.toString(),
-      },
-    );
+    // // get active workspace for user
+    // // fetch the worksace somehwere
+    // const workspace = await ctx.runQuery(
+    //   internal.web.assignment.getUserActiveWorkspace,
+    //   {
+    //     userId: user._id.toString(),
+    //   },
+    // );
 
-    if (!workspace) {
-      console.log("No active workspace found for user", user._id.toString());
-      return;
-    }
+    // if (!workspace) {
+    //   console.log("No active workspace found for user", user._id.toString());
+    //   return;
+    // }
 
     for (const change of args.changes) {
       const newEvent: WithoutSystemFields<Doc<"events">> = {
         eventType: change.eventType,
         timestamp: change.timestamp,
-        workspaceId: workspace._id,
+        workspaceId: "ks74y4q2sn8x2t0t31nq5cb32s7vvjy5" as Id<"workspaces">, //workspace._id,
         metadata: change.metadata,
       };
       const eventId = await ctx.db.insert("events", newEvent);
