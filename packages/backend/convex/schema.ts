@@ -17,11 +17,10 @@ export default defineSchema({
     studentId: v.string(), // map this to betterAuth user id
   }).index("studentId_classrooms", ["studentId", "classroomId"]),
   events: defineTable({
-    changeDetails: v.object({}),
     eventType: v.string(),
     timestamp: v.number(),
     workspaceId: v.id("workspaces"),
-    metadata: v.object({}),
+    metadata: v.record(v.string(), v.any()),
   }),
   flags: defineTable({
     description: v.string(),
