@@ -37,8 +37,6 @@ export default defineSchema({
   }),
   workspaces: defineTable({
     coderWorkspaceId: v.string(),
-    coderSessionId: v.string(),
-    coderSessionGeneratedTime: v.string(),
-    watchedFlag: v.boolean(),
+    userId: v.string(), // map this to betterAuth user id
   }),
 });

@@ -4,14 +4,23 @@ import {
   createNewSessionKey,
   createNewUser,
   createUserWorkspace,
+  createWorkspaceBuild,
   getOrganizations,
   getTemplatesByOrganization,
   getUserByName,
   getWorkspaceMetadataByUserAndWorkspaceName,
+  listWorkspaces,
 } from "@package/coder-sdk";
 import { createClient } from "@package/coder-sdk/client";
 
-import { action, query } from "../_generated/server";
+import { internal } from "../_generated/api";
+import {
+  action,
+  internalMutation,
+  internalQuery,
+  mutation,
+  query,
+} from "../_generated/server";
 import { authComponent } from "../auth";
 
 export const getById = query({
@@ -35,6 +44,44 @@ export const getByIds = query({
     }
     const assignments = await Promise.all(args.ids.map((id) => ctx.db.get(id)));
     return assignments.filter(Boolean);
+  },
+});
+
+export const setUserActiveWorkspace = internalMutation({
+  args: {
+    userId: v.string(),
+    coderWorkspaceId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const workspaces = await ctx.db.query("workspaces").collect();
+
+    for (const ws of workspaces) {
+      // delete any existing active workspaces for this user
+      if (
+        ws.userId === args.userId &&
+        ws.coderWorkspaceId !== args.coderWorkspaceId
+      ) {
+        await ctx.db.delete(ws._id);
+      }
+    }
+
+    await ctx.db.insert("workspaces", {
+      userId: args.userId,
+      coderWorkspaceId: args.coderWorkspaceId,
+    });
+
+    return;
+  },
+});
+
+export const getUserActiveWorkspace = internalQuery({
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    const workspace = await ctx.db
+      .query("workspaces")
+      .filter((q) => q.eq(q.field("userId"), args.userId))
+      .first();
+    return workspace;
   },
 });
 
@@ -150,7 +197,49 @@ export const launchWorkspace = action({
     });
 
     if (workspaceMetadata.error || !workspaceMetadata.data) {
-      throw new Error("Failed to create or fetch workspace in Coder");
+      throw new Error("Failed to fetch or create workspace metadata in Coder");
+    }
+
+    // close all other workspaces for this user
+    const workspaces = await listWorkspaces({
+      client: coderClient,
+      query: {
+        q: `owner:${coderUserId}`,
+      },
+    });
+
+    if (workspaces.error) {
+      throw new Error(
+        `Failed to list workspaces from Coder: ${JSON.stringify(workspaces.error)}`,
+      );
+    }
+
+    for (const ws of workspaces.data?.workspaces ?? []) {
+      // close it
+      if (!ws.id) {
+        continue;
+      }
+      if (ws.id === workspaceMetadata.data?.id) {
+        continue;
+      }
+
+      // ws.id
+      const workspaceStop = await createWorkspaceBuild({
+        client: coderClient,
+        path: {
+          workspace: ws.id!,
+        },
+        body: {
+          transition: "stop",
+        },
+      });
+      if (workspaceStop.error) {
+        console.error(
+          `Failed to stop workspace ${ws.id} for user ${coderUserId}: ${JSON.stringify(
+            workspaceStop.error,
+          )}`,
+        );
+      }
     }
 
     const coderUserSessionKey = await createNewSessionKey({
@@ -168,7 +257,10 @@ export const launchWorkspace = action({
       throw new Error("Failed to create session key in Coder");
     }
 
-    // construct workspace url
+    await ctx.runMutation(internal.web.assignment.setUserActiveWorkspace, {
+      userId: coderUserId,
+      coderWorkspaceId: workspaceMetadata.data.id!,
+    });
 
     const coderApiUrl = new URL(process.env.CODER_API_URL!);
     const coderHost = coderApiUrl.host;
