@@ -1,0 +1,376 @@
+# GKE Deployment for Coder
+# Single-file Kubernetes manifest for Google Kubernetes Engine
+#
+# Prerequisites:
+#   1. Create a GKE cluster with Workload Identity enabled
+#   2. Reserve a static IP: gcloud compute addresses create coder-ip --global
+#   3. Create the DB secret: kubectl create secret generic coder-db-url -n coder --from-literal=url="postgres://coder:PASSWORD@postgresql.coder.svc.cluster.local:5432/coder?sslmode=disable"
+#
+# Deploy:
+#   kubectl apply -f gke-deployment.yml
+#
+# Update YOUR_DOMAIN and YOUR_EMAIL below before deploying
+
+---
+# Namespace: coder
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: coder
+  labels:
+    app.kubernetes.io/name: coder
+
+---
+# Namespace: workspaces
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: workspaces
+  labels:
+    app.kubernetes.io/name: coder-workspaces
+
+---
+# RBAC: Role for workspace management
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: coder-workspace-manager
+  namespace: workspaces
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["create", "get", "list", "delete", "update", "patch", "watch"]
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "pods/exec"]
+    verbs: ["create", "get", "list", "delete", "update", "patch", "watch"]
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["create", "get", "list", "delete", "update", "patch", "watch"]
+  - apiGroups: [""]
+    resources: ["secrets", "configmaps"]
+    verbs: ["create", "get", "list", "delete", "update", "patch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["create", "get", "list", "delete", "update", "patch", "watch"]
+
+---
+# RBAC: RoleBinding for coder service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: coder-workspace-manager
+  namespace: workspaces
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: coder-workspace-manager
+subjects:
+  - kind: ServiceAccount
+    name: coder
+    namespace: coder
+
+---
+# ServiceAccount for Coder
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: coder
+  namespace: coder
+  labels:
+    app.kubernetes.io/name: coder
+
+---
+# PostgreSQL: PersistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgresql-pvc
+  namespace: coder
+  labels:
+    app.kubernetes.io/name: postgresql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard-rwo
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+# PostgreSQL: ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-config
+  namespace: coder
+data:
+  POSTGRES_DB: coder
+  POSTGRES_USER: coder
+
+---
+# PostgreSQL: Secret (change this password!)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgresql-secret
+  namespace: coder
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: "CHANGE_ME_TO_SECURE_PASSWORD"
+
+---
+# PostgreSQL: Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+  namespace: coder
+  labels:
+    app.kubernetes.io/name: postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgresql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgresql
+    spec:
+      containers:
+        - name: postgresql
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+              name: postgresql
+          envFrom:
+            - configMapRef:
+                name: postgresql-config
+            - secretRef:
+                name: postgresql-secret
+          volumeMounts:
+            - name: postgresql-data
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - coder
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - coder
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: postgresql-data
+          persistentVolumeClaim:
+            claimName: postgresql-pvc
+
+---
+# PostgreSQL: Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: coder
+  labels:
+    app.kubernetes.io/name: postgresql
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgresql
+  selector:
+    app.kubernetes.io/name: postgresql
+
+---
+# Coder: ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coder-config
+  namespace: coder
+data:
+  # UPDATE THESE VALUES
+  CODER_ACCESS_URL: "https://coder.nolapse.tech"
+  CODER_WILDCARD_ACCESS_URL: "*.coder.nolapse.tech"
+  CODER_OAUTH2_GITHUB_ALLOW_SIGNUPS: "true"
+  CODER_TELEMETRY_ENABLE: "false"
+  CODER_DERP_SERVER_ENABLE: "true"
+
+---
+# Coder: Secret for DB connection
+apiVersion: v1
+kind: Secret
+metadata:
+  name: coder-db-url
+  namespace: coder
+type: Opaque
+stringData:
+  url: "postgres://coder:CHANGE_ME_TO_SECURE_PASSWORD@postgresql.coder.svc.cluster.local:5432/coder?sslmode=disable"
+
+---
+# Coder: Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coder
+  namespace: coder
+  labels:
+    app.kubernetes.io/name: coder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: coder
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: coder
+    spec:
+      serviceAccountName: coder
+      containers:
+        - name: coder
+          image: ghcr.io/coder/coder:v2.28.0
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: coder-config
+          env:
+            - name: CODER_PG_CONNECTION_URL
+              valueFrom:
+                secretKeyRef:
+                  name: coder-db-url
+                  key: url
+            - name: CODER_HTTP_ADDRESS
+              value: "0.0.0.0:8080"
+          resources:
+            requests:
+              cpu: "2"
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 3Gi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+---
+# Coder: Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: coder
+  namespace: coder
+  labels:
+    app.kubernetes.io/name: coder
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/backend-config: '{"default": "coder-backend-config"}'
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: coder
+
+---
+# GKE: BackendConfig for health checks and websocket timeout
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: coder-backend-config
+  namespace: coder
+spec:
+  healthCheck:
+    type: HTTP
+    requestPath: /healthz
+    port: 8080
+  timeoutSec: 86400
+  connectionDraining:
+    drainingTimeoutSec: 300
+  sessionAffinity:
+    affinityType: "GENERATED_COOKIE"
+    affinityCookieTtlSec: 86400
+
+---
+# GKE: ManagedCertificate for automatic SSL
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: coder-managed-cert
+  namespace: coder
+spec:
+  domains:
+    - coder.nolapse.tech
+
+---
+# GKE: FrontendConfig for HTTPS redirect
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: coder-frontend-config
+  namespace: coder
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT
+
+---
+# GKE: Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: coder-ingress
+  namespace: coder
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "coder-global-ip"
+    networking.gke.io/managed-certificates: "coder-managed-cert"
+    networking.gke.io/v1beta1.FrontendConfig: "coder-frontend-config"
+spec:
+  rules:
+    - host: coder.nolapse.tech
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: coder
+                port:
+                  number: 80

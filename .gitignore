@@ -52,3 +52,8 @@ dist/
 
 # test app
 apps/test/*
+
+infra/.terraform
+infra/*.tfvars
+infra/*.tfstate
+infra/*.tfstate.*
