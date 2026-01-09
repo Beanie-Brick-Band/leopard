@@ -1,0 +1,1 @@
+PLACEHOLDER to avoid interactive dialog from vsce when building.
