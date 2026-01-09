@@ -1,0 +1,40 @@
+# values.k3s.yml
+# Coder values for k3s deployment
+
+coder:
+  env:
+    - name: CODER_ACCESS_URL
+      value: "https://coder.nolapse.tech"
+    - name: CODER_WILDCARD_ACCESS_URL
+      value: "*.coder.nolapse.tech"
+    - name: CODER_PG_CONNECTION_URL
+      valueFrom:
+        secretKeyRef:
+          name: coder-db-url
+          key: url
+
+  replicaCount: 1
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+  service:
+    type: ClusterIP
+
+  ingress:
+    enable: true
+    className: traefik
+    host: coder.nolapse.tech
+    wildcardHost: "*.coder.nolapse.tech"
+    tls:
+      enable: true
+      secretName: coder-tls
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"

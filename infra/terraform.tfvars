@@ -1,7 +1,7 @@
-# Copy this file to terraform.tfvars and fill in your values
-
-project_id    = "spry-cortex-483721-q8"
-region        = "northamerica-northeast1"
-zone          = "northamerica-northeast1-b"
-instance_name = "codr-k8s-host"
-network_name  = "codr-network"
+tenancy_ocid     = "ocid1.tenancy.oc1..aaaaaaaa2milfd6sepuun2cjmwkrhmhy7ky3fndhd2b5ugx3sfnjys5pl5xa"
+user_ocid        = "ocid1.user.oc1..aaaaaaaahoqrn7xammug2v33bcrqlkgaymbw7bn4kergvvmdxkadjml72ohq"
+fingerprint      = "4e:fa:19:74:99:d3:37:91:f9:7a:74:17:53:04:6c:f0"
+private_key_path = "/Users/arian/.oci/oci_api_key.pem"
+region           = "ca-toronto-1"
+compartment_ocid = "ocid1.tenancy.oc1..aaaaaaaa2milfd6sepuun2cjmwkrhmhy7ky3fndhd2b5ugx3sfnjys5pl5xa"
+ssh_public_key   = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDH94CNfo3539TdfAZTU1ZcLbH/PmOUi7BxxTfsjyhSXpik0ep/D3ky4SPmJWUO1cSQd0Ohxm4eUvTXgqY9HWcDqpDbQyHOfZJf60CN77JWzWkp34UvJn4o3sp0HKUALjaXK9N7Cc/BQTvpATa+VRS5Vm1jA29AVKa6gFNZU3IOoh508tjYMj+/scQ6PdzLKoli5XxVTCX3euWAtqpJnpg8cZ9pRbmThm0xiFPLTLWOK548sZtkzG6XNtm3l8rbL5od9w0DwOeWmtWgc+o7StSFAZm43x8u8OwScQ3nQpjhIENBhOwhaTq1Yi4RI8X2JD2JT3/oNqedgtugMuQ63SFy1TE8Bl3SZYv1DnB391nDZH4mPHUpNo5R8DXF+z+R+7naVvBfqm7ZC0yG2a1W3A63aDO0DM9Yc+VH57YFz2VAWYgHRTsh/g7xL0aM54/yiyYpPKDulspNtfL9/H8VrVEO9ZAUJhlw4TlN4iO/1IwYV83nhU6FiST80pMVfBXbQ4hbAm3Xs6w2I2yQZQsnqoxRAPyveP/5Bb62LVji4nJONShuVep12HLK+9v/CVZQD5DvKZYv2oIcydFmhVnwunRoDMJ4siolMp5q2FeQ1DLib6nQyhZNEpCJS+EUiFqxkoAQn0n2ddz834Lzhsn4mez5Cf2nPCvf3hQXOBX7hWEA/w== arian@Mac"
