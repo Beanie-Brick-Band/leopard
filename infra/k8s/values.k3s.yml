@@ -7,6 +7,8 @@ coder:
       value: "https://coder.nolapse.tech"
     - name: CODER_WILDCARD_ACCESS_URL
       value: "*.coder.nolapse.tech"
+    - name: CODER_OAUTH2_GITHUB_ALLOW_SIGNUPS
+      value: "true"
     - name: CODER_PG_CONNECTION_URL
       valueFrom:
         secretKeyRef:
