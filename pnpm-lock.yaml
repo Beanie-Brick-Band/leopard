@@ -215,6 +215,9 @@ importers:
       convex:
         specifier: ^1.29.0
         version: 1.29.0(react@19.2.0)
+      zod:
+        specifier: 'catalog:'
+        version: 4.1.12
     devDependencies:
       '@package/eslint-config':
         specifier: workspace:*
