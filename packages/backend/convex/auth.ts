@@ -1,11 +1,12 @@
 import type { GenericCtx } from "@convex-dev/better-auth";
 import { createClient } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
-import { betterAuth } from "better-auth";
+import { betterAuth } from "better-auth/minimal";
 
 import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
+import authConfig from "./auth.config";
 
 if (!process.env.WEB_DEPLOYMENT_URL) {
   throw new Error("WEB_DEPLOYMENT_URL is not set");
@@ -42,7 +43,7 @@ export const createAuth = (
     },
     plugins: [
       // The Convex plugin is required for Convex compatibility
-      convex(),
+      convex({ authConfig }),
     ],
     advanced: {
       crossSubDomainCookies: {
