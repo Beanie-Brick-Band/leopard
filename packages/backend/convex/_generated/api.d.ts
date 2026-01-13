@@ -8,6 +8,12 @@
  * @module
  */
 
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
+
 import type * as api_coder from "../api/coder.js";
 import type * as api_extension from "../api/extension.js";
 import type * as auth from "../auth.js";
@@ -16,12 +22,6 @@ import type * as web_assignment from "../web/assignment.js";
 import type * as web_classroom from "../web/classroom.js";
 import type * as web_index from "../web/index.js";
 import type * as web_replay from "../web/replay.js";
-
-import type {
-  ApiFromModules,
-  FilterApi,
-  FunctionReference,
-} from "convex/server";
 
 declare const fullApi: ApiFromModules<{
   "api/coder": typeof api_coder;

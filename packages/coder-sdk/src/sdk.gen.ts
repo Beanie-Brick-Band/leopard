@@ -1,223 +1,911 @@
+import type { Client, Options as Options2, TDataShape } from "./client";
+import type {
+  ActivateUserAccountData,
+  ActivateUserAccountResponses,
+  AddNewLicenseData,
+  AddNewLicenseResponses,
+  AddOrganizationMemberData,
+  AddOrganizationMemberResponses,
+  ApiRootHandlerData,
+  ApiRootHandlerResponses,
+  ArchiveTemplateUnusedVersionsByTemplateIdData,
+  ArchiveTemplateUnusedVersionsByTemplateIdResponses,
+  ArchiveTemplateVersionData,
+  ArchiveTemplateVersionResponses,
+  AssignRoleToOrganizationMemberData,
+  AssignRoleToOrganizationMemberResponses,
+  AssignRoleToUserData,
+  AssignRoleToUserResponses,
+  AuthenticateAgentOnAwsInstanceData,
+  AuthenticateAgentOnAwsInstanceResponses,
+  AuthenticateAgentOnAzureInstanceData,
+  AuthenticateAgentOnAzureInstanceResponses,
+  AuthenticateAgentOnGoogleCloudInstanceData,
+  AuthenticateAgentOnGoogleCloudInstanceResponses,
+  BuildInfoData,
+  BuildInfoResponses,
+  CancelTemplateVersionByIdData,
+  CancelTemplateVersionByIdResponses,
+  CancelTemplateVersionDryRunByJobIdData,
+  CancelTemplateVersionDryRunByJobIdResponses,
+  CancelWorkspaceBuildData,
+  CancelWorkspaceBuildResponses,
+  ChangePasswordWithAOneTimePasscodeData,
+  ChangePasswordWithAOneTimePasscodeResponses,
+  CheckAuthorizationData,
+  CheckAuthorizationResponses,
+  CheckInitialUserCreatedData,
+  CheckInitialUserCreatedResponses,
+  CompletelyClearsTheWorkspacesUserAndGroupAclsData,
+  CompletelyClearsTheWorkspacesUserAndGroupAclsResponses,
+  ConvertUserFromPasswordToOauthAuthenticationData,
+  ConvertUserFromPasswordToOauthAuthenticationResponses,
+  CoordinateWorkspaceAgentData,
+  CreateGroupForOrganizationData,
+  CreateGroupForOrganizationResponses,
+  CreateInitialUserData,
+  CreateInitialUserResponses,
+  CreateNewSessionKeyData,
+  CreateNewSessionKeyResponses,
+  CreateNewUserData,
+  CreateNewUserResponses,
+  CreateOauth2ApplicationData,
+  CreateOauth2ApplicationResponses,
+  CreateOauth2ApplicationSecretData,
+  CreateOauth2ApplicationSecretResponses,
+  CreateOrganizationData,
+  CreateOrganizationResponses,
+  CreateProvisionerKeyData,
+  CreateProvisionerKeyResponses,
+  CreateTaskData,
+  CreateTaskResponses,
+  CreateTemplateByOrganizationData,
+  CreateTemplateByOrganizationResponses,
+  CreateTemplateVersionByOrganizationData,
+  CreateTemplateVersionByOrganizationResponses,
+  CreateTemplateVersionDryRunData,
+  CreateTemplateVersionDryRunResponses,
+  CreateTokenApiKeyData,
+  CreateTokenApiKeyResponses,
+  CreateUserWebpushSubscriptionData,
+  CreateUserWebpushSubscriptionResponses,
+  CreateUserWorkspaceByOrganizationData,
+  CreateUserWorkspaceByOrganizationResponses,
+  CreateUserWorkspaceData,
+  CreateUserWorkspaceResponses,
+  CreateWorkspaceBuildData,
+  CreateWorkspaceBuildResponses,
+  CreateWorkspaceProxyData,
+  CreateWorkspaceProxyResponses,
+  DebugDerpTrafficData,
+  DebugDerpTrafficResponses,
+  DebugExpvarData,
+  DebugExpvarResponses,
+  DebugInfoDeploymentHealthData,
+  DebugInfoDeploymentHealthResponses,
+  DebugInfoTailnetData,
+  DebugInfoTailnetResponses,
+  DebugInfoWebsocketTestData,
+  DebugInfoWebsocketTestResponses,
+  DebugInfoWireguardCoordinatorData,
+  DebugInfoWireguardCoordinatorResponses,
+  DebugMetricsData,
+  DebugMetricsResponses,
+  DebugOidcContextForAuserData,
+  DebugOidcContextForAuserResponses,
+  DebugPprofCmdlineData,
+  DebugPprofCmdlineResponses,
+  DebugPprofIndexData,
+  DebugPprofIndexResponses,
+  DebugPprofProfileData,
+  DebugPprofProfileResponses,
+  DebugPprofSymbolData,
+  DebugPprofSymbolResponses,
+  DebugPprofTraceData,
+  DebugPprofTraceResponses,
+  DeleteACustomOrganizationRoleData,
+  DeleteACustomOrganizationRoleResponses,
+  DeleteApiKeyData,
+  DeleteApiKeyResponses,
+  DeleteExternalAuthUserLinkByIdData,
+  DeleteExternalAuthUserLinkByIdResponses,
+  DeleteGroupByNameData,
+  DeleteGroupByNameResponses,
+  DeleteLicenseData,
+  DeleteLicenseResponses,
+  DeleteOauth2ApplicationData,
+  DeleteOauth2ApplicationResponses,
+  DeleteOauth2ApplicationSecretData,
+  DeleteOauth2ApplicationSecretResponses,
+  DeleteOauth2ApplicationTokensData,
+  DeleteOauth2ApplicationTokensResponses,
+  DeleteOauth2ClientConfigurationData,
+  DeleteOauth2ClientConfigurationResponses,
+  DeleteOrganizationData,
+  DeleteOrganizationResponses,
+  DeleteProvisionerKeyData,
+  DeleteProvisionerKeyResponses,
+  DeleteTaskData,
+  DeleteTaskResponses,
+  DeleteTemplateByIdData,
+  DeleteTemplateByIdResponses,
+  DeleteUserData,
+  DeleteUserResponses,
+  DeleteUserWebpushSubscriptionData,
+  DeleteUserWebpushSubscriptionResponses,
+  DeleteWorkspaceAgentPortShareData,
+  DeleteWorkspaceAgentPortShareResponses,
+  DeleteWorkspaceProxyData,
+  DeleteWorkspaceProxyResponses,
+  DeregisterWorkspaceProxyData,
+  DeregisterWorkspaceProxyResponses,
+  EvaluateDynamicParametersForTemplateVersionData,
+  EvaluateDynamicParametersForTemplateVersionResponses,
+  ExtendWorkspaceDeadlineByIdData,
+  ExtendWorkspaceDeadlineByIdResponses,
+  FavoriteWorkspaceByIdData,
+  FavoriteWorkspaceByIdResponses,
+  FetchProvisionerKeyDetailsData,
+  FetchProvisionerKeyDetailsResponses,
+  GenerateFakeAuditLogData,
+  GenerateFakeAuditLogResponses,
+  GetActiveReplicasData,
+  GetActiveReplicasResponses,
+  GetAgentInitScriptData,
+  GetAgentInitScriptResponses,
+  GetAllTemplatesData,
+  GetAllTemplatesResponses,
+  GetApiKeyByIdData,
+  GetApiKeyByIdResponses,
+  GetApiKeyByTokenNameData,
+  GetApiKeyByTokenNameResponses,
+  GetAppearanceData,
+  GetAppearanceResponses,
+  GetApplicationsHostData,
+  GetApplicationsHostResponses,
+  GetAuditLogsData,
+  GetAuditLogsResponses,
+  GetAuthenticationMethodsData,
+  GetAuthenticationMethodsResponses,
+  GetAutofillBuildParametersForUserData,
+  GetAutofillBuildParametersForUserResponses,
+  GetBuildParametersForWorkspaceBuildData,
+  GetBuildParametersForWorkspaceBuildResponses,
+  GetConnectionInfoForWorkspaceAgentData,
+  GetConnectionInfoForWorkspaceAgentGenericData,
+  GetConnectionInfoForWorkspaceAgentGenericResponses,
+  GetConnectionInfoForWorkspaceAgentResponses,
+  GetConnectionLogsData,
+  GetConnectionLogsResponses,
+  GetCustomNotificationTemplatesData,
+  GetCustomNotificationTemplatesErrors,
+  GetCustomNotificationTemplatesResponses,
+  GetDeploymentConfigData,
+  GetDeploymentConfigResponses,
+  GetDeploymentDausData,
+  GetDeploymentDausResponses,
+  GetDeploymentStatsData,
+  GetDeploymentStatsResponses,
+  GetDerpMapUpdatesData,
+  GetEnabledExperimentsData,
+  GetEnabledExperimentsResponses,
+  GetEntitlementsData,
+  GetEntitlementsResponses,
+  GetExternalAuthByIdData,
+  GetExternalAuthByIdResponses,
+  GetExternalAuthByTemplateVersionData,
+  GetExternalAuthByTemplateVersionResponses,
+  GetExternalAuthDeviceByIdData,
+  GetExternalAuthDeviceByIdResponses,
+  GetFileByIdData,
+  GetFileByIdResponses,
+  GetGithubDeviceAuthData,
+  GetGithubDeviceAuthResponses,
+  GetGroupByIdData,
+  GetGroupByIdResponses,
+  GetGroupByOrganizationAndGroupNameData,
+  GetGroupByOrganizationAndGroupNameResponses,
+  GetGroupIdpSyncSettingsByOrganizationData,
+  GetGroupIdpSyncSettingsByOrganizationResponses,
+  GetGroupsByOrganizationData,
+  GetGroupsByOrganizationResponses,
+  GetGroupsData,
+  GetGroupsResponses,
+  GetHealthSettingsData,
+  GetHealthSettingsResponses,
+  GetInsightsAboutTemplatesData,
+  GetInsightsAboutTemplatesResponses,
+  GetInsightsAboutUserActivityData,
+  GetInsightsAboutUserActivityResponses,
+  GetInsightsAboutUserLatencyData,
+  GetInsightsAboutUserLatencyResponses,
+  GetInsightsAboutUserStatusCountsData,
+  GetInsightsAboutUserStatusCountsResponses,
+  GetLicensesData,
+  GetLicensesResponses,
+  GetListeningPortsForWorkspaceAgentData,
+  GetListeningPortsForWorkspaceAgentResponses,
+  GetLogsByTemplateVersionData,
+  GetLogsByTemplateVersionResponses,
+  GetLogsByWorkspaceAgentData,
+  GetLogsByWorkspaceAgentResponses,
+  GetMemberRolesByOrganizationData,
+  GetMemberRolesByOrganizationResponses,
+  GetNotificationDispatchMethodsData,
+  GetNotificationDispatchMethodsResponses,
+  GetNotificationsSettingsData,
+  GetNotificationsSettingsResponses,
+  GetOauth2ApplicationData,
+  GetOauth2ApplicationResponses,
+  GetOauth2ApplicationsData,
+  GetOauth2ApplicationSecretsData,
+  GetOauth2ApplicationSecretsResponses,
+  GetOauth2ApplicationsResponses,
+  GetOauth2ClientConfigurationData,
+  GetOauth2ClientConfigurationResponses,
+  GetOrganizationByIdData,
+  GetOrganizationByIdResponses,
+  GetOrganizationByUserAndOrganizationNameData,
+  GetOrganizationByUserAndOrganizationNameResponses,
+  GetOrganizationIdpSyncSettingsData,
+  GetOrganizationIdpSyncSettingsResponses,
+  GetOrganizationsByUserData,
+  GetOrganizationsByUserResponses,
+  GetOrganizationsData,
+  GetOrganizationsResponses,
+  GetPrebuildsSettingsData,
+  GetPrebuildsSettingsResponses,
+  GetPreviousTemplateVersionByOrganizationTemplateAndNameData,
+  GetPreviousTemplateVersionByOrganizationTemplateAndNameResponses,
+  GetProvisionerDaemonsData,
+  GetProvisionerDaemonsResponses,
+  GetProvisionerJobData,
+  GetProvisionerJobResponses,
+  GetProvisionerJobsData,
+  GetProvisionerJobsResponses,
+  GetProvisionerStateForWorkspaceBuildData,
+  GetProvisionerStateForWorkspaceBuildResponses,
+  GetResourcesByTemplateVersionData,
+  GetResourcesByTemplateVersionResponses,
+  GetRichParametersByTemplateVersionData,
+  GetRichParametersByTemplateVersionResponses,
+  GetRoleIdpSyncSettingsByOrganizationData,
+  GetRoleIdpSyncSettingsByOrganizationResponses,
+  GetRunningContainersForWorkspaceAgentData,
+  GetRunningContainersForWorkspaceAgentResponses,
+  GetSafeExperimentsData,
+  GetSafeExperimentsResponses,
+  GetSiteMemberRolesData,
+  GetSiteMemberRolesResponses,
+  GetSiteWideRegionsForWorkspaceConnectionsData,
+  GetSiteWideRegionsForWorkspaceConnectionsResponses,
+  GetSystemNotificationTemplatesData,
+  GetSystemNotificationTemplatesErrors,
+  GetSystemNotificationTemplatesResponses,
+  GetTaskData,
+  GetTaskLogsData,
+  GetTaskLogsResponses,
+  GetTaskResponses,
+  GetTemplateAclsData,
+  GetTemplateAclsResponses,
+  GetTemplateAvailableAclUsersgroupsData,
+  GetTemplateAvailableAclUsersgroupsResponses,
+  GetTemplateDausByIdData,
+  GetTemplateDausByIdResponses,
+  GetTemplateExamplesByOrganizationData,
+  GetTemplateExamplesByOrganizationResponses,
+  GetTemplateExamplesData,
+  GetTemplateExamplesResponses,
+  GetTemplatesByOrganizationAndTemplateNameData,
+  GetTemplatesByOrganizationAndTemplateNameResponses,
+  GetTemplatesByOrganizationData,
+  GetTemplatesByOrganizationResponses,
+  GetTemplateSettingsByIdData,
+  GetTemplateSettingsByIdResponses,
+  GetTemplateVariablesByTemplateVersionData,
+  GetTemplateVariablesByTemplateVersionResponses,
+  GetTemplateVersionByIdData,
+  GetTemplateVersionByIdResponses,
+  GetTemplateVersionByOrganizationTemplateAndNameData,
+  GetTemplateVersionByOrganizationTemplateAndNameResponses,
+  GetTemplateVersionByTemplateIdAndNameData,
+  GetTemplateVersionByTemplateIdAndNameResponses,
+  GetTemplateVersionDryRunByJobIdData,
+  GetTemplateVersionDryRunByJobIdResponses,
+  GetTemplateVersionDryRunLogsByJobIdData,
+  GetTemplateVersionDryRunLogsByJobIdResponses,
+  GetTemplateVersionDryRunMatchedProvisionersData,
+  GetTemplateVersionDryRunMatchedProvisionersResponses,
+  GetTemplateVersionDryRunResourcesByJobIdData,
+  GetTemplateVersionDryRunResourcesByJobIdResponses,
+  GetTemplateVersionPresetsData,
+  GetTemplateVersionPresetsResponses,
+  GetTheAvailableIdpSyncClaimFieldsData,
+  GetTheAvailableIdpSyncClaimFieldsResponses,
+  GetTheAvailableOrganizationIdpSyncClaimFieldsData,
+  GetTheAvailableOrganizationIdpSyncClaimFieldsResponses,
+  GetTheIdpSyncClaimFieldValuesData,
+  GetTheIdpSyncClaimFieldValuesResponses,
+  GetTheOrganizationIdpSyncClaimFieldValuesData,
+  GetTheOrganizationIdpSyncClaimFieldValuesResponses,
+  GetTokenConfigData,
+  GetTokenConfigResponses,
+  GetUserAppearanceSettingsData,
+  GetUserAppearanceSettingsResponses,
+  GetUserByNameData,
+  GetUserByNameResponses,
+  GetUserExternalAuthsData,
+  GetUserExternalAuthsResponses,
+  GetUserGitSshKeyData,
+  GetUserGitSshKeyResponses,
+  GetUserLoginTypeData,
+  GetUserLoginTypeResponses,
+  GetUserNotificationPreferencesData,
+  GetUserNotificationPreferencesResponses,
+  GetUserQuietHoursScheduleData,
+  GetUserQuietHoursScheduleResponses,
+  GetUserRolesData,
+  GetUserRolesResponses,
+  GetUsersData,
+  GetUsersResponses,
+  GetUserTokensData,
+  GetUserTokensResponses,
+  GetWorkspaceAclsData,
+  GetWorkspaceAclsResponses,
+  GetWorkspaceAgentByIdData,
+  GetWorkspaceAgentByIdResponses,
+  GetWorkspaceAgentExternalAuthData,
+  GetWorkspaceAgentExternalAuthResponses,
+  GetWorkspaceAgentGitSshKeyData,
+  GetWorkspaceAgentGitSshKeyResponses,
+  GetWorkspaceAgentPortSharesData,
+  GetWorkspaceAgentPortSharesResponses,
+  GetWorkspaceAgentReinitializationData,
+  GetWorkspaceAgentReinitializationResponses,
+  GetWorkspaceBuildByUserWorkspaceNameAndBuildNumberData,
+  GetWorkspaceBuildByUserWorkspaceNameAndBuildNumberResponses,
+  GetWorkspaceBuildData,
+  GetWorkspaceBuildLogsData,
+  GetWorkspaceBuildLogsResponses,
+  GetWorkspaceBuildResponses,
+  GetWorkspaceBuildsByWorkspaceIdData,
+  GetWorkspaceBuildsByWorkspaceIdResponses,
+  GetWorkspaceBuildTimingsByIdData,
+  GetWorkspaceBuildTimingsByIdResponses,
+  GetWorkspaceExternalAgentCredentialsData,
+  GetWorkspaceExternalAgentCredentialsResponses,
+  GetWorkspaceMetadataByIdData,
+  GetWorkspaceMetadataByIdResponses,
+  GetWorkspaceMetadataByUserAndWorkspaceNameData,
+  GetWorkspaceMetadataByUserAndWorkspaceNameResponses,
+  GetWorkspaceProxiesData,
+  GetWorkspaceProxiesResponses,
+  GetWorkspaceProxyCryptoKeysData,
+  GetWorkspaceProxyCryptoKeysResponses,
+  GetWorkspaceProxyData,
+  GetWorkspaceProxyResponses,
+  GetWorkspaceQuotaByUserData,
+  GetWorkspaceQuotaByUserDeprecatedData,
+  GetWorkspaceQuotaByUserDeprecatedResponses,
+  GetWorkspaceQuotaByUserResponses,
+  GetWorkspaceTimingsByIdData,
+  GetWorkspaceTimingsByIdResponses,
+  InsertACustomOrganizationRoleData,
+  InsertACustomOrganizationRoleResponses,
+  IssueSignedAppTokenForReconnectingPtyData,
+  IssueSignedAppTokenForReconnectingPtyResponses,
+  IssueSignedWorkspaceAppTokenData,
+  IssueSignedWorkspaceAppTokenResponses,
+  ListAibridgeInterceptionsData,
+  ListAibridgeInterceptionsResponses,
+  ListApiKeyScopesData,
+  ListApiKeyScopesResponses,
+  ListInboxNotificationsData,
+  ListInboxNotificationsResponses,
+  ListOrganizationMembersData,
+  ListOrganizationMembersResponses,
+  ListProvisionerKeyDaemonsData,
+  ListProvisionerKeyDaemonsResponses,
+  ListProvisionerKeyData,
+  ListProvisionerKeyResponses,
+  ListTasksData,
+  ListTasksResponses,
+  ListTemplateVersionsByTemplateIdData,
+  ListTemplateVersionsByTemplateIdResponses,
+  ListWorkspacesData,
+  ListWorkspacesResponses,
+  LogInUserData,
+  LogInUserResponses,
+  LogOutUserData,
+  LogOutUserResponses,
+  MarkAllUnreadNotificationsAsReadData,
+  MarkAllUnreadNotificationsAsReadResponses,
+  Oauth2AuthorizationRequestGetData,
+  Oauth2AuthorizationRequestGetResponses,
+  Oauth2AuthorizationRequestPostData,
+  Oauth2AuthorizationServerMetadataData,
+  Oauth2AuthorizationServerMetadataResponses,
+  Oauth2DynamicClientRegistrationData,
+  Oauth2DynamicClientRegistrationResponses,
+  Oauth2ProtectedResourceMetadataData,
+  Oauth2ProtectedResourceMetadataResponses,
+  Oauth2TokenExchangeData,
+  Oauth2TokenExchangeResponses,
+  Oauth2TokenRevocationData,
+  Oauth2TokenRevocationResponses,
+  Oauth20GithubCallbackData,
+  OpenDynamicParametersWebsocketByTemplateVersionData,
+  OpenidConnectCallbackData,
+  OpenPtyToWorkspaceAgentData,
+  PaginatedOrganizationMembersData,
+  PaginatedOrganizationMembersResponses,
+  PatchTemplateVersionByIdData,
+  PatchTemplateVersionByIdResponses,
+  PatchWorkspaceAgentAppStatusData,
+  PatchWorkspaceAgentAppStatusResponses,
+  PatchWorkspaceAgentLogsData,
+  PatchWorkspaceAgentLogsResponses,
+  PostExternalAuthDeviceByIdData,
+  PostExternalAuthDeviceByIdResponses,
+  PostWorkspaceAgentLogSourceData,
+  PostWorkspaceAgentLogSourceResponses,
+  PostWorkspaceUsageByIdData,
+  PostWorkspaceUsageByIdResponses,
+  PutOauth2ClientConfigurationData,
+  PutOauth2ClientConfigurationResponses,
+  RecreateDevcontainerForWorkspaceAgentData,
+  RecreateDevcontainerForWorkspaceAgentResponses,
+  RedirectToUriWithEncryptedApiKeyData,
+  RegenerateUserSshKeyData,
+  RegenerateUserSshKeyResponses,
+  RegisterWorkspaceProxyData,
+  RegisterWorkspaceProxyResponses,
+  RemovedGetLogsByWorkspaceAgentData,
+  RemovedGetLogsByWorkspaceAgentResponses,
+  RemovedGetParametersByTemplateVersionData,
+  RemovedGetParametersByTemplateVersionResponses,
+  RemovedGetSchemaByTemplateVersionData,
+  RemovedGetSchemaByTemplateVersionResponses,
+  RemovedGetWorkspaceAgentGitAuthData,
+  RemovedGetWorkspaceAgentGitAuthResponses,
+  RemovedGetWorkspaceResourcesForWorkspaceBuildData,
+  RemovedGetWorkspaceResourcesForWorkspaceBuildResponses,
+  RemoveOrganizationMemberData,
+  RemoveOrganizationMemberResponses,
+  ReportCspViolationsData,
+  ReportCspViolationsResponses,
+  ReportWorkspaceAppStatsData,
+  ReportWorkspaceAppStatsResponses,
+  RequestOneTimePasscodeData,
+  RequestOneTimePasscodeResponses,
+  ResolveWorkspaceAutostartByIdData,
+  ResolveWorkspaceAutostartByIdResponses,
+  ScimCreateNewUserData,
+  ScimCreateNewUserResponses,
+  ScimGetServiceProviderConfigData,
+  ScimGetServiceProviderConfigResponses,
+  ScimGetUserByIdData,
+  ScimGetUserByIdErrors,
+  ScimGetUsersData,
+  ScimGetUsersResponses,
+  ScimReplaceUserStatusData,
+  ScimReplaceUserStatusResponses,
+  ScimUpdateUserStatusData,
+  ScimUpdateUserStatusResponses,
+  SendACustomNotificationData,
+  SendACustomNotificationErrors,
+  SendACustomNotificationResponses,
+  SendATestNotificationData,
+  SendATestNotificationResponses,
+  SendATestPushNotificationData,
+  SendATestPushNotificationResponses,
+  SendTaskInputData,
+  SendTaskInputResponses,
+  ServeProvisionerDaemonData,
+  SshConfigData,
+  SshConfigResponses,
+  SuspendUserAccountData,
+  SuspendUserAccountResponses,
+  UnarchiveTemplateVersionData,
+  UnarchiveTemplateVersionResponses,
+  UnfavoriteWorkspaceByIdData,
+  UnfavoriteWorkspaceByIdResponses,
+  UpdateActiveTemplateVersionByTemplateIdData,
+  UpdateActiveTemplateVersionByTemplateIdResponses,
+  UpdateAppearanceData,
+  UpdateAppearanceResponses,
+  UpdateCheckData,
+  UpdateCheckResponses,
+  UpdateGroupByNameData,
+  UpdateGroupByNameResponses,
+  UpdateGroupIdpSyncConfigData,
+  UpdateGroupIdpSyncConfigResponses,
+  UpdateGroupIdpSyncMappingData,
+  UpdateGroupIdpSyncMappingResponses,
+  UpdateGroupIdpSyncSettingsByOrganizationData,
+  UpdateGroupIdpSyncSettingsByOrganizationResponses,
+  UpdateHealthSettingsData,
+  UpdateHealthSettingsResponses,
+  UpdateLicenseEntitlementsData,
+  UpdateLicenseEntitlementsResponses,
+  UpdateNotificationsSettingsData,
+  UpdateNotificationsSettingsResponses,
+  UpdateNotificationTemplateDispatchMethodData,
+  UpdateNotificationTemplateDispatchMethodResponses,
+  UpdateOauth2ApplicationData,
+  UpdateOauth2ApplicationResponses,
+  UpdateOrganizationData,
+  UpdateOrganizationIdpSyncConfigData,
+  UpdateOrganizationIdpSyncConfigResponses,
+  UpdateOrganizationIdpSyncMappingData,
+  UpdateOrganizationIdpSyncMappingResponses,
+  UpdateOrganizationIdpSyncSettingsData,
+  UpdateOrganizationIdpSyncSettingsResponses,
+  UpdateOrganizationResponses,
+  UpdatePrebuildsSettingsData,
+  UpdatePrebuildsSettingsResponses,
+  UpdateReadStatusOfANotificationData,
+  UpdateReadStatusOfANotificationResponses,
+  UpdateRoleIdpSyncConfigData,
+  UpdateRoleIdpSyncConfigResponses,
+  UpdateRoleIdpSyncMappingData,
+  UpdateRoleIdpSyncMappingResponses,
+  UpdateRoleIdpSyncSettingsByOrganizationData,
+  UpdateRoleIdpSyncSettingsByOrganizationResponses,
+  UpdateTemplateAclData,
+  UpdateTemplateAclResponses,
+  UpdateTemplateSettingsByIdData,
+  UpdateTemplateSettingsByIdResponses,
+  UpdateUserAppearanceSettingsData,
+  UpdateUserAppearanceSettingsResponses,
+  UpdateUserNotificationPreferencesData,
+  UpdateUserNotificationPreferencesResponses,
+  UpdateUserPasswordData,
+  UpdateUserPasswordResponses,
+  UpdateUserProfileData,
+  UpdateUserProfileResponses,
+  UpdateUserQuietHoursScheduleData,
+  UpdateUserQuietHoursScheduleResponses,
+  UpdateWorkspaceAclData,
+  UpdateWorkspaceAclResponses,
+  UpdateWorkspaceAutomaticUpdatesByIdData,
+  UpdateWorkspaceAutomaticUpdatesByIdResponses,
+  UpdateWorkspaceAutostartScheduleByIdData,
+  UpdateWorkspaceAutostartScheduleByIdResponses,
+  UpdateWorkspaceDormancyStatusByIdData,
+  UpdateWorkspaceDormancyStatusByIdResponses,
+  UpdateWorkspaceMetadataByIdData,
+  UpdateWorkspaceMetadataByIdResponses,
+  UpdateWorkspaceProxyData,
+  UpdateWorkspaceProxyResponses,
+  UpdateWorkspaceTtlByIdData,
+  UpdateWorkspaceTtlByIdResponses,
+  UploadFileData,
+  UploadFileResponses,
+  UpsertACustomOrganizationRoleData,
+  UpsertACustomOrganizationRoleResponses,
+  UpsertWorkspaceAgentPortShareData,
+  UpsertWorkspaceAgentPortShareResponses,
+  UserScopedTailnetRpcConnectionData,
+  ValidateUserPasswordData,
+  ValidateUserPasswordResponses,
+  WatchForNewInboxNotificationsData,
+  WatchForNewInboxNotificationsResponses,
+  WatchForWorkspaceAgentMetadataUpdatesData,
+  WatchForWorkspaceAgentMetadataUpdatesResponses,
+  WatchForWorkspaceAgentMetadataUpdatesViaWebsocketsData,
+  WatchForWorkspaceAgentMetadataUpdatesViaWebsocketsResponses,
+  WatchWorkspaceAgentForContainerUpdatesData,
+  WatchWorkspaceAgentForContainerUpdatesResponses,
+  WatchWorkspaceByIdData,
+  WatchWorkspaceByIdResponses,
+  WatchWorkspaceByIdViaWebsocketsData,
+  WatchWorkspaceByIdViaWebsocketsResponses,
+  WorkspaceAgentRpcApiData,
+  WorkspaceProxyCoordinateData,
+} from "./types.gen";
+import { urlSearchParamsBodySerializer } from "./client";
+import { client } from "./client.gen";
+
 // This file is auto-generated by @hey-api/openapi-ts
 
-import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
-import { client } from './client.gen';
-import type { ActivateUserAccountData, ActivateUserAccountResponses, AddNewLicenseData, AddNewLicenseResponses, AddOrganizationMemberData, AddOrganizationMemberResponses, ApiRootHandlerData, ApiRootHandlerResponses, ArchiveTemplateUnusedVersionsByTemplateIdData, ArchiveTemplateUnusedVersionsByTemplateIdResponses, ArchiveTemplateVersionData, ArchiveTemplateVersionResponses, AssignRoleToOrganizationMemberData, AssignRoleToOrganizationMemberResponses, AssignRoleToUserData, AssignRoleToUserResponses, AuthenticateAgentOnAwsInstanceData, AuthenticateAgentOnAwsInstanceResponses, AuthenticateAgentOnAzureInstanceData, AuthenticateAgentOnAzureInstanceResponses, AuthenticateAgentOnGoogleCloudInstanceData, AuthenticateAgentOnGoogleCloudInstanceResponses, BuildInfoData, BuildInfoResponses, CancelTemplateVersionByIdData, CancelTemplateVersionByIdResponses, CancelTemplateVersionDryRunByJobIdData, CancelTemplateVersionDryRunByJobIdResponses, CancelWorkspaceBuildData, CancelWorkspaceBuildResponses, ChangePasswordWithAOneTimePasscodeData, ChangePasswordWithAOneTimePasscodeResponses, CheckAuthorizationData, CheckAuthorizationResponses, CheckInitialUserCreatedData, CheckInitialUserCreatedResponses, CompletelyClearsTheWorkspacesUserAndGroupAclsData, CompletelyClearsTheWorkspacesUserAndGroupAclsResponses, ConvertUserFromPasswordToOauthAuthenticationData, ConvertUserFromPasswordToOauthAuthenticationResponses, CoordinateWorkspaceAgentData, CreateGroupForOrganizationData, CreateGroupForOrganizationResponses, CreateInitialUserData, CreateInitialUserResponses, CreateNewSessionKeyData, CreateNewSessionKeyResponses, CreateNewUserData, CreateNewUserResponses, CreateOauth2ApplicationData, CreateOauth2ApplicationResponses, CreateOauth2ApplicationSecretData, CreateOauth2ApplicationSecretResponses, CreateOrganizationData, CreateOrganizationResponses, CreateProvisionerKeyData, CreateProvisionerKeyResponses, CreateTaskData, CreateTaskResponses, CreateTemplateByOrganizationData, CreateTemplateByOrganizationResponses, CreateTemplateVersionByOrganizationData, CreateTemplateVersionByOrganizationResponses, CreateTemplateVersionDryRunData, CreateTemplateVersionDryRunResponses, CreateTokenApiKeyData, CreateTokenApiKeyResponses, CreateUserWebpushSubscriptionData, CreateUserWebpushSubscriptionResponses, CreateUserWorkspaceByOrganizationData, CreateUserWorkspaceByOrganizationResponses, CreateUserWorkspaceData, CreateUserWorkspaceResponses, CreateWorkspaceBuildData, CreateWorkspaceBuildResponses, CreateWorkspaceProxyData, CreateWorkspaceProxyResponses, DebugDerpTrafficData, DebugDerpTrafficResponses, DebugExpvarData, DebugExpvarResponses, DebugInfoDeploymentHealthData, DebugInfoDeploymentHealthResponses, DebugInfoTailnetData, DebugInfoTailnetResponses, DebugInfoWebsocketTestData, DebugInfoWebsocketTestResponses, DebugInfoWireguardCoordinatorData, DebugInfoWireguardCoordinatorResponses, DebugMetricsData, DebugMetricsResponses, DebugOidcContextForAuserData, DebugOidcContextForAuserResponses, DebugPprofCmdlineData, DebugPprofCmdlineResponses, DebugPprofIndexData, DebugPprofIndexResponses, DebugPprofProfileData, DebugPprofProfileResponses, DebugPprofSymbolData, DebugPprofSymbolResponses, DebugPprofTraceData, DebugPprofTraceResponses, DeleteACustomOrganizationRoleData, DeleteACustomOrganizationRoleResponses, DeleteApiKeyData, DeleteApiKeyResponses, DeleteExternalAuthUserLinkByIdData, DeleteExternalAuthUserLinkByIdResponses, DeleteGroupByNameData, DeleteGroupByNameResponses, DeleteLicenseData, DeleteLicenseResponses, DeleteOauth2ApplicationData, DeleteOauth2ApplicationResponses, DeleteOauth2ApplicationSecretData, DeleteOauth2ApplicationSecretResponses, DeleteOauth2ApplicationTokensData, DeleteOauth2ApplicationTokensResponses, DeleteOauth2ClientConfigurationData, DeleteOauth2ClientConfigurationResponses, DeleteOrganizationData, DeleteOrganizationResponses, DeleteProvisionerKeyData, DeleteProvisionerKeyResponses, DeleteTaskData, DeleteTaskResponses, DeleteTemplateByIdData, DeleteTemplateByIdResponses, DeleteUserData, DeleteUserResponses, DeleteUserWebpushSubscriptionData, DeleteUserWebpushSubscriptionResponses, DeleteWorkspaceAgentPortShareData, DeleteWorkspaceAgentPortShareResponses, DeleteWorkspaceProxyData, DeleteWorkspaceProxyResponses, DeregisterWorkspaceProxyData, DeregisterWorkspaceProxyResponses, EvaluateDynamicParametersForTemplateVersionData, EvaluateDynamicParametersForTemplateVersionResponses, ExtendWorkspaceDeadlineByIdData, ExtendWorkspaceDeadlineByIdResponses, FavoriteWorkspaceByIdData, FavoriteWorkspaceByIdResponses, FetchProvisionerKeyDetailsData, FetchProvisionerKeyDetailsResponses, GenerateFakeAuditLogData, GenerateFakeAuditLogResponses, GetActiveReplicasData, GetActiveReplicasResponses, GetAgentInitScriptData, GetAgentInitScriptResponses, GetAllTemplatesData, GetAllTemplatesResponses, GetApiKeyByIdData, GetApiKeyByIdResponses, GetApiKeyByTokenNameData, GetApiKeyByTokenNameResponses, GetAppearanceData, GetAppearanceResponses, GetApplicationsHostData, GetApplicationsHostResponses, GetAuditLogsData, GetAuditLogsResponses, GetAuthenticationMethodsData, GetAuthenticationMethodsResponses, GetAutofillBuildParametersForUserData, GetAutofillBuildParametersForUserResponses, GetBuildParametersForWorkspaceBuildData, GetBuildParametersForWorkspaceBuildResponses, GetConnectionInfoForWorkspaceAgentData, GetConnectionInfoForWorkspaceAgentGenericData, GetConnectionInfoForWorkspaceAgentGenericResponses, GetConnectionInfoForWorkspaceAgentResponses, GetConnectionLogsData, GetConnectionLogsResponses, GetCustomNotificationTemplatesData, GetCustomNotificationTemplatesErrors, GetCustomNotificationTemplatesResponses, GetDeploymentConfigData, GetDeploymentConfigResponses, GetDeploymentDausData, GetDeploymentDausResponses, GetDeploymentStatsData, GetDeploymentStatsResponses, GetDerpMapUpdatesData, GetEnabledExperimentsData, GetEnabledExperimentsResponses, GetEntitlementsData, GetEntitlementsResponses, GetExternalAuthByIdData, GetExternalAuthByIdResponses, GetExternalAuthByTemplateVersionData, GetExternalAuthByTemplateVersionResponses, GetExternalAuthDeviceByIdData, GetExternalAuthDeviceByIdResponses, GetFileByIdData, GetFileByIdResponses, GetGithubDeviceAuthData, GetGithubDeviceAuthResponses, GetGroupByIdData, GetGroupByIdResponses, GetGroupByOrganizationAndGroupNameData, GetGroupByOrganizationAndGroupNameResponses, GetGroupIdpSyncSettingsByOrganizationData, GetGroupIdpSyncSettingsByOrganizationResponses, GetGroupsByOrganizationData, GetGroupsByOrganizationResponses, GetGroupsData, GetGroupsResponses, GetHealthSettingsData, GetHealthSettingsResponses, GetInsightsAboutTemplatesData, GetInsightsAboutTemplatesResponses, GetInsightsAboutUserActivityData, GetInsightsAboutUserActivityResponses, GetInsightsAboutUserLatencyData, GetInsightsAboutUserLatencyResponses, GetInsightsAboutUserStatusCountsData, GetInsightsAboutUserStatusCountsResponses, GetLicensesData, GetLicensesResponses, GetListeningPortsForWorkspaceAgentData, GetListeningPortsForWorkspaceAgentResponses, GetLogsByTemplateVersionData, GetLogsByTemplateVersionResponses, GetLogsByWorkspaceAgentData, GetLogsByWorkspaceAgentResponses, GetMemberRolesByOrganizationData, GetMemberRolesByOrganizationResponses, GetNotificationDispatchMethodsData, GetNotificationDispatchMethodsResponses, GetNotificationsSettingsData, GetNotificationsSettingsResponses, GetOauth2ApplicationData, GetOauth2ApplicationResponses, GetOauth2ApplicationsData, GetOauth2ApplicationSecretsData, GetOauth2ApplicationSecretsResponses, GetOauth2ApplicationsResponses, GetOauth2ClientConfigurationData, GetOauth2ClientConfigurationResponses, GetOrganizationByIdData, GetOrganizationByIdResponses, GetOrganizationByUserAndOrganizationNameData, GetOrganizationByUserAndOrganizationNameResponses, GetOrganizationIdpSyncSettingsData, GetOrganizationIdpSyncSettingsResponses, GetOrganizationsByUserData, GetOrganizationsByUserResponses, GetOrganizationsData, GetOrganizationsResponses, GetPrebuildsSettingsData, GetPrebuildsSettingsResponses, GetPreviousTemplateVersionByOrganizationTemplateAndNameData, GetPreviousTemplateVersionByOrganizationTemplateAndNameResponses, GetProvisionerDaemonsData, GetProvisionerDaemonsResponses, GetProvisionerJobData, GetProvisionerJobResponses, GetProvisionerJobsData, GetProvisionerJobsResponses, GetProvisionerStateForWorkspaceBuildData, GetProvisionerStateForWorkspaceBuildResponses, GetResourcesByTemplateVersionData, GetResourcesByTemplateVersionResponses, GetRichParametersByTemplateVersionData, GetRichParametersByTemplateVersionResponses, GetRoleIdpSyncSettingsByOrganizationData, GetRoleIdpSyncSettingsByOrganizationResponses, GetRunningContainersForWorkspaceAgentData, GetRunningContainersForWorkspaceAgentResponses, GetSafeExperimentsData, GetSafeExperimentsResponses, GetSiteMemberRolesData, GetSiteMemberRolesResponses, GetSiteWideRegionsForWorkspaceConnectionsData, GetSiteWideRegionsForWorkspaceConnectionsResponses, GetSystemNotificationTemplatesData, GetSystemNotificationTemplatesErrors, GetSystemNotificationTemplatesResponses, GetTaskData, GetTaskLogsData, GetTaskLogsResponses, GetTaskResponses, GetTemplateAclsData, GetTemplateAclsResponses, GetTemplateAvailableAclUsersgroupsData, GetTemplateAvailableAclUsersgroupsResponses, GetTemplateDausByIdData, GetTemplateDausByIdResponses, GetTemplateExamplesByOrganizationData, GetTemplateExamplesByOrganizationResponses, GetTemplateExamplesData, GetTemplateExamplesResponses, GetTemplatesByOrganizationAndTemplateNameData, GetTemplatesByOrganizationAndTemplateNameResponses, GetTemplatesByOrganizationData, GetTemplatesByOrganizationResponses, GetTemplateSettingsByIdData, GetTemplateSettingsByIdResponses, GetTemplateVariablesByTemplateVersionData, GetTemplateVariablesByTemplateVersionResponses, GetTemplateVersionByIdData, GetTemplateVersionByIdResponses, GetTemplateVersionByOrganizationTemplateAndNameData, GetTemplateVersionByOrganizationTemplateAndNameResponses, GetTemplateVersionByTemplateIdAndNameData, GetTemplateVersionByTemplateIdAndNameResponses, GetTemplateVersionDryRunByJobIdData, GetTemplateVersionDryRunByJobIdResponses, GetTemplateVersionDryRunLogsByJobIdData, GetTemplateVersionDryRunLogsByJobIdResponses, GetTemplateVersionDryRunMatchedProvisionersData, GetTemplateVersionDryRunMatchedProvisionersResponses, GetTemplateVersionDryRunResourcesByJobIdData, GetTemplateVersionDryRunResourcesByJobIdResponses, GetTemplateVersionPresetsData, GetTemplateVersionPresetsResponses, GetTheAvailableIdpSyncClaimFieldsData, GetTheAvailableIdpSyncClaimFieldsResponses, GetTheAvailableOrganizationIdpSyncClaimFieldsData, GetTheAvailableOrganizationIdpSyncClaimFieldsResponses, GetTheIdpSyncClaimFieldValuesData, GetTheIdpSyncClaimFieldValuesResponses, GetTheOrganizationIdpSyncClaimFieldValuesData, GetTheOrganizationIdpSyncClaimFieldValuesResponses, GetTokenConfigData, GetTokenConfigResponses, GetUserAppearanceSettingsData, GetUserAppearanceSettingsResponses, GetUserByNameData, GetUserByNameResponses, GetUserExternalAuthsData, GetUserExternalAuthsResponses, GetUserGitSshKeyData, GetUserGitSshKeyResponses, GetUserLoginTypeData, GetUserLoginTypeResponses, GetUserNotificationPreferencesData, GetUserNotificationPreferencesResponses, GetUserQuietHoursScheduleData, GetUserQuietHoursScheduleResponses, GetUserRolesData, GetUserRolesResponses, GetUsersData, GetUsersResponses, GetUserTokensData, GetUserTokensResponses, GetWorkspaceAclsData, GetWorkspaceAclsResponses, GetWorkspaceAgentByIdData, GetWorkspaceAgentByIdResponses, GetWorkspaceAgentExternalAuthData, GetWorkspaceAgentExternalAuthResponses, GetWorkspaceAgentGitSshKeyData, GetWorkspaceAgentGitSshKeyResponses, GetWorkspaceAgentPortSharesData, GetWorkspaceAgentPortSharesResponses, GetWorkspaceAgentReinitializationData, GetWorkspaceAgentReinitializationResponses, GetWorkspaceBuildByUserWorkspaceNameAndBuildNumberData, GetWorkspaceBuildByUserWorkspaceNameAndBuildNumberResponses, GetWorkspaceBuildData, GetWorkspaceBuildLogsData, GetWorkspaceBuildLogsResponses, GetWorkspaceBuildResponses, GetWorkspaceBuildsByWorkspaceIdData, GetWorkspaceBuildsByWorkspaceIdResponses, GetWorkspaceBuildTimingsByIdData, GetWorkspaceBuildTimingsByIdResponses, GetWorkspaceExternalAgentCredentialsData, GetWorkspaceExternalAgentCredentialsResponses, GetWorkspaceMetadataByIdData, GetWorkspaceMetadataByIdResponses, GetWorkspaceMetadataByUserAndWorkspaceNameData, GetWorkspaceMetadataByUserAndWorkspaceNameResponses, GetWorkspaceProxiesData, GetWorkspaceProxiesResponses, GetWorkspaceProxyCryptoKeysData, GetWorkspaceProxyCryptoKeysResponses, GetWorkspaceProxyData, GetWorkspaceProxyResponses, GetWorkspaceQuotaByUserData, GetWorkspaceQuotaByUserDeprecatedData, GetWorkspaceQuotaByUserDeprecatedResponses, GetWorkspaceQuotaByUserResponses, GetWorkspaceTimingsByIdData, GetWorkspaceTimingsByIdResponses, InsertACustomOrganizationRoleData, InsertACustomOrganizationRoleResponses, IssueSignedAppTokenForReconnectingPtyData, IssueSignedAppTokenForReconnectingPtyResponses, IssueSignedWorkspaceAppTokenData, IssueSignedWorkspaceAppTokenResponses, ListAibridgeInterceptionsData, ListAibridgeInterceptionsResponses, ListApiKeyScopesData, ListApiKeyScopesResponses, ListInboxNotificationsData, ListInboxNotificationsResponses, ListOrganizationMembersData, ListOrganizationMembersResponses, ListProvisionerKeyDaemonsData, ListProvisionerKeyDaemonsResponses, ListProvisionerKeyData, ListProvisionerKeyResponses, ListTasksData, ListTasksResponses, ListTemplateVersionsByTemplateIdData, ListTemplateVersionsByTemplateIdResponses, ListWorkspacesData, ListWorkspacesResponses, LogInUserData, LogInUserResponses, LogOutUserData, LogOutUserResponses, MarkAllUnreadNotificationsAsReadData, MarkAllUnreadNotificationsAsReadResponses, Oauth20GithubCallbackData, Oauth2AuthorizationRequestGetData, Oauth2AuthorizationRequestGetResponses, Oauth2AuthorizationRequestPostData, Oauth2AuthorizationServerMetadataData, Oauth2AuthorizationServerMetadataResponses, Oauth2DynamicClientRegistrationData, Oauth2DynamicClientRegistrationResponses, Oauth2ProtectedResourceMetadataData, Oauth2ProtectedResourceMetadataResponses, Oauth2TokenExchangeData, Oauth2TokenExchangeResponses, Oauth2TokenRevocationData, Oauth2TokenRevocationResponses, OpenDynamicParametersWebsocketByTemplateVersionData, OpenidConnectCallbackData, OpenPtyToWorkspaceAgentData, PaginatedOrganizationMembersData, PaginatedOrganizationMembersResponses, PatchTemplateVersionByIdData, PatchTemplateVersionByIdResponses, PatchWorkspaceAgentAppStatusData, PatchWorkspaceAgentAppStatusResponses, PatchWorkspaceAgentLogsData, PatchWorkspaceAgentLogsResponses, PostExternalAuthDeviceByIdData, PostExternalAuthDeviceByIdResponses, PostWorkspaceAgentLogSourceData, PostWorkspaceAgentLogSourceResponses, PostWorkspaceUsageByIdData, PostWorkspaceUsageByIdResponses, PutOauth2ClientConfigurationData, PutOauth2ClientConfigurationResponses, RecreateDevcontainerForWorkspaceAgentData, RecreateDevcontainerForWorkspaceAgentResponses, RedirectToUriWithEncryptedApiKeyData, RegenerateUserSshKeyData, RegenerateUserSshKeyResponses, RegisterWorkspaceProxyData, RegisterWorkspaceProxyResponses, RemovedGetLogsByWorkspaceAgentData, RemovedGetLogsByWorkspaceAgentResponses, RemovedGetParametersByTemplateVersionData, RemovedGetParametersByTemplateVersionResponses, RemovedGetSchemaByTemplateVersionData, RemovedGetSchemaByTemplateVersionResponses, RemovedGetWorkspaceAgentGitAuthData, RemovedGetWorkspaceAgentGitAuthResponses, RemovedGetWorkspaceResourcesForWorkspaceBuildData, RemovedGetWorkspaceResourcesForWorkspaceBuildResponses, RemoveOrganizationMemberData, RemoveOrganizationMemberResponses, ReportCspViolationsData, ReportCspViolationsResponses, ReportWorkspaceAppStatsData, ReportWorkspaceAppStatsResponses, RequestOneTimePasscodeData, RequestOneTimePasscodeResponses, ResolveWorkspaceAutostartByIdData, ResolveWorkspaceAutostartByIdResponses, ScimCreateNewUserData, ScimCreateNewUserResponses, ScimGetServiceProviderConfigData, ScimGetServiceProviderConfigResponses, ScimGetUserByIdData, ScimGetUserByIdErrors, ScimGetUsersData, ScimGetUsersResponses, ScimReplaceUserStatusData, ScimReplaceUserStatusResponses, ScimUpdateUserStatusData, ScimUpdateUserStatusResponses, SendACustomNotificationData, SendACustomNotificationErrors, SendACustomNotificationResponses, SendATestNotificationData, SendATestNotificationResponses, SendATestPushNotificationData, SendATestPushNotificationResponses, SendTaskInputData, SendTaskInputResponses, ServeProvisionerDaemonData, SshConfigData, SshConfigResponses, SuspendUserAccountData, SuspendUserAccountResponses, UnarchiveTemplateVersionData, UnarchiveTemplateVersionResponses, UnfavoriteWorkspaceByIdData, UnfavoriteWorkspaceByIdResponses, UpdateActiveTemplateVersionByTemplateIdData, UpdateActiveTemplateVersionByTemplateIdResponses, UpdateAppearanceData, UpdateAppearanceResponses, UpdateCheckData, UpdateCheckResponses, UpdateGroupByNameData, UpdateGroupByNameResponses, UpdateGroupIdpSyncConfigData, UpdateGroupIdpSyncConfigResponses, UpdateGroupIdpSyncMappingData, UpdateGroupIdpSyncMappingResponses, UpdateGroupIdpSyncSettingsByOrganizationData, UpdateGroupIdpSyncSettingsByOrganizationResponses, UpdateHealthSettingsData, UpdateHealthSettingsResponses, UpdateLicenseEntitlementsData, UpdateLicenseEntitlementsResponses, UpdateNotificationsSettingsData, UpdateNotificationsSettingsResponses, UpdateNotificationTemplateDispatchMethodData, UpdateNotificationTemplateDispatchMethodResponses, UpdateOauth2ApplicationData, UpdateOauth2ApplicationResponses, UpdateOrganizationData, UpdateOrganizationIdpSyncConfigData, UpdateOrganizationIdpSyncConfigResponses, UpdateOrganizationIdpSyncMappingData, UpdateOrganizationIdpSyncMappingResponses, UpdateOrganizationIdpSyncSettingsData, UpdateOrganizationIdpSyncSettingsResponses, UpdateOrganizationResponses, UpdatePrebuildsSettingsData, UpdatePrebuildsSettingsResponses, UpdateReadStatusOfANotificationData, UpdateReadStatusOfANotificationResponses, UpdateRoleIdpSyncConfigData, UpdateRoleIdpSyncConfigResponses, UpdateRoleIdpSyncMappingData, UpdateRoleIdpSyncMappingResponses, UpdateRoleIdpSyncSettingsByOrganizationData, UpdateRoleIdpSyncSettingsByOrganizationResponses, UpdateTemplateAclData, UpdateTemplateAclResponses, UpdateTemplateSettingsByIdData, UpdateTemplateSettingsByIdResponses, UpdateUserAppearanceSettingsData, UpdateUserAppearanceSettingsResponses, UpdateUserNotificationPreferencesData, UpdateUserNotificationPreferencesResponses, UpdateUserPasswordData, UpdateUserPasswordResponses, UpdateUserProfileData, UpdateUserProfileResponses, UpdateUserQuietHoursScheduleData, UpdateUserQuietHoursScheduleResponses, UpdateWorkspaceAclData, UpdateWorkspaceAclResponses, UpdateWorkspaceAutomaticUpdatesByIdData, UpdateWorkspaceAutomaticUpdatesByIdResponses, UpdateWorkspaceAutostartScheduleByIdData, UpdateWorkspaceAutostartScheduleByIdResponses, UpdateWorkspaceDormancyStatusByIdData, UpdateWorkspaceDormancyStatusByIdResponses, UpdateWorkspaceMetadataByIdData, UpdateWorkspaceMetadataByIdResponses, UpdateWorkspaceProxyData, UpdateWorkspaceProxyResponses, UpdateWorkspaceTtlByIdData, UpdateWorkspaceTtlByIdResponses, UploadFileData, UploadFileResponses, UpsertACustomOrganizationRoleData, UpsertACustomOrganizationRoleResponses, UpsertWorkspaceAgentPortShareData, UpsertWorkspaceAgentPortShareResponses, UserScopedTailnetRpcConnectionData, ValidateUserPasswordData, ValidateUserPasswordResponses, WatchForNewInboxNotificationsData, WatchForNewInboxNotificationsResponses, WatchForWorkspaceAgentMetadataUpdatesData, WatchForWorkspaceAgentMetadataUpdatesResponses, WatchForWorkspaceAgentMetadataUpdatesViaWebsocketsData, WatchForWorkspaceAgentMetadataUpdatesViaWebsocketsResponses, WatchWorkspaceAgentForContainerUpdatesData, WatchWorkspaceAgentForContainerUpdatesResponses, WatchWorkspaceByIdData, WatchWorkspaceByIdResponses, WatchWorkspaceByIdViaWebsocketsData, WatchWorkspaceByIdViaWebsocketsResponses, WorkspaceAgentRpcApiData, WorkspaceProxyCoordinateData } from './types.gen';
-
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
-    /**
-     * You can provide a client instance returned by `createClient()` instead of
-     * individual options. This might be also useful if you want to implement a
-     * custom client.
-     */
-    client?: Client;
-    /**
-     * You can pass arbitrary values through the `meta` object. This can be
-     * used to access values that aren't defined as part of the SDK function.
-     */
-    meta?: Record<string, unknown>;
+export type Options<
+  TData extends TDataShape = TDataShape,
+  ThrowOnError extends boolean = boolean,
+> = Options2<TData, ThrowOnError> & {
+  /**
+   * You can provide a client instance returned by `createClient()` instead of
+   * individual options. This might be also useful if you want to implement a
+   * custom client.
+   */
+  client?: Client;
+  /**
+   * You can pass arbitrary values through the `meta` object. This can be
+   * used to access values that aren't defined as part of the SDK function.
+   */
+  meta?: Record<string, unknown>;
 };
 
 /**
  * API root handler
  */
-export const apiRootHandler = <ThrowOnError extends boolean = false>(options?: Options<ApiRootHandlerData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ApiRootHandlerResponses, unknown, ThrowOnError>({
-        url: '/',
-        ...options
-    });
+export const apiRootHandler = <ThrowOnError extends boolean = false>(
+  options?: Options<ApiRootHandlerData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ApiRootHandlerResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/",
+    ...options,
+  });
 };
 
 /**
  * OAuth2 authorization server metadata.
  */
-export const oauth2AuthorizationServerMetadata = <ThrowOnError extends boolean = false>(options?: Options<Oauth2AuthorizationServerMetadataData, ThrowOnError>) => {
-    return (options?.client ?? client).get<Oauth2AuthorizationServerMetadataResponses, unknown, ThrowOnError>({
-        url: '/.well-known/oauth-authorization-server',
-        ...options
-    });
+export const oauth2AuthorizationServerMetadata = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<Oauth2AuthorizationServerMetadataData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    Oauth2AuthorizationServerMetadataResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/.well-known/oauth-authorization-server",
+    ...options,
+  });
 };
 
 /**
  * OAuth2 protected resource metadata.
  */
-export const oauth2ProtectedResourceMetadata = <ThrowOnError extends boolean = false>(options?: Options<Oauth2ProtectedResourceMetadataData, ThrowOnError>) => {
-    return (options?.client ?? client).get<Oauth2ProtectedResourceMetadataResponses, unknown, ThrowOnError>({
-        url: '/.well-known/oauth-protected-resource',
-        ...options
-    });
+export const oauth2ProtectedResourceMetadata = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<Oauth2ProtectedResourceMetadataData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    Oauth2ProtectedResourceMetadataResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/.well-known/oauth-protected-resource",
+    ...options,
+  });
 };
 
 /**
  * List AIBridge interceptions
  */
-export const listAibridgeInterceptions = <ThrowOnError extends boolean = false>(options?: Options<ListAibridgeInterceptionsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ListAibridgeInterceptionsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/aibridge/interceptions',
-        ...options
-    });
+export const listAibridgeInterceptions = <ThrowOnError extends boolean = false>(
+  options?: Options<ListAibridgeInterceptionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListAibridgeInterceptionsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/aibridge/interceptions",
+    ...options,
+  });
 };
 
 /**
  * List AI tasks
  */
-export const listTasks = <ThrowOnError extends boolean = false>(options?: Options<ListTasksData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ListTasksResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/api/experimental/tasks',
-        ...options
-    });
+export const listTasks = <ThrowOnError extends boolean = false>(
+  options?: Options<ListTasksData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListTasksResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/api/experimental/tasks",
+    ...options,
+  });
 };
 
 /**
  * Create a new AI task
  */
-export const createTask = <ThrowOnError extends boolean = false>(options: Options<CreateTaskData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateTaskResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/api/experimental/tasks/{user}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createTask = <ThrowOnError extends boolean = false>(
+  options: Options<CreateTaskData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateTaskResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/api/experimental/tasks/{user}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Delete AI task by ID
  */
-export const deleteTask = <ThrowOnError extends boolean = false>(options: Options<DeleteTaskData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteTaskResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/api/experimental/tasks/{user}/{task}',
-        ...options
-    });
+export const deleteTask = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteTaskData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteTaskResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/api/experimental/tasks/{user}/{task}",
+    ...options,
+  });
 };
 
 /**
  * Get AI task by ID
  */
-export const getTask = <ThrowOnError extends boolean = false>(options: Options<GetTaskData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTaskResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/api/experimental/tasks/{user}/{task}',
-        ...options
-    });
+export const getTask = <ThrowOnError extends boolean = false>(
+  options: Options<GetTaskData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTaskResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/api/experimental/tasks/{user}/{task}",
+    ...options,
+  });
 };
 
 /**
  * Get AI task logs
  */
-export const getTaskLogs = <ThrowOnError extends boolean = false>(options: Options<GetTaskLogsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTaskLogsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/api/experimental/tasks/{user}/{task}/logs',
-        ...options
-    });
+export const getTaskLogs = <ThrowOnError extends boolean = false>(
+  options: Options<GetTaskLogsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTaskLogsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/api/experimental/tasks/{user}/{task}/logs",
+    ...options,
+  });
 };
 
 /**
  * Send input to AI task
  */
-export const sendTaskInput = <ThrowOnError extends boolean = false>(options: Options<SendTaskInputData, ThrowOnError>) => {
-    return (options.client ?? client).post<SendTaskInputResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/api/experimental/tasks/{user}/{task}/send',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const sendTaskInput = <ThrowOnError extends boolean = false>(
+  options: Options<SendTaskInputData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    SendTaskInputResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/api/experimental/tasks/{user}/{task}/send",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get appearance
  */
-export const getAppearance = <ThrowOnError extends boolean = false>(options?: Options<GetAppearanceData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetAppearanceResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/appearance',
-        ...options
-    });
+export const getAppearance = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAppearanceData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAppearanceResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/appearance",
+    ...options,
+  });
 };
 
 /**
  * Update appearance
  */
-export const updateAppearance = <ThrowOnError extends boolean = false>(options: Options<UpdateAppearanceData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateAppearanceResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/appearance',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateAppearance = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateAppearanceData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateAppearanceResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/appearance",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Redirect to URI with encrypted API key
  */
-export const redirectToUriWithEncryptedApiKey = <ThrowOnError extends boolean = false>(options?: Options<RedirectToUriWithEncryptedApiKeyData, ThrowOnError>) => {
-    return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/applications/auth-redirect',
-        ...options
-    });
+export const redirectToUriWithEncryptedApiKey = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<RedirectToUriWithEncryptedApiKeyData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/applications/auth-redirect",
+    ...options,
+  });
 };
 
 /**
@@ -225,585 +913,805 @@ export const redirectToUriWithEncryptedApiKey = <ThrowOnError extends boolean = 
  *
  * @deprecated
  */
-export const getApplicationsHost = <ThrowOnError extends boolean = false>(options?: Options<GetApplicationsHostData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApplicationsHostResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/applications/host',
-        ...options
-    });
+export const getApplicationsHost = <ThrowOnError extends boolean = false>(
+  options?: Options<GetApplicationsHostData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetApplicationsHostResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/applications/host",
+    ...options,
+  });
 };
 
 /**
  * Issue signed app token for reconnecting PTY
  */
-export const issueSignedAppTokenForReconnectingPty = <ThrowOnError extends boolean = false>(options: Options<IssueSignedAppTokenForReconnectingPtyData, ThrowOnError>) => {
-    return (options.client ?? client).post<IssueSignedAppTokenForReconnectingPtyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/applications/reconnecting-pty-signed-token',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const issueSignedAppTokenForReconnectingPty = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<IssueSignedAppTokenForReconnectingPtyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    IssueSignedAppTokenForReconnectingPtyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/applications/reconnecting-pty-signed-token",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get audit logs
  */
-export const getAuditLogs = <ThrowOnError extends boolean = false>(options: Options<GetAuditLogsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetAuditLogsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/audit',
-        ...options
-    });
+export const getAuditLogs = <ThrowOnError extends boolean = false>(
+  options: Options<GetAuditLogsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetAuditLogsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/audit",
+    ...options,
+  });
 };
 
 /**
  * Generate fake audit log
  */
-export const generateFakeAuditLog = <ThrowOnError extends boolean = false>(options: Options<GenerateFakeAuditLogData, ThrowOnError>) => {
-    return (options.client ?? client).post<GenerateFakeAuditLogResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/audit/testgenerate',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const generateFakeAuditLog = <ThrowOnError extends boolean = false>(
+  options: Options<GenerateFakeAuditLogData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    GenerateFakeAuditLogResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/audit/testgenerate",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * List API key scopes
  */
-export const listApiKeyScopes = <ThrowOnError extends boolean = false>(options?: Options<ListApiKeyScopesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ListApiKeyScopesResponses, unknown, ThrowOnError>({
-        url: '/auth/scopes',
-        ...options
-    });
+export const listApiKeyScopes = <ThrowOnError extends boolean = false>(
+  options?: Options<ListApiKeyScopesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListApiKeyScopesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/auth/scopes",
+    ...options,
+  });
 };
 
 /**
  * Check authorization
  */
-export const checkAuthorization = <ThrowOnError extends boolean = false>(options: Options<CheckAuthorizationData, ThrowOnError>) => {
-    return (options.client ?? client).post<CheckAuthorizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/authcheck',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const checkAuthorization = <ThrowOnError extends boolean = false>(
+  options: Options<CheckAuthorizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CheckAuthorizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/authcheck",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Build info
  */
-export const buildInfo = <ThrowOnError extends boolean = false>(options?: Options<BuildInfoData, ThrowOnError>) => {
-    return (options?.client ?? client).get<BuildInfoResponses, unknown, ThrowOnError>({
-        url: '/buildinfo',
-        ...options
-    });
+export const buildInfo = <ThrowOnError extends boolean = false>(
+  options?: Options<BuildInfoData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    BuildInfoResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/buildinfo",
+    ...options,
+  });
 };
 
 /**
  * Get connection logs
  */
-export const getConnectionLogs = <ThrowOnError extends boolean = false>(options: Options<GetConnectionLogsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetConnectionLogsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/connectionlog',
-        ...options
-    });
+export const getConnectionLogs = <ThrowOnError extends boolean = false>(
+  options: Options<GetConnectionLogsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetConnectionLogsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/connectionlog",
+    ...options,
+  });
 };
 
 /**
  * Report CSP violations
  */
-export const reportCspViolations = <ThrowOnError extends boolean = false>(options: Options<ReportCspViolationsData, ThrowOnError>) => {
-    return (options.client ?? client).post<ReportCspViolationsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/csp/reports',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const reportCspViolations = <ThrowOnError extends boolean = false>(
+  options: Options<ReportCspViolationsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    ReportCspViolationsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/csp/reports",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Debug Info Wireguard Coordinator
  */
-export const debugInfoWireguardCoordinator = <ThrowOnError extends boolean = false>(options?: Options<DebugInfoWireguardCoordinatorData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugInfoWireguardCoordinatorResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/coordinator',
-        ...options
-    });
+export const debugInfoWireguardCoordinator = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<DebugInfoWireguardCoordinatorData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugInfoWireguardCoordinatorResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/coordinator",
+    ...options,
+  });
 };
 
 /**
  * Debug DERP traffic
  */
-export const debugDerpTraffic = <ThrowOnError extends boolean = false>(options?: Options<DebugDerpTrafficData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugDerpTrafficResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/derp/traffic',
-        ...options
-    });
+export const debugDerpTraffic = <ThrowOnError extends boolean = false>(
+  options?: Options<DebugDerpTrafficData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugDerpTrafficResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/derp/traffic",
+    ...options,
+  });
 };
 
 /**
  * Debug expvar
  */
-export const debugExpvar = <ThrowOnError extends boolean = false>(options?: Options<DebugExpvarData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugExpvarResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/expvar',
-        ...options
-    });
+export const debugExpvar = <ThrowOnError extends boolean = false>(
+  options?: Options<DebugExpvarData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugExpvarResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/expvar",
+    ...options,
+  });
 };
 
 /**
  * Debug Info Deployment Health
  */
-export const debugInfoDeploymentHealth = <ThrowOnError extends boolean = false>(options?: Options<DebugInfoDeploymentHealthData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugInfoDeploymentHealthResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/health',
-        ...options
-    });
+export const debugInfoDeploymentHealth = <ThrowOnError extends boolean = false>(
+  options?: Options<DebugInfoDeploymentHealthData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugInfoDeploymentHealthResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/health",
+    ...options,
+  });
 };
 
 /**
  * Get health settings
  */
-export const getHealthSettings = <ThrowOnError extends boolean = false>(options?: Options<GetHealthSettingsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetHealthSettingsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/health/settings',
-        ...options
-    });
+export const getHealthSettings = <ThrowOnError extends boolean = false>(
+  options?: Options<GetHealthSettingsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetHealthSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/health/settings",
+    ...options,
+  });
 };
 
 /**
  * Update health settings
  */
-export const updateHealthSettings = <ThrowOnError extends boolean = false>(options: Options<UpdateHealthSettingsData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateHealthSettingsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/health/settings',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateHealthSettings = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateHealthSettingsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateHealthSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/health/settings",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Debug metrics
  */
-export const debugMetrics = <ThrowOnError extends boolean = false>(options?: Options<DebugMetricsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugMetricsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/metrics',
-        ...options
-    });
+export const debugMetrics = <ThrowOnError extends boolean = false>(
+  options?: Options<DebugMetricsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugMetricsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/metrics",
+    ...options,
+  });
 };
 
 /**
  * Debug pprof index
  */
-export const debugPprofIndex = <ThrowOnError extends boolean = false>(options?: Options<DebugPprofIndexData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugPprofIndexResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/pprof',
-        ...options
-    });
+export const debugPprofIndex = <ThrowOnError extends boolean = false>(
+  options?: Options<DebugPprofIndexData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugPprofIndexResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/pprof",
+    ...options,
+  });
 };
 
 /**
  * Debug pprof cmdline
  */
-export const debugPprofCmdline = <ThrowOnError extends boolean = false>(options?: Options<DebugPprofCmdlineData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugPprofCmdlineResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/pprof/cmdline',
-        ...options
-    });
+export const debugPprofCmdline = <ThrowOnError extends boolean = false>(
+  options?: Options<DebugPprofCmdlineData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugPprofCmdlineResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/pprof/cmdline",
+    ...options,
+  });
 };
 
 /**
  * Debug pprof profile
  */
-export const debugPprofProfile = <ThrowOnError extends boolean = false>(options?: Options<DebugPprofProfileData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugPprofProfileResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/pprof/profile',
-        ...options
-    });
+export const debugPprofProfile = <ThrowOnError extends boolean = false>(
+  options?: Options<DebugPprofProfileData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugPprofProfileResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/pprof/profile",
+    ...options,
+  });
 };
 
 /**
  * Debug pprof symbol
  */
-export const debugPprofSymbol = <ThrowOnError extends boolean = false>(options?: Options<DebugPprofSymbolData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugPprofSymbolResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/pprof/symbol',
-        ...options
-    });
+export const debugPprofSymbol = <ThrowOnError extends boolean = false>(
+  options?: Options<DebugPprofSymbolData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugPprofSymbolResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/pprof/symbol",
+    ...options,
+  });
 };
 
 /**
  * Debug pprof trace
  */
-export const debugPprofTrace = <ThrowOnError extends boolean = false>(options?: Options<DebugPprofTraceData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugPprofTraceResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/pprof/trace',
-        ...options
-    });
+export const debugPprofTrace = <ThrowOnError extends boolean = false>(
+  options?: Options<DebugPprofTraceData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugPprofTraceResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/pprof/trace",
+    ...options,
+  });
 };
 
 /**
  * Debug Info Tailnet
  */
-export const debugInfoTailnet = <ThrowOnError extends boolean = false>(options?: Options<DebugInfoTailnetData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugInfoTailnetResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/tailnet',
-        ...options
-    });
+export const debugInfoTailnet = <ThrowOnError extends boolean = false>(
+  options?: Options<DebugInfoTailnetData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugInfoTailnetResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/tailnet",
+    ...options,
+  });
 };
 
 /**
  * Debug Info Websocket Test
  */
-export const debugInfoWebsocketTest = <ThrowOnError extends boolean = false>(options?: Options<DebugInfoWebsocketTestData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DebugInfoWebsocketTestResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/ws',
-        ...options
-    });
+export const debugInfoWebsocketTest = <ThrowOnError extends boolean = false>(
+  options?: Options<DebugInfoWebsocketTestData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    DebugInfoWebsocketTestResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/ws",
+    ...options,
+  });
 };
 
 /**
  * Debug OIDC context for a user
  */
-export const debugOidcContextForAUser = <ThrowOnError extends boolean = false>(options: Options<DebugOidcContextForAuserData, ThrowOnError>) => {
-    return (options.client ?? client).get<DebugOidcContextForAuserResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/debug/{user}/debug-link',
-        ...options
-    });
+export const debugOidcContextForAUser = <ThrowOnError extends boolean = false>(
+  options: Options<DebugOidcContextForAuserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    DebugOidcContextForAuserResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/debug/{user}/debug-link",
+    ...options,
+  });
 };
 
 /**
  * Get deployment config
  */
-export const getDeploymentConfig = <ThrowOnError extends boolean = false>(options?: Options<GetDeploymentConfigData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetDeploymentConfigResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/deployment/config',
-        ...options
-    });
+export const getDeploymentConfig = <ThrowOnError extends boolean = false>(
+  options?: Options<GetDeploymentConfigData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetDeploymentConfigResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/deployment/config",
+    ...options,
+  });
 };
 
 /**
  * SSH Config
  */
-export const sshConfig = <ThrowOnError extends boolean = false>(options?: Options<SshConfigData, ThrowOnError>) => {
-    return (options?.client ?? client).get<SshConfigResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/deployment/ssh',
-        ...options
-    });
+export const sshConfig = <ThrowOnError extends boolean = false>(
+  options?: Options<SshConfigData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    SshConfigResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/deployment/ssh",
+    ...options,
+  });
 };
 
 /**
  * Get deployment stats
  */
-export const getDeploymentStats = <ThrowOnError extends boolean = false>(options?: Options<GetDeploymentStatsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetDeploymentStatsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/deployment/stats',
-        ...options
-    });
+export const getDeploymentStats = <ThrowOnError extends boolean = false>(
+  options?: Options<GetDeploymentStatsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetDeploymentStatsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/deployment/stats",
+    ...options,
+  });
 };
 
 /**
  * Get DERP map updates
  */
-export const getDerpMapUpdates = <ThrowOnError extends boolean = false>(options?: Options<GetDerpMapUpdatesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/derp-map',
-        ...options
-    });
+export const getDerpMapUpdates = <ThrowOnError extends boolean = false>(
+  options?: Options<GetDerpMapUpdatesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/derp-map",
+    ...options,
+  });
 };
 
 /**
  * Get entitlements
  */
-export const getEntitlements = <ThrowOnError extends boolean = false>(options?: Options<GetEntitlementsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetEntitlementsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/entitlements',
-        ...options
-    });
+export const getEntitlements = <ThrowOnError extends boolean = false>(
+  options?: Options<GetEntitlementsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetEntitlementsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/entitlements",
+    ...options,
+  });
 };
 
 /**
  * Get enabled experiments
  */
-export const getEnabledExperiments = <ThrowOnError extends boolean = false>(options?: Options<GetEnabledExperimentsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetEnabledExperimentsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/experiments',
-        ...options
-    });
+export const getEnabledExperiments = <ThrowOnError extends boolean = false>(
+  options?: Options<GetEnabledExperimentsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetEnabledExperimentsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/experiments",
+    ...options,
+  });
 };
 
 /**
  * Get safe experiments
  */
-export const getSafeExperiments = <ThrowOnError extends boolean = false>(options?: Options<GetSafeExperimentsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetSafeExperimentsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/experiments/available',
-        ...options
-    });
+export const getSafeExperiments = <ThrowOnError extends boolean = false>(
+  options?: Options<GetSafeExperimentsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSafeExperimentsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/experiments/available",
+    ...options,
+  });
 };
 
 /**
  * Get user external auths
  */
-export const getUserExternalAuths = <ThrowOnError extends boolean = false>(options?: Options<GetUserExternalAuthsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetUserExternalAuthsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/external-auth',
-        ...options
-    });
+export const getUserExternalAuths = <ThrowOnError extends boolean = false>(
+  options?: Options<GetUserExternalAuthsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetUserExternalAuthsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/external-auth",
+    ...options,
+  });
 };
 
 /**
  * Delete external auth user link by ID
  */
-export const deleteExternalAuthUserLinkById = <ThrowOnError extends boolean = false>(options: Options<DeleteExternalAuthUserLinkByIdData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteExternalAuthUserLinkByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/external-auth/{externalauth}',
-        ...options
-    });
+export const deleteExternalAuthUserLinkById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteExternalAuthUserLinkByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteExternalAuthUserLinkByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/external-auth/{externalauth}",
+    ...options,
+  });
 };
 
 /**
  * Get external auth by ID
  */
-export const getExternalAuthById = <ThrowOnError extends boolean = false>(options: Options<GetExternalAuthByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetExternalAuthByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/external-auth/{externalauth}',
-        ...options
-    });
+export const getExternalAuthById = <ThrowOnError extends boolean = false>(
+  options: Options<GetExternalAuthByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetExternalAuthByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/external-auth/{externalauth}",
+    ...options,
+  });
 };
 
 /**
  * Get external auth device by ID.
  */
-export const getExternalAuthDeviceById = <ThrowOnError extends boolean = false>(options: Options<GetExternalAuthDeviceByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetExternalAuthDeviceByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/external-auth/{externalauth}/device',
-        ...options
-    });
+export const getExternalAuthDeviceById = <ThrowOnError extends boolean = false>(
+  options: Options<GetExternalAuthDeviceByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetExternalAuthDeviceByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/external-auth/{externalauth}/device",
+    ...options,
+  });
 };
 
 /**
  * Post external auth device by ID
  */
-export const postExternalAuthDeviceById = <ThrowOnError extends boolean = false>(options: Options<PostExternalAuthDeviceByIdData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostExternalAuthDeviceByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/external-auth/{externalauth}/device',
-        ...options
-    });
+export const postExternalAuthDeviceById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PostExternalAuthDeviceByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    PostExternalAuthDeviceByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/external-auth/{externalauth}/device",
+    ...options,
+  });
 };
 
 /**
@@ -811,883 +1719,1243 @@ export const postExternalAuthDeviceById = <ThrowOnError extends boolean = false>
  *
  * Swagger notice: Swagger 2.0 doesn't support file upload with a `content-type` different than `application/x-www-form-urlencoded`.
  */
-export const uploadFile = <ThrowOnError extends boolean = false>(options: Options<UploadFileData, ThrowOnError>) => {
-    return (options.client ?? client).post<UploadFileResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/files',
-        ...options
-    });
+export const uploadFile = <ThrowOnError extends boolean = false>(
+  options: Options<UploadFileData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    UploadFileResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/files",
+    ...options,
+  });
 };
 
 /**
  * Get file by ID
  */
-export const getFileById = <ThrowOnError extends boolean = false>(options: Options<GetFileByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetFileByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/files/{fileID}',
-        ...options
-    });
+export const getFileById = <ThrowOnError extends boolean = false>(
+  options: Options<GetFileByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetFileByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/files/{fileID}",
+    ...options,
+  });
 };
 
 /**
  * Get groups
  */
-export const getGroups = <ThrowOnError extends boolean = false>(options: Options<GetGroupsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetGroupsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/groups',
-        ...options
-    });
+export const getGroups = <ThrowOnError extends boolean = false>(
+  options: Options<GetGroupsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetGroupsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/groups",
+    ...options,
+  });
 };
 
 /**
  * Delete group by name
  */
-export const deleteGroupByName = <ThrowOnError extends boolean = false>(options: Options<DeleteGroupByNameData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteGroupByNameResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/groups/{group}',
-        ...options
-    });
+export const deleteGroupByName = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteGroupByNameData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteGroupByNameResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/groups/{group}",
+    ...options,
+  });
 };
 
 /**
  * Get group by ID
  */
-export const getGroupById = <ThrowOnError extends boolean = false>(options: Options<GetGroupByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetGroupByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/groups/{group}',
-        ...options
-    });
+export const getGroupById = <ThrowOnError extends boolean = false>(
+  options: Options<GetGroupByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetGroupByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/groups/{group}",
+    ...options,
+  });
 };
 
 /**
  * Update group by name
  */
-export const updateGroupByName = <ThrowOnError extends boolean = false>(options: Options<UpdateGroupByNameData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateGroupByNameResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/groups/{group}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateGroupByName = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateGroupByNameData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateGroupByNameResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/groups/{group}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get agent init script
  */
-export const getAgentInitScript = <ThrowOnError extends boolean = false>(options: Options<GetAgentInitScriptData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetAgentInitScriptResponses, unknown, ThrowOnError>({
-        url: '/init-script/{os}/{arch}',
-        ...options
-    });
+export const getAgentInitScript = <ThrowOnError extends boolean = false>(
+  options: Options<GetAgentInitScriptData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetAgentInitScriptResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/init-script/{os}/{arch}",
+    ...options,
+  });
 };
 
 /**
  * Get deployment DAUs
  */
-export const getDeploymentDaus = <ThrowOnError extends boolean = false>(options: Options<GetDeploymentDausData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetDeploymentDausResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/insights/daus',
-        ...options
-    });
+export const getDeploymentDaus = <ThrowOnError extends boolean = false>(
+  options: Options<GetDeploymentDausData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetDeploymentDausResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/insights/daus",
+    ...options,
+  });
 };
 
 /**
  * Get insights about templates
  */
-export const getInsightsAboutTemplates = <ThrowOnError extends boolean = false>(options: Options<GetInsightsAboutTemplatesData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetInsightsAboutTemplatesResponses, unknown, ThrowOnError>({
-        querySerializer: {
-            parameters: {
-                template_ids: {
-                    array: {
-                        explode: false
-                    }
-                }
-            }
+export const getInsightsAboutTemplates = <ThrowOnError extends boolean = false>(
+  options: Options<GetInsightsAboutTemplatesData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetInsightsAboutTemplatesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    querySerializer: {
+      parameters: {
+        template_ids: {
+          array: {
+            explode: false,
+          },
         },
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/insights/templates',
-        ...options
-    });
+      },
+    },
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/insights/templates",
+    ...options,
+  });
 };
 
 /**
  * Get insights about user activity
  */
-export const getInsightsAboutUserActivity = <ThrowOnError extends boolean = false>(options: Options<GetInsightsAboutUserActivityData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetInsightsAboutUserActivityResponses, unknown, ThrowOnError>({
-        querySerializer: {
-            parameters: {
-                template_ids: {
-                    array: {
-                        explode: false
-                    }
-                }
-            }
+export const getInsightsAboutUserActivity = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetInsightsAboutUserActivityData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetInsightsAboutUserActivityResponses,
+    unknown,
+    ThrowOnError
+  >({
+    querySerializer: {
+      parameters: {
+        template_ids: {
+          array: {
+            explode: false,
+          },
         },
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/insights/user-activity',
-        ...options
-    });
+      },
+    },
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/insights/user-activity",
+    ...options,
+  });
 };
 
 /**
  * Get insights about user latency
  */
-export const getInsightsAboutUserLatency = <ThrowOnError extends boolean = false>(options: Options<GetInsightsAboutUserLatencyData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetInsightsAboutUserLatencyResponses, unknown, ThrowOnError>({
-        querySerializer: {
-            parameters: {
-                template_ids: {
-                    array: {
-                        explode: false
-                    }
-                }
-            }
+export const getInsightsAboutUserLatency = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetInsightsAboutUserLatencyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetInsightsAboutUserLatencyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    querySerializer: {
+      parameters: {
+        template_ids: {
+          array: {
+            explode: false,
+          },
         },
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/insights/user-latency',
-        ...options
-    });
+      },
+    },
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/insights/user-latency",
+    ...options,
+  });
 };
 
 /**
  * Get insights about user status counts
  */
-export const getInsightsAboutUserStatusCounts = <ThrowOnError extends boolean = false>(options: Options<GetInsightsAboutUserStatusCountsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetInsightsAboutUserStatusCountsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/insights/user-status-counts',
-        ...options
-    });
+export const getInsightsAboutUserStatusCounts = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetInsightsAboutUserStatusCountsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetInsightsAboutUserStatusCountsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/insights/user-status-counts",
+    ...options,
+  });
 };
 
 /**
  * Get licenses
  */
-export const getLicenses = <ThrowOnError extends boolean = false>(options?: Options<GetLicensesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetLicensesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/licenses',
-        ...options
-    });
+export const getLicenses = <ThrowOnError extends boolean = false>(
+  options?: Options<GetLicensesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetLicensesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/licenses",
+    ...options,
+  });
 };
 
 /**
  * Add new license
  */
-export const addNewLicense = <ThrowOnError extends boolean = false>(options: Options<AddNewLicenseData, ThrowOnError>) => {
-    return (options.client ?? client).post<AddNewLicenseResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/licenses',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const addNewLicense = <ThrowOnError extends boolean = false>(
+  options: Options<AddNewLicenseData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    AddNewLicenseResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/licenses",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Update license entitlements
  */
-export const updateLicenseEntitlements = <ThrowOnError extends boolean = false>(options?: Options<UpdateLicenseEntitlementsData, ThrowOnError>) => {
-    return (options?.client ?? client).post<UpdateLicenseEntitlementsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/licenses/refresh-entitlements',
-        ...options
-    });
+export const updateLicenseEntitlements = <ThrowOnError extends boolean = false>(
+  options?: Options<UpdateLicenseEntitlementsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    UpdateLicenseEntitlementsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/licenses/refresh-entitlements",
+    ...options,
+  });
 };
 
 /**
  * Delete license
  */
-export const deleteLicense = <ThrowOnError extends boolean = false>(options: Options<DeleteLicenseData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteLicenseResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/licenses/{id}',
-        ...options
-    });
+export const deleteLicense = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteLicenseData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteLicenseResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/licenses/{id}",
+    ...options,
+  });
 };
 
 /**
  * Send a custom notification
  */
-export const sendACustomNotification = <ThrowOnError extends boolean = false>(options: Options<SendACustomNotificationData, ThrowOnError>) => {
-    return (options.client ?? client).post<SendACustomNotificationResponses, SendACustomNotificationErrors, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/custom',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const sendACustomNotification = <ThrowOnError extends boolean = false>(
+  options: Options<SendACustomNotificationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    SendACustomNotificationResponses,
+    SendACustomNotificationErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/custom",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get notification dispatch methods
  */
-export const getNotificationDispatchMethods = <ThrowOnError extends boolean = false>(options?: Options<GetNotificationDispatchMethodsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetNotificationDispatchMethodsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/dispatch-methods',
-        ...options
-    });
+export const getNotificationDispatchMethods = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetNotificationDispatchMethodsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetNotificationDispatchMethodsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/dispatch-methods",
+    ...options,
+  });
 };
 
 /**
  * List inbox notifications
  */
-export const listInboxNotifications = <ThrowOnError extends boolean = false>(options?: Options<ListInboxNotificationsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ListInboxNotificationsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/inbox',
-        ...options
-    });
+export const listInboxNotifications = <ThrowOnError extends boolean = false>(
+  options?: Options<ListInboxNotificationsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListInboxNotificationsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/inbox",
+    ...options,
+  });
 };
 
 /**
  * Mark all unread notifications as read
  */
-export const markAllUnreadNotificationsAsRead = <ThrowOnError extends boolean = false>(options?: Options<MarkAllUnreadNotificationsAsReadData, ThrowOnError>) => {
-    return (options?.client ?? client).put<MarkAllUnreadNotificationsAsReadResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/inbox/mark-all-as-read',
-        ...options
-    });
+export const markAllUnreadNotificationsAsRead = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<MarkAllUnreadNotificationsAsReadData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    MarkAllUnreadNotificationsAsReadResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/inbox/mark-all-as-read",
+    ...options,
+  });
 };
 
 /**
  * Watch for new inbox notifications
  */
-export const watchForNewInboxNotifications = <ThrowOnError extends boolean = false>(options?: Options<WatchForNewInboxNotificationsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<WatchForNewInboxNotificationsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/inbox/watch',
-        ...options
-    });
+export const watchForNewInboxNotifications = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<WatchForNewInboxNotificationsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    WatchForNewInboxNotificationsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/inbox/watch",
+    ...options,
+  });
 };
 
 /**
  * Update read status of a notification
  */
-export const updateReadStatusOfANotification = <ThrowOnError extends boolean = false>(options: Options<UpdateReadStatusOfANotificationData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateReadStatusOfANotificationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/inbox/{id}/read-status',
-        ...options
-    });
+export const updateReadStatusOfANotification = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateReadStatusOfANotificationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateReadStatusOfANotificationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/inbox/{id}/read-status",
+    ...options,
+  });
 };
 
 /**
  * Get notifications settings
  */
-export const getNotificationsSettings = <ThrowOnError extends boolean = false>(options?: Options<GetNotificationsSettingsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetNotificationsSettingsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/settings',
-        ...options
-    });
+export const getNotificationsSettings = <ThrowOnError extends boolean = false>(
+  options?: Options<GetNotificationsSettingsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetNotificationsSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/settings",
+    ...options,
+  });
 };
 
 /**
  * Update notifications settings
  */
-export const updateNotificationsSettings = <ThrowOnError extends boolean = false>(options: Options<UpdateNotificationsSettingsData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateNotificationsSettingsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/settings',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateNotificationsSettings = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateNotificationsSettingsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateNotificationsSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/settings",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get custom notification templates
  */
-export const getCustomNotificationTemplates = <ThrowOnError extends boolean = false>(options?: Options<GetCustomNotificationTemplatesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetCustomNotificationTemplatesResponses, GetCustomNotificationTemplatesErrors, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/templates/custom',
-        ...options
-    });
+export const getCustomNotificationTemplates = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetCustomNotificationTemplatesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetCustomNotificationTemplatesResponses,
+    GetCustomNotificationTemplatesErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/templates/custom",
+    ...options,
+  });
 };
 
 /**
  * Get system notification templates
  */
-export const getSystemNotificationTemplates = <ThrowOnError extends boolean = false>(options?: Options<GetSystemNotificationTemplatesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetSystemNotificationTemplatesResponses, GetSystemNotificationTemplatesErrors, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/templates/system',
-        ...options
-    });
+export const getSystemNotificationTemplates = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetSystemNotificationTemplatesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSystemNotificationTemplatesResponses,
+    GetSystemNotificationTemplatesErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/templates/system",
+    ...options,
+  });
 };
 
 /**
  * Update notification template dispatch method
  */
-export const updateNotificationTemplateDispatchMethod = <ThrowOnError extends boolean = false>(options: Options<UpdateNotificationTemplateDispatchMethodData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateNotificationTemplateDispatchMethodResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/templates/{notification_template}/method',
-        ...options
-    });
+export const updateNotificationTemplateDispatchMethod = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateNotificationTemplateDispatchMethodData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateNotificationTemplateDispatchMethodResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/templates/{notification_template}/method",
+    ...options,
+  });
 };
 
 /**
  * Send a test notification
  */
-export const sendATestNotification = <ThrowOnError extends boolean = false>(options?: Options<SendATestNotificationData, ThrowOnError>) => {
-    return (options?.client ?? client).post<SendATestNotificationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/notifications/test',
-        ...options
-    });
+export const sendATestNotification = <ThrowOnError extends boolean = false>(
+  options?: Options<SendATestNotificationData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    SendATestNotificationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/notifications/test",
+    ...options,
+  });
 };
 
 /**
  * Get OAuth2 applications.
  */
-export const getOauth2Applications = <ThrowOnError extends boolean = false>(options?: Options<GetOauth2ApplicationsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetOauth2ApplicationsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/oauth2-provider/apps',
-        ...options
-    });
+export const getOauth2Applications = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOauth2ApplicationsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetOauth2ApplicationsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/oauth2-provider/apps",
+    ...options,
+  });
 };
 
 /**
  * Create OAuth2 application.
  */
-export const createOauth2Application = <ThrowOnError extends boolean = false>(options: Options<CreateOauth2ApplicationData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateOauth2ApplicationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/oauth2-provider/apps',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createOauth2Application = <ThrowOnError extends boolean = false>(
+  options: Options<CreateOauth2ApplicationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateOauth2ApplicationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/oauth2-provider/apps",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Delete OAuth2 application.
  */
-export const deleteOauth2Application = <ThrowOnError extends boolean = false>(options: Options<DeleteOauth2ApplicationData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteOauth2ApplicationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/oauth2-provider/apps/{app}',
-        ...options
-    });
+export const deleteOauth2Application = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteOauth2ApplicationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteOauth2ApplicationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/oauth2-provider/apps/{app}",
+    ...options,
+  });
 };
 
 /**
  * Get OAuth2 application.
  */
-export const getOauth2Application = <ThrowOnError extends boolean = false>(options: Options<GetOauth2ApplicationData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetOauth2ApplicationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/oauth2-provider/apps/{app}',
-        ...options
-    });
+export const getOauth2Application = <ThrowOnError extends boolean = false>(
+  options: Options<GetOauth2ApplicationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetOauth2ApplicationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/oauth2-provider/apps/{app}",
+    ...options,
+  });
 };
 
 /**
  * Update OAuth2 application.
  */
-export const updateOauth2Application = <ThrowOnError extends boolean = false>(options: Options<UpdateOauth2ApplicationData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateOauth2ApplicationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/oauth2-provider/apps/{app}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateOauth2Application = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateOauth2ApplicationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateOauth2ApplicationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/oauth2-provider/apps/{app}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get OAuth2 application secrets.
  */
-export const getOauth2ApplicationSecrets = <ThrowOnError extends boolean = false>(options: Options<GetOauth2ApplicationSecretsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetOauth2ApplicationSecretsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/oauth2-provider/apps/{app}/secrets',
-        ...options
-    });
+export const getOauth2ApplicationSecrets = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetOauth2ApplicationSecretsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetOauth2ApplicationSecretsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/oauth2-provider/apps/{app}/secrets",
+    ...options,
+  });
 };
 
 /**
  * Create OAuth2 application secret.
  */
-export const createOauth2ApplicationSecret = <ThrowOnError extends boolean = false>(options: Options<CreateOauth2ApplicationSecretData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateOauth2ApplicationSecretResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/oauth2-provider/apps/{app}/secrets',
-        ...options
-    });
+export const createOauth2ApplicationSecret = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateOauth2ApplicationSecretData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateOauth2ApplicationSecretResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/oauth2-provider/apps/{app}/secrets",
+    ...options,
+  });
 };
 
 /**
  * Delete OAuth2 application secret.
  */
-export const deleteOauth2ApplicationSecret = <ThrowOnError extends boolean = false>(options: Options<DeleteOauth2ApplicationSecretData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteOauth2ApplicationSecretResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/oauth2-provider/apps/{app}/secrets/{secretID}',
-        ...options
-    });
+export const deleteOauth2ApplicationSecret = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteOauth2ApplicationSecretData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteOauth2ApplicationSecretResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/oauth2-provider/apps/{app}/secrets/{secretID}",
+    ...options,
+  });
 };
 
 /**
  * OAuth2 authorization request (GET - show authorization page).
  */
-export const oauth2AuthorizationRequestGet = <ThrowOnError extends boolean = false>(options: Options<Oauth2AuthorizationRequestGetData, ThrowOnError>) => {
-    return (options.client ?? client).get<Oauth2AuthorizationRequestGetResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/oauth2/authorize',
-        ...options
-    });
+export const oauth2AuthorizationRequestGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<Oauth2AuthorizationRequestGetData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    Oauth2AuthorizationRequestGetResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/oauth2/authorize",
+    ...options,
+  });
 };
 
 /**
  * OAuth2 authorization request (POST - process authorization).
  */
-export const oauth2AuthorizationRequestPost = <ThrowOnError extends boolean = false>(options: Options<Oauth2AuthorizationRequestPostData, ThrowOnError>) => {
-    return (options.client ?? client).post<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/oauth2/authorize',
-        ...options
-    });
+export const oauth2AuthorizationRequestPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<Oauth2AuthorizationRequestPostData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/oauth2/authorize",
+    ...options,
+  });
 };
 
 /**
  * Delete OAuth2 client registration (RFC 7592)
  */
-export const deleteOauth2ClientConfiguration = <ThrowOnError extends boolean = false>(options: Options<DeleteOauth2ClientConfigurationData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteOauth2ClientConfigurationResponses, unknown, ThrowOnError>({
-        url: '/oauth2/clients/{client_id}',
-        ...options
-    });
+export const deleteOauth2ClientConfiguration = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteOauth2ClientConfigurationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteOauth2ClientConfigurationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/oauth2/clients/{client_id}",
+    ...options,
+  });
 };
 
 /**
  * Get OAuth2 client configuration (RFC 7592)
  */
-export const getOauth2ClientConfiguration = <ThrowOnError extends boolean = false>(options: Options<GetOauth2ClientConfigurationData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetOauth2ClientConfigurationResponses, unknown, ThrowOnError>({
-        url: '/oauth2/clients/{client_id}',
-        ...options
-    });
+export const getOauth2ClientConfiguration = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetOauth2ClientConfigurationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetOauth2ClientConfigurationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/oauth2/clients/{client_id}",
+    ...options,
+  });
 };
 
 /**
  * Update OAuth2 client configuration (RFC 7592)
  */
-export const putOauth2ClientConfiguration = <ThrowOnError extends boolean = false>(options: Options<PutOauth2ClientConfigurationData, ThrowOnError>) => {
-    return (options.client ?? client).put<PutOauth2ClientConfigurationResponses, unknown, ThrowOnError>({
-        url: '/oauth2/clients/{client_id}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const putOauth2ClientConfiguration = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PutOauth2ClientConfigurationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    PutOauth2ClientConfigurationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/oauth2/clients/{client_id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * OAuth2 dynamic client registration (RFC 7591)
  */
-export const oauth2DynamicClientRegistration = <ThrowOnError extends boolean = false>(options: Options<Oauth2DynamicClientRegistrationData, ThrowOnError>) => {
-    return (options.client ?? client).post<Oauth2DynamicClientRegistrationResponses, unknown, ThrowOnError>({
-        url: '/oauth2/register',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const oauth2DynamicClientRegistration = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<Oauth2DynamicClientRegistrationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    Oauth2DynamicClientRegistrationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/oauth2/register",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Revoke OAuth2 tokens (RFC 7009).
  */
-export const oauth2TokenRevocation = <ThrowOnError extends boolean = false>(options: Options<Oauth2TokenRevocationData, ThrowOnError>) => {
-    return (options.client ?? client).post<Oauth2TokenRevocationResponses, unknown, ThrowOnError>({
-        ...urlSearchParamsBodySerializer,
-        url: '/oauth2/revoke',
-        ...options,
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            ...options.headers
-        }
-    });
+export const oauth2TokenRevocation = <ThrowOnError extends boolean = false>(
+  options: Options<Oauth2TokenRevocationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    Oauth2TokenRevocationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    ...urlSearchParamsBodySerializer,
+    url: "/oauth2/revoke",
+    ...options,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Delete OAuth2 application tokens.
  */
-export const deleteOauth2ApplicationTokens = <ThrowOnError extends boolean = false>(options: Options<DeleteOauth2ApplicationTokensData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteOauth2ApplicationTokensResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/oauth2/tokens',
-        ...options
-    });
+export const deleteOauth2ApplicationTokens = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteOauth2ApplicationTokensData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteOauth2ApplicationTokensResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/oauth2/tokens",
+    ...options,
+  });
 };
 
 /**
  * OAuth2 token exchange.
  */
-export const oauth2TokenExchange = <ThrowOnError extends boolean = false>(options?: Options<Oauth2TokenExchangeData, ThrowOnError>) => {
-    return (options?.client ?? client).post<Oauth2TokenExchangeResponses, unknown, ThrowOnError>({
-        url: '/oauth2/tokens',
-        ...options
-    });
+export const oauth2TokenExchange = <ThrowOnError extends boolean = false>(
+  options?: Options<Oauth2TokenExchangeData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    Oauth2TokenExchangeResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/oauth2/tokens",
+    ...options,
+  });
 };
 
 /**
  * Get organizations
  */
-export const getOrganizations = <ThrowOnError extends boolean = false>(options?: Options<GetOrganizationsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetOrganizationsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations',
-        ...options
-    });
+export const getOrganizations = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOrganizationsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetOrganizationsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations",
+    ...options,
+  });
 };
 
 /**
  * Create organization
  */
-export const createOrganization = <ThrowOnError extends boolean = false>(options: Options<CreateOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createOrganization = <ThrowOnError extends boolean = false>(
+  options: Options<CreateOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Delete organization
  */
-export const deleteOrganization = <ThrowOnError extends boolean = false>(options: Options<DeleteOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}',
-        ...options
-    });
+export const deleteOrganization = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}",
+    ...options,
+  });
 };
 
 /**
  * Get organization by ID
  */
-export const getOrganizationById = <ThrowOnError extends boolean = false>(options: Options<GetOrganizationByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetOrganizationByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}',
-        ...options
-    });
+export const getOrganizationById = <ThrowOnError extends boolean = false>(
+  options: Options<GetOrganizationByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetOrganizationByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}",
+    ...options,
+  });
 };
 
 /**
  * Update organization
  */
-export const updateOrganization = <ThrowOnError extends boolean = false>(options: Options<UpdateOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateOrganization = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get groups by organization
  */
-export const getGroupsByOrganization = <ThrowOnError extends boolean = false>(options: Options<GetGroupsByOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetGroupsByOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/groups',
-        ...options
-    });
+export const getGroupsByOrganization = <ThrowOnError extends boolean = false>(
+  options: Options<GetGroupsByOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetGroupsByOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/groups",
+    ...options,
+  });
 };
 
 /**
  * Create group for organization
  */
-export const createGroupForOrganization = <ThrowOnError extends boolean = false>(options: Options<CreateGroupForOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateGroupForOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/groups',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createGroupForOrganization = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateGroupForOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateGroupForOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/groups",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get group by organization and group name
  */
-export const getGroupByOrganizationAndGroupName = <ThrowOnError extends boolean = false>(options: Options<GetGroupByOrganizationAndGroupNameData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetGroupByOrganizationAndGroupNameResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/groups/{groupName}',
-        ...options
-    });
+export const getGroupByOrganizationAndGroupName = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetGroupByOrganizationAndGroupNameData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetGroupByOrganizationAndGroupNameResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/groups/{groupName}",
+    ...options,
+  });
 };
 
 /**
@@ -1695,157 +2963,221 @@ export const getGroupByOrganizationAndGroupName = <ThrowOnError extends boolean 
  *
  * @deprecated
  */
-export const listOrganizationMembers = <ThrowOnError extends boolean = false>(options: Options<ListOrganizationMembersData, ThrowOnError>) => {
-    return (options.client ?? client).get<ListOrganizationMembersResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/members',
-        ...options
-    });
+export const listOrganizationMembers = <ThrowOnError extends boolean = false>(
+  options: Options<ListOrganizationMembersData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    ListOrganizationMembersResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/members",
+    ...options,
+  });
 };
 
 /**
  * Get member roles by organization
  */
-export const getMemberRolesByOrganization = <ThrowOnError extends boolean = false>(options: Options<GetMemberRolesByOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetMemberRolesByOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/members/roles',
-        ...options
-    });
+export const getMemberRolesByOrganization = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetMemberRolesByOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetMemberRolesByOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/members/roles",
+    ...options,
+  });
 };
 
 /**
  * Insert a custom organization role
  */
-export const insertACustomOrganizationRole = <ThrowOnError extends boolean = false>(options: Options<InsertACustomOrganizationRoleData, ThrowOnError>) => {
-    return (options.client ?? client).post<InsertACustomOrganizationRoleResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/members/roles',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const insertACustomOrganizationRole = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<InsertACustomOrganizationRoleData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    InsertACustomOrganizationRoleResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/members/roles",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Upsert a custom organization role
  */
-export const upsertACustomOrganizationRole = <ThrowOnError extends boolean = false>(options: Options<UpsertACustomOrganizationRoleData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpsertACustomOrganizationRoleResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/members/roles',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const upsertACustomOrganizationRole = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpsertACustomOrganizationRoleData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpsertACustomOrganizationRoleResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/members/roles",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Delete a custom organization role
  */
-export const deleteACustomOrganizationRole = <ThrowOnError extends boolean = false>(options: Options<DeleteACustomOrganizationRoleData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteACustomOrganizationRoleResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/members/roles/{roleName}',
-        ...options
-    });
+export const deleteACustomOrganizationRole = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteACustomOrganizationRoleData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteACustomOrganizationRoleResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/members/roles/{roleName}",
+    ...options,
+  });
 };
 
 /**
  * Remove organization member
  */
-export const removeOrganizationMember = <ThrowOnError extends boolean = false>(options: Options<RemoveOrganizationMemberData, ThrowOnError>) => {
-    return (options.client ?? client).delete<RemoveOrganizationMemberResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/members/{user}',
-        ...options
-    });
+export const removeOrganizationMember = <ThrowOnError extends boolean = false>(
+  options: Options<RemoveOrganizationMemberData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    RemoveOrganizationMemberResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/members/{user}",
+    ...options,
+  });
 };
 
 /**
  * Add organization member
  */
-export const addOrganizationMember = <ThrowOnError extends boolean = false>(options: Options<AddOrganizationMemberData, ThrowOnError>) => {
-    return (options.client ?? client).post<AddOrganizationMemberResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/members/{user}',
-        ...options
-    });
+export const addOrganizationMember = <ThrowOnError extends boolean = false>(
+  options: Options<AddOrganizationMemberData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    AddOrganizationMemberResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/members/{user}",
+    ...options,
+  });
 };
 
 /**
  * Assign role to organization member
  */
-export const assignRoleToOrganizationMember = <ThrowOnError extends boolean = false>(options: Options<AssignRoleToOrganizationMemberData, ThrowOnError>) => {
-    return (options.client ?? client).put<AssignRoleToOrganizationMemberResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/members/{user}/roles',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const assignRoleToOrganizationMember = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AssignRoleToOrganizationMemberData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    AssignRoleToOrganizationMemberResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/members/{user}/roles",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get workspace quota by user
  */
-export const getWorkspaceQuotaByUser = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceQuotaByUserData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceQuotaByUserResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/members/{user}/workspace-quota',
-        ...options
-    });
+export const getWorkspaceQuotaByUser = <ThrowOnError extends boolean = false>(
+  options: Options<GetWorkspaceQuotaByUserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceQuotaByUserResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/members/{user}/workspace-quota",
+    ...options,
+  });
 };
 
 /**
@@ -1858,379 +3190,514 @@ export const getWorkspaceQuotaByUser = <ThrowOnError extends boolean = false>(op
  *
  * @deprecated
  */
-export const createUserWorkspaceByOrganization = <ThrowOnError extends boolean = false>(options: Options<CreateUserWorkspaceByOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateUserWorkspaceByOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/members/{user}/workspaces',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createUserWorkspaceByOrganization = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateUserWorkspaceByOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateUserWorkspaceByOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/members/{user}/workspaces",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Paginated organization members
  */
-export const paginatedOrganizationMembers = <ThrowOnError extends boolean = false>(options: Options<PaginatedOrganizationMembersData, ThrowOnError>) => {
-    return (options.client ?? client).get<PaginatedOrganizationMembersResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/paginated-members',
-        ...options
-    });
+export const paginatedOrganizationMembers = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PaginatedOrganizationMembersData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    PaginatedOrganizationMembersResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/paginated-members",
+    ...options,
+  });
 };
 
 /**
  * Get provisioner daemons
  */
-export const getProvisionerDaemons = <ThrowOnError extends boolean = false>(options: Options<GetProvisionerDaemonsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetProvisionerDaemonsResponses, unknown, ThrowOnError>({
-        querySerializer: {
-            parameters: {
-                ids: {
-                    array: {
-                        explode: false
-                    }
-                },
-                tags: {
-                    object: {
-                        explode: false,
-                        style: 'form'
-                    }
-                }
-            }
+export const getProvisionerDaemons = <ThrowOnError extends boolean = false>(
+  options: Options<GetProvisionerDaemonsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetProvisionerDaemonsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    querySerializer: {
+      parameters: {
+        ids: {
+          array: {
+            explode: false,
+          },
         },
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/provisionerdaemons',
-        ...options
-    });
+        tags: {
+          object: {
+            explode: false,
+            style: "form",
+          },
+        },
+      },
+    },
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/provisionerdaemons",
+    ...options,
+  });
 };
 
 /**
  * Serve provisioner daemon
  */
-export const serveProvisionerDaemon = <ThrowOnError extends boolean = false>(options: Options<ServeProvisionerDaemonData, ThrowOnError>) => {
-    return (options.client ?? client).get<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/provisionerdaemons/serve',
-        ...options
-    });
+export const serveProvisionerDaemon = <ThrowOnError extends boolean = false>(
+  options: Options<ServeProvisionerDaemonData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/provisionerdaemons/serve",
+    ...options,
+  });
 };
 
 /**
  * Get provisioner jobs
  */
-export const getProvisionerJobs = <ThrowOnError extends boolean = false>(options: Options<GetProvisionerJobsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetProvisionerJobsResponses, unknown, ThrowOnError>({
-        querySerializer: {
-            parameters: {
-                ids: {
-                    array: {
-                        explode: false
-                    }
-                },
-                tags: {
-                    object: {
-                        explode: false,
-                        style: 'form'
-                    }
-                }
-            }
+export const getProvisionerJobs = <ThrowOnError extends boolean = false>(
+  options: Options<GetProvisionerJobsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetProvisionerJobsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    querySerializer: {
+      parameters: {
+        ids: {
+          array: {
+            explode: false,
+          },
         },
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/provisionerjobs',
-        ...options
-    });
+        tags: {
+          object: {
+            explode: false,
+            style: "form",
+          },
+        },
+      },
+    },
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/provisionerjobs",
+    ...options,
+  });
 };
 
 /**
  * Get provisioner job
  */
-export const getProvisionerJob = <ThrowOnError extends boolean = false>(options: Options<GetProvisionerJobData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetProvisionerJobResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/provisionerjobs/{job}',
-        ...options
-    });
+export const getProvisionerJob = <ThrowOnError extends boolean = false>(
+  options: Options<GetProvisionerJobData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetProvisionerJobResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/provisionerjobs/{job}",
+    ...options,
+  });
 };
 
 /**
  * List provisioner key
  */
-export const listProvisionerKey = <ThrowOnError extends boolean = false>(options: Options<ListProvisionerKeyData, ThrowOnError>) => {
-    return (options.client ?? client).get<ListProvisionerKeyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/provisionerkeys',
-        ...options
-    });
+export const listProvisionerKey = <ThrowOnError extends boolean = false>(
+  options: Options<ListProvisionerKeyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    ListProvisionerKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/provisionerkeys",
+    ...options,
+  });
 };
 
 /**
  * Create provisioner key
  */
-export const createProvisionerKey = <ThrowOnError extends boolean = false>(options: Options<CreateProvisionerKeyData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateProvisionerKeyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/provisionerkeys',
-        ...options
-    });
+export const createProvisionerKey = <ThrowOnError extends boolean = false>(
+  options: Options<CreateProvisionerKeyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateProvisionerKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/provisionerkeys",
+    ...options,
+  });
 };
 
 /**
  * List provisioner key daemons
  */
-export const listProvisionerKeyDaemons = <ThrowOnError extends boolean = false>(options: Options<ListProvisionerKeyDaemonsData, ThrowOnError>) => {
-    return (options.client ?? client).get<ListProvisionerKeyDaemonsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/provisionerkeys/daemons',
-        ...options
-    });
+export const listProvisionerKeyDaemons = <ThrowOnError extends boolean = false>(
+  options: Options<ListProvisionerKeyDaemonsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    ListProvisionerKeyDaemonsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/provisionerkeys/daemons",
+    ...options,
+  });
 };
 
 /**
  * Delete provisioner key
  */
-export const deleteProvisionerKey = <ThrowOnError extends boolean = false>(options: Options<DeleteProvisionerKeyData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteProvisionerKeyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/provisionerkeys/{provisionerkey}',
-        ...options
-    });
+export const deleteProvisionerKey = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteProvisionerKeyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteProvisionerKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/provisionerkeys/{provisionerkey}",
+    ...options,
+  });
 };
 
 /**
  * Get the available organization idp sync claim fields
  */
-export const getTheAvailableOrganizationIdpSyncClaimFields = <ThrowOnError extends boolean = false>(options: Options<GetTheAvailableOrganizationIdpSyncClaimFieldsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTheAvailableOrganizationIdpSyncClaimFieldsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/settings/idpsync/available-fields',
-        ...options
-    });
+export const getTheAvailableOrganizationIdpSyncClaimFields = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetTheAvailableOrganizationIdpSyncClaimFieldsData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).get<
+    GetTheAvailableOrganizationIdpSyncClaimFieldsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/settings/idpsync/available-fields",
+    ...options,
+  });
 };
 
 /**
  * Get the organization idp sync claim field values
  */
-export const getTheOrganizationIdpSyncClaimFieldValues = <ThrowOnError extends boolean = false>(options: Options<GetTheOrganizationIdpSyncClaimFieldValuesData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTheOrganizationIdpSyncClaimFieldValuesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/settings/idpsync/field-values',
-        ...options
-    });
+export const getTheOrganizationIdpSyncClaimFieldValues = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTheOrganizationIdpSyncClaimFieldValuesData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTheOrganizationIdpSyncClaimFieldValuesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/settings/idpsync/field-values",
+    ...options,
+  });
 };
 
 /**
  * Get group IdP Sync settings by organization
  */
-export const getGroupIdpSyncSettingsByOrganization = <ThrowOnError extends boolean = false>(options: Options<GetGroupIdpSyncSettingsByOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetGroupIdpSyncSettingsByOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/settings/idpsync/groups',
-        ...options
-    });
+export const getGroupIdpSyncSettingsByOrganization = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetGroupIdpSyncSettingsByOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetGroupIdpSyncSettingsByOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/settings/idpsync/groups",
+    ...options,
+  });
 };
 
 /**
  * Update group IdP Sync settings by organization
  */
-export const updateGroupIdpSyncSettingsByOrganization = <ThrowOnError extends boolean = false>(options: Options<UpdateGroupIdpSyncSettingsByOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateGroupIdpSyncSettingsByOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/settings/idpsync/groups',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateGroupIdpSyncSettingsByOrganization = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateGroupIdpSyncSettingsByOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateGroupIdpSyncSettingsByOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/settings/idpsync/groups",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Update group IdP Sync config
  */
-export const updateGroupIdpSyncConfig = <ThrowOnError extends boolean = false>(options: Options<UpdateGroupIdpSyncConfigData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateGroupIdpSyncConfigResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/settings/idpsync/groups/config',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateGroupIdpSyncConfig = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateGroupIdpSyncConfigData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateGroupIdpSyncConfigResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/settings/idpsync/groups/config",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Update group IdP Sync mapping
  */
-export const updateGroupIdpSyncMapping = <ThrowOnError extends boolean = false>(options: Options<UpdateGroupIdpSyncMappingData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateGroupIdpSyncMappingResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/settings/idpsync/groups/mapping',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateGroupIdpSyncMapping = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateGroupIdpSyncMappingData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateGroupIdpSyncMappingResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/settings/idpsync/groups/mapping",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get role IdP Sync settings by organization
  */
-export const getRoleIdpSyncSettingsByOrganization = <ThrowOnError extends boolean = false>(options: Options<GetRoleIdpSyncSettingsByOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetRoleIdpSyncSettingsByOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/settings/idpsync/roles',
-        ...options
-    });
+export const getRoleIdpSyncSettingsByOrganization = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetRoleIdpSyncSettingsByOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetRoleIdpSyncSettingsByOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/settings/idpsync/roles",
+    ...options,
+  });
 };
 
 /**
  * Update role IdP Sync settings by organization
  */
-export const updateRoleIdpSyncSettingsByOrganization = <ThrowOnError extends boolean = false>(options: Options<UpdateRoleIdpSyncSettingsByOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateRoleIdpSyncSettingsByOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/settings/idpsync/roles',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateRoleIdpSyncSettingsByOrganization = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateRoleIdpSyncSettingsByOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateRoleIdpSyncSettingsByOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/settings/idpsync/roles",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Update role IdP Sync config
  */
-export const updateRoleIdpSyncConfig = <ThrowOnError extends boolean = false>(options: Options<UpdateRoleIdpSyncConfigData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateRoleIdpSyncConfigResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/settings/idpsync/roles/config',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateRoleIdpSyncConfig = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateRoleIdpSyncConfigData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateRoleIdpSyncConfigResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/settings/idpsync/roles/config",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Update role IdP Sync mapping
  */
-export const updateRoleIdpSyncMapping = <ThrowOnError extends boolean = false>(options: Options<UpdateRoleIdpSyncMappingData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateRoleIdpSyncMappingResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/settings/idpsync/roles/mapping',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateRoleIdpSyncMapping = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateRoleIdpSyncMappingData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateRoleIdpSyncMappingResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/settings/idpsync/roles/mapping",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
@@ -2240,37 +3707,53 @@ export const updateRoleIdpSyncMapping = <ThrowOnError extends boolean = false>(o
  * By default, only non-deprecated templates are returned.
  * To include deprecated templates, specify `deprecated:true` in the search query.
  */
-export const getTemplatesByOrganization = <ThrowOnError extends boolean = false>(options: Options<GetTemplatesByOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplatesByOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/templates',
-        ...options
-    });
+export const getTemplatesByOrganization = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTemplatesByOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplatesByOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/templates",
+    ...options,
+  });
 };
 
 /**
  * Create template by organization
  */
-export const createTemplateByOrganization = <ThrowOnError extends boolean = false>(options: Options<CreateTemplateByOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateTemplateByOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/templates',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createTemplateByOrganization = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateTemplateByOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateTemplateByOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/templates",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
@@ -2278,389 +3761,562 @@ export const createTemplateByOrganization = <ThrowOnError extends boolean = fals
  *
  * @deprecated
  */
-export const getTemplateExamplesByOrganization = <ThrowOnError extends boolean = false>(options: Options<GetTemplateExamplesByOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateExamplesByOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/templates/examples',
-        ...options
-    });
+export const getTemplateExamplesByOrganization = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTemplateExamplesByOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateExamplesByOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/templates/examples",
+    ...options,
+  });
 };
 
 /**
  * Get templates by organization and template name
  */
-export const getTemplatesByOrganizationAndTemplateName = <ThrowOnError extends boolean = false>(options: Options<GetTemplatesByOrganizationAndTemplateNameData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplatesByOrganizationAndTemplateNameResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/templates/{templatename}',
-        ...options
-    });
+export const getTemplatesByOrganizationAndTemplateName = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTemplatesByOrganizationAndTemplateNameData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplatesByOrganizationAndTemplateNameResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/templates/{templatename}",
+    ...options,
+  });
 };
 
 /**
  * Get template version by organization, template, and name
  */
-export const getTemplateVersionByOrganizationTemplateAndName = <ThrowOnError extends boolean = false>(options: Options<GetTemplateVersionByOrganizationTemplateAndNameData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateVersionByOrganizationTemplateAndNameResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/templates/{templatename}/versions/{templateversionname}',
-        ...options
-    });
+export const getTemplateVersionByOrganizationTemplateAndName = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetTemplateVersionByOrganizationTemplateAndNameData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateVersionByOrganizationTemplateAndNameResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/templates/{templatename}/versions/{templateversionname}",
+    ...options,
+  });
 };
 
 /**
  * Get previous template version by organization, template, and name
  */
-export const getPreviousTemplateVersionByOrganizationTemplateAndName = <ThrowOnError extends boolean = false>(options: Options<GetPreviousTemplateVersionByOrganizationTemplateAndNameData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetPreviousTemplateVersionByOrganizationTemplateAndNameResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/templates/{templatename}/versions/{templateversionname}/previous',
-        ...options
-    });
+export const getPreviousTemplateVersionByOrganizationTemplateAndName = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetPreviousTemplateVersionByOrganizationTemplateAndNameData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).get<
+    GetPreviousTemplateVersionByOrganizationTemplateAndNameResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/templates/{templatename}/versions/{templateversionname}/previous",
+    ...options,
+  });
 };
 
 /**
  * Create template version by organization
  */
-export const createTemplateVersionByOrganization = <ThrowOnError extends boolean = false>(options: Options<CreateTemplateVersionByOrganizationData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateTemplateVersionByOrganizationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/organizations/{organization}/templateversions',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createTemplateVersionByOrganization = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateTemplateVersionByOrganizationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateTemplateVersionByOrganizationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/organizations/{organization}/templateversions",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get prebuilds settings
  */
-export const getPrebuildsSettings = <ThrowOnError extends boolean = false>(options?: Options<GetPrebuildsSettingsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetPrebuildsSettingsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/prebuilds/settings',
-        ...options
-    });
+export const getPrebuildsSettings = <ThrowOnError extends boolean = false>(
+  options?: Options<GetPrebuildsSettingsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetPrebuildsSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/prebuilds/settings",
+    ...options,
+  });
 };
 
 /**
  * Update prebuilds settings
  */
-export const updatePrebuildsSettings = <ThrowOnError extends boolean = false>(options: Options<UpdatePrebuildsSettingsData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdatePrebuildsSettingsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/prebuilds/settings',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updatePrebuildsSettings = <ThrowOnError extends boolean = false>(
+  options: Options<UpdatePrebuildsSettingsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdatePrebuildsSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/prebuilds/settings",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Fetch provisioner key details
  */
-export const fetchProvisionerKeyDetails = <ThrowOnError extends boolean = false>(options: Options<FetchProvisionerKeyDetailsData, ThrowOnError>) => {
-    return (options.client ?? client).get<FetchProvisionerKeyDetailsResponses, unknown, ThrowOnError>({
-        url: '/provisionerkeys/{provisionerkey}',
-        ...options
-    });
+export const fetchProvisionerKeyDetails = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<FetchProvisionerKeyDetailsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    FetchProvisionerKeyDetailsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/provisionerkeys/{provisionerkey}",
+    ...options,
+  });
 };
 
 /**
  * Get site-wide regions for workspace connections
  */
-export const getSiteWideRegionsForWorkspaceConnections = <ThrowOnError extends boolean = false>(options?: Options<GetSiteWideRegionsForWorkspaceConnectionsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetSiteWideRegionsForWorkspaceConnectionsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/regions',
-        ...options
-    });
+export const getSiteWideRegionsForWorkspaceConnections = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<
+    GetSiteWideRegionsForWorkspaceConnectionsData,
+    ThrowOnError
+  >,
+) => {
+  return (options?.client ?? client).get<
+    GetSiteWideRegionsForWorkspaceConnectionsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/regions",
+    ...options,
+  });
 };
 
 /**
  * Get active replicas
  */
-export const getActiveReplicas = <ThrowOnError extends boolean = false>(options?: Options<GetActiveReplicasData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetActiveReplicasResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/replicas',
-        ...options
-    });
+export const getActiveReplicas = <ThrowOnError extends boolean = false>(
+  options?: Options<GetActiveReplicasData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetActiveReplicasResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/replicas",
+    ...options,
+  });
 };
 
 /**
  * SCIM 2.0: Service Provider Config
  */
-export const scimGetServiceProviderConfig = <ThrowOnError extends boolean = false>(options?: Options<ScimGetServiceProviderConfigData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ScimGetServiceProviderConfigResponses, unknown, ThrowOnError>({
-        url: '/scim/v2/ServiceProviderConfig',
-        ...options
-    });
+export const scimGetServiceProviderConfig = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ScimGetServiceProviderConfigData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ScimGetServiceProviderConfigResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/scim/v2/ServiceProviderConfig",
+    ...options,
+  });
 };
 
 /**
  * SCIM 2.0: Get users
  */
-export const scimGetUsers = <ThrowOnError extends boolean = false>(options?: Options<ScimGetUsersData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ScimGetUsersResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Authorizaiton',
-                type: 'apiKey'
-            }
-        ],
-        url: '/scim/v2/Users',
-        ...options
-    });
+export const scimGetUsers = <ThrowOnError extends boolean = false>(
+  options?: Options<ScimGetUsersData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ScimGetUsersResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Authorizaiton",
+        type: "apiKey",
+      },
+    ],
+    url: "/scim/v2/Users",
+    ...options,
+  });
 };
 
 /**
  * SCIM 2.0: Create new user
  */
-export const scimCreateNewUser = <ThrowOnError extends boolean = false>(options: Options<ScimCreateNewUserData, ThrowOnError>) => {
-    return (options.client ?? client).post<ScimCreateNewUserResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Authorizaiton',
-                type: 'apiKey'
-            }
-        ],
-        url: '/scim/v2/Users',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const scimCreateNewUser = <ThrowOnError extends boolean = false>(
+  options: Options<ScimCreateNewUserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    ScimCreateNewUserResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Authorizaiton",
+        type: "apiKey",
+      },
+    ],
+    url: "/scim/v2/Users",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * SCIM 2.0: Get user by ID
  */
-export const scimGetUserById = <ThrowOnError extends boolean = false>(options: Options<ScimGetUserByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<unknown, ScimGetUserByIdErrors, ThrowOnError>({
-        security: [
-            {
-                name: 'Authorizaiton',
-                type: 'apiKey'
-            }
-        ],
-        url: '/scim/v2/Users/{id}',
-        ...options
-    });
+export const scimGetUserById = <ThrowOnError extends boolean = false>(
+  options: Options<ScimGetUserByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    unknown,
+    ScimGetUserByIdErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Authorizaiton",
+        type: "apiKey",
+      },
+    ],
+    url: "/scim/v2/Users/{id}",
+    ...options,
+  });
 };
 
 /**
  * SCIM 2.0: Update user account
  */
-export const scimUpdateUserStatus = <ThrowOnError extends boolean = false>(options: Options<ScimUpdateUserStatusData, ThrowOnError>) => {
-    return (options.client ?? client).patch<ScimUpdateUserStatusResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Authorizaiton',
-                type: 'apiKey'
-            }
-        ],
-        url: '/scim/v2/Users/{id}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const scimUpdateUserStatus = <ThrowOnError extends boolean = false>(
+  options: Options<ScimUpdateUserStatusData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    ScimUpdateUserStatusResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Authorizaiton",
+        type: "apiKey",
+      },
+    ],
+    url: "/scim/v2/Users/{id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * SCIM 2.0: Replace user account
  */
-export const scimReplaceUserStatus = <ThrowOnError extends boolean = false>(options: Options<ScimReplaceUserStatusData, ThrowOnError>) => {
-    return (options.client ?? client).put<ScimReplaceUserStatusResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Authorizaiton',
-                type: 'apiKey'
-            }
-        ],
-        url: '/scim/v2/Users/{id}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const scimReplaceUserStatus = <ThrowOnError extends boolean = false>(
+  options: Options<ScimReplaceUserStatusData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    ScimReplaceUserStatusResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Authorizaiton",
+        type: "apiKey",
+      },
+    ],
+    url: "/scim/v2/Users/{id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get the available idp sync claim fields
  */
-export const getTheAvailableIdpSyncClaimFields = <ThrowOnError extends boolean = false>(options: Options<GetTheAvailableIdpSyncClaimFieldsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTheAvailableIdpSyncClaimFieldsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/settings/idpsync/available-fields',
-        ...options
-    });
+export const getTheAvailableIdpSyncClaimFields = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTheAvailableIdpSyncClaimFieldsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTheAvailableIdpSyncClaimFieldsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/settings/idpsync/available-fields",
+    ...options,
+  });
 };
 
 /**
  * Get the idp sync claim field values
  */
-export const getTheIdpSyncClaimFieldValues = <ThrowOnError extends boolean = false>(options: Options<GetTheIdpSyncClaimFieldValuesData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTheIdpSyncClaimFieldValuesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/settings/idpsync/field-values',
-        ...options
-    });
+export const getTheIdpSyncClaimFieldValues = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTheIdpSyncClaimFieldValuesData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTheIdpSyncClaimFieldValuesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/settings/idpsync/field-values",
+    ...options,
+  });
 };
 
 /**
  * Get organization IdP Sync settings
  */
-export const getOrganizationIdpSyncSettings = <ThrowOnError extends boolean = false>(options?: Options<GetOrganizationIdpSyncSettingsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetOrganizationIdpSyncSettingsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/settings/idpsync/organization',
-        ...options
-    });
+export const getOrganizationIdpSyncSettings = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetOrganizationIdpSyncSettingsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetOrganizationIdpSyncSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/settings/idpsync/organization",
+    ...options,
+  });
 };
 
 /**
  * Update organization IdP Sync settings
  */
-export const updateOrganizationIdpSyncSettings = <ThrowOnError extends boolean = false>(options: Options<UpdateOrganizationIdpSyncSettingsData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateOrganizationIdpSyncSettingsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/settings/idpsync/organization',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateOrganizationIdpSyncSettings = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateOrganizationIdpSyncSettingsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateOrganizationIdpSyncSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/settings/idpsync/organization",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Update organization IdP Sync config
  */
-export const updateOrganizationIdpSyncConfig = <ThrowOnError extends boolean = false>(options: Options<UpdateOrganizationIdpSyncConfigData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateOrganizationIdpSyncConfigResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/settings/idpsync/organization/config',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateOrganizationIdpSyncConfig = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateOrganizationIdpSyncConfigData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateOrganizationIdpSyncConfigResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/settings/idpsync/organization/config",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Update organization IdP Sync mapping
  */
-export const updateOrganizationIdpSyncMapping = <ThrowOnError extends boolean = false>(options: Options<UpdateOrganizationIdpSyncMappingData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateOrganizationIdpSyncMappingResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/settings/idpsync/organization/mapping',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateOrganizationIdpSyncMapping = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateOrganizationIdpSyncMappingData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateOrganizationIdpSyncMappingResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/settings/idpsync/organization/mapping",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * User-scoped tailnet RPC connection
  */
-export const userScopedTailnetRpcConnection = <ThrowOnError extends boolean = false>(options?: Options<UserScopedTailnetRpcConnectionData, ThrowOnError>) => {
-    return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/tailnet',
-        ...options
-    });
+export const userScopedTailnetRpcConnection = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<UserScopedTailnetRpcConnectionData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/tailnet",
+    ...options,
+  });
 };
 
 /**
@@ -2670,1381 +4326,1943 @@ export const userScopedTailnetRpcConnection = <ThrowOnError extends boolean = fa
  * By default, only non-deprecated templates are returned.
  * To include deprecated templates, specify `deprecated:true` in the search query.
  */
-export const getAllTemplates = <ThrowOnError extends boolean = false>(options?: Options<GetAllTemplatesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetAllTemplatesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates',
-        ...options
-    });
+export const getAllTemplates = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAllTemplatesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAllTemplatesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates",
+    ...options,
+  });
 };
 
 /**
  * Get template examples
  */
-export const getTemplateExamples = <ThrowOnError extends boolean = false>(options?: Options<GetTemplateExamplesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetTemplateExamplesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/examples',
-        ...options
-    });
+export const getTemplateExamples = <ThrowOnError extends boolean = false>(
+  options?: Options<GetTemplateExamplesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetTemplateExamplesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/examples",
+    ...options,
+  });
 };
 
 /**
  * Delete template by ID
  */
-export const deleteTemplateById = <ThrowOnError extends boolean = false>(options: Options<DeleteTemplateByIdData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteTemplateByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/{template}',
-        ...options
-    });
+export const deleteTemplateById = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteTemplateByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteTemplateByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/{template}",
+    ...options,
+  });
 };
 
 /**
  * Get template settings by ID
  */
-export const getTemplateSettingsById = <ThrowOnError extends boolean = false>(options: Options<GetTemplateSettingsByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateSettingsByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/{template}',
-        ...options
-    });
+export const getTemplateSettingsById = <ThrowOnError extends boolean = false>(
+  options: Options<GetTemplateSettingsByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateSettingsByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/{template}",
+    ...options,
+  });
 };
 
 /**
  * Update template settings by ID
  */
-export const updateTemplateSettingsById = <ThrowOnError extends boolean = false>(options: Options<UpdateTemplateSettingsByIdData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateTemplateSettingsByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/{template}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateTemplateSettingsById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateTemplateSettingsByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateTemplateSettingsByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/{template}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get template ACLs
  */
-export const getTemplateAcls = <ThrowOnError extends boolean = false>(options: Options<GetTemplateAclsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateAclsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/{template}/acl',
-        ...options
-    });
+export const getTemplateAcls = <ThrowOnError extends boolean = false>(
+  options: Options<GetTemplateAclsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateAclsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/{template}/acl",
+    ...options,
+  });
 };
 
 /**
  * Update template ACL
  */
-export const updateTemplateAcl = <ThrowOnError extends boolean = false>(options: Options<UpdateTemplateAclData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateTemplateAclResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/{template}/acl',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateTemplateAcl = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateTemplateAclData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateTemplateAclResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/{template}/acl",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get template available acl users/groups
  */
-export const getTemplateAvailableAclUsersgroups = <ThrowOnError extends boolean = false>(options: Options<GetTemplateAvailableAclUsersgroupsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateAvailableAclUsersgroupsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/{template}/acl/available',
-        ...options
-    });
+export const getTemplateAvailableAclUsersgroups = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTemplateAvailableAclUsersgroupsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateAvailableAclUsersgroupsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/{template}/acl/available",
+    ...options,
+  });
 };
 
 /**
  * Get template DAUs by ID
  */
-export const getTemplateDausById = <ThrowOnError extends boolean = false>(options: Options<GetTemplateDausByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateDausByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/{template}/daus',
-        ...options
-    });
+export const getTemplateDausById = <ThrowOnError extends boolean = false>(
+  options: Options<GetTemplateDausByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateDausByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/{template}/daus",
+    ...options,
+  });
 };
 
 /**
  * List template versions by template ID
  */
-export const listTemplateVersionsByTemplateId = <ThrowOnError extends boolean = false>(options: Options<ListTemplateVersionsByTemplateIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<ListTemplateVersionsByTemplateIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/{template}/versions',
-        ...options
-    });
+export const listTemplateVersionsByTemplateId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListTemplateVersionsByTemplateIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    ListTemplateVersionsByTemplateIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/{template}/versions",
+    ...options,
+  });
 };
 
 /**
  * Update active template version by template ID
  */
-export const updateActiveTemplateVersionByTemplateId = <ThrowOnError extends boolean = false>(options: Options<UpdateActiveTemplateVersionByTemplateIdData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateActiveTemplateVersionByTemplateIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/{template}/versions',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateActiveTemplateVersionByTemplateId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateActiveTemplateVersionByTemplateIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateActiveTemplateVersionByTemplateIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/{template}/versions",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Archive template unused versions by template id
  */
-export const archiveTemplateUnusedVersionsByTemplateId = <ThrowOnError extends boolean = false>(options: Options<ArchiveTemplateUnusedVersionsByTemplateIdData, ThrowOnError>) => {
-    return (options.client ?? client).post<ArchiveTemplateUnusedVersionsByTemplateIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/{template}/versions/archive',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const archiveTemplateUnusedVersionsByTemplateId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ArchiveTemplateUnusedVersionsByTemplateIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    ArchiveTemplateUnusedVersionsByTemplateIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/{template}/versions/archive",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get template version by template ID and name
  */
-export const getTemplateVersionByTemplateIdAndName = <ThrowOnError extends boolean = false>(options: Options<GetTemplateVersionByTemplateIdAndNameData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateVersionByTemplateIdAndNameResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templates/{template}/versions/{templateversionname}',
-        ...options
-    });
+export const getTemplateVersionByTemplateIdAndName = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTemplateVersionByTemplateIdAndNameData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateVersionByTemplateIdAndNameResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templates/{template}/versions/{templateversionname}",
+    ...options,
+  });
 };
 
 /**
  * Get template version by ID
  */
-export const getTemplateVersionById = <ThrowOnError extends boolean = false>(options: Options<GetTemplateVersionByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateVersionByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}',
-        ...options
-    });
+export const getTemplateVersionById = <ThrowOnError extends boolean = false>(
+  options: Options<GetTemplateVersionByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateVersionByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}",
+    ...options,
+  });
 };
 
 /**
  * Patch template version by ID
  */
-export const patchTemplateVersionById = <ThrowOnError extends boolean = false>(options: Options<PatchTemplateVersionByIdData, ThrowOnError>) => {
-    return (options.client ?? client).patch<PatchTemplateVersionByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const patchTemplateVersionById = <ThrowOnError extends boolean = false>(
+  options: Options<PatchTemplateVersionByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    PatchTemplateVersionByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Archive template version
  */
-export const archiveTemplateVersion = <ThrowOnError extends boolean = false>(options: Options<ArchiveTemplateVersionData, ThrowOnError>) => {
-    return (options.client ?? client).post<ArchiveTemplateVersionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/archive',
-        ...options
-    });
+export const archiveTemplateVersion = <ThrowOnError extends boolean = false>(
+  options: Options<ArchiveTemplateVersionData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    ArchiveTemplateVersionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/archive",
+    ...options,
+  });
 };
 
 /**
  * Cancel template version by ID
  */
-export const cancelTemplateVersionById = <ThrowOnError extends boolean = false>(options: Options<CancelTemplateVersionByIdData, ThrowOnError>) => {
-    return (options.client ?? client).patch<CancelTemplateVersionByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/cancel',
-        ...options
-    });
+export const cancelTemplateVersionById = <ThrowOnError extends boolean = false>(
+  options: Options<CancelTemplateVersionByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    CancelTemplateVersionByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/cancel",
+    ...options,
+  });
 };
 
 /**
  * Create template version dry-run
  */
-export const createTemplateVersionDryRun = <ThrowOnError extends boolean = false>(options: Options<CreateTemplateVersionDryRunData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateTemplateVersionDryRunResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/dry-run',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createTemplateVersionDryRun = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateTemplateVersionDryRunData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateTemplateVersionDryRunResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/dry-run",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get template version dry-run by job ID
  */
-export const getTemplateVersionDryRunByJobId = <ThrowOnError extends boolean = false>(options: Options<GetTemplateVersionDryRunByJobIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateVersionDryRunByJobIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/dry-run/{jobID}',
-        ...options
-    });
+export const getTemplateVersionDryRunByJobId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTemplateVersionDryRunByJobIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateVersionDryRunByJobIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/dry-run/{jobID}",
+    ...options,
+  });
 };
 
 /**
  * Cancel template version dry-run by job ID
  */
-export const cancelTemplateVersionDryRunByJobId = <ThrowOnError extends boolean = false>(options: Options<CancelTemplateVersionDryRunByJobIdData, ThrowOnError>) => {
-    return (options.client ?? client).patch<CancelTemplateVersionDryRunByJobIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/dry-run/{jobID}/cancel',
-        ...options
-    });
+export const cancelTemplateVersionDryRunByJobId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CancelTemplateVersionDryRunByJobIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    CancelTemplateVersionDryRunByJobIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/dry-run/{jobID}/cancel",
+    ...options,
+  });
 };
 
 /**
  * Get template version dry-run logs by job ID
  */
-export const getTemplateVersionDryRunLogsByJobId = <ThrowOnError extends boolean = false>(options: Options<GetTemplateVersionDryRunLogsByJobIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateVersionDryRunLogsByJobIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/dry-run/{jobID}/logs',
-        ...options
-    });
+export const getTemplateVersionDryRunLogsByJobId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTemplateVersionDryRunLogsByJobIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateVersionDryRunLogsByJobIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/dry-run/{jobID}/logs",
+    ...options,
+  });
 };
 
 /**
  * Get template version dry-run matched provisioners
  */
-export const getTemplateVersionDryRunMatchedProvisioners = <ThrowOnError extends boolean = false>(options: Options<GetTemplateVersionDryRunMatchedProvisionersData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateVersionDryRunMatchedProvisionersResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/dry-run/{jobID}/matched-provisioners',
-        ...options
-    });
+export const getTemplateVersionDryRunMatchedProvisioners = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetTemplateVersionDryRunMatchedProvisionersData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateVersionDryRunMatchedProvisionersResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/dry-run/{jobID}/matched-provisioners",
+    ...options,
+  });
 };
 
 /**
  * Get template version dry-run resources by job ID
  */
-export const getTemplateVersionDryRunResourcesByJobId = <ThrowOnError extends boolean = false>(options: Options<GetTemplateVersionDryRunResourcesByJobIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateVersionDryRunResourcesByJobIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/dry-run/{jobID}/resources',
-        ...options
-    });
+export const getTemplateVersionDryRunResourcesByJobId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTemplateVersionDryRunResourcesByJobIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateVersionDryRunResourcesByJobIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/dry-run/{jobID}/resources",
+    ...options,
+  });
 };
 
 /**
  * Open dynamic parameters WebSocket by template version
  */
-export const openDynamicParametersWebsocketByTemplateVersion = <ThrowOnError extends boolean = false>(options: Options<OpenDynamicParametersWebsocketByTemplateVersionData, ThrowOnError>) => {
-    return (options.client ?? client).get<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/dynamic-parameters',
-        ...options
-    });
+export const openDynamicParametersWebsocketByTemplateVersion = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    OpenDynamicParametersWebsocketByTemplateVersionData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).get<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/dynamic-parameters",
+    ...options,
+  });
 };
 
 /**
  * Evaluate dynamic parameters for template version
  */
-export const evaluateDynamicParametersForTemplateVersion = <ThrowOnError extends boolean = false>(options: Options<EvaluateDynamicParametersForTemplateVersionData, ThrowOnError>) => {
-    return (options.client ?? client).post<EvaluateDynamicParametersForTemplateVersionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/dynamic-parameters/evaluate',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const evaluateDynamicParametersForTemplateVersion = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    EvaluateDynamicParametersForTemplateVersionData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).post<
+    EvaluateDynamicParametersForTemplateVersionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/dynamic-parameters/evaluate",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get external auth by template version
  */
-export const getExternalAuthByTemplateVersion = <ThrowOnError extends boolean = false>(options: Options<GetExternalAuthByTemplateVersionData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetExternalAuthByTemplateVersionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/external-auth',
-        ...options
-    });
+export const getExternalAuthByTemplateVersion = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetExternalAuthByTemplateVersionData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetExternalAuthByTemplateVersionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/external-auth",
+    ...options,
+  });
 };
 
 /**
  * Get logs by template version
  */
-export const getLogsByTemplateVersion = <ThrowOnError extends boolean = false>(options: Options<GetLogsByTemplateVersionData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetLogsByTemplateVersionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/logs',
-        ...options
-    });
+export const getLogsByTemplateVersion = <ThrowOnError extends boolean = false>(
+  options: Options<GetLogsByTemplateVersionData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetLogsByTemplateVersionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/logs",
+    ...options,
+  });
 };
 
 /**
  * Removed: Get parameters by template version
  */
-export const removedGetParametersByTemplateVersion = <ThrowOnError extends boolean = false>(options: Options<RemovedGetParametersByTemplateVersionData, ThrowOnError>) => {
-    return (options.client ?? client).get<RemovedGetParametersByTemplateVersionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/parameters',
-        ...options
-    });
+export const removedGetParametersByTemplateVersion = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<RemovedGetParametersByTemplateVersionData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    RemovedGetParametersByTemplateVersionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/parameters",
+    ...options,
+  });
 };
 
 /**
  * Get template version presets
  */
-export const getTemplateVersionPresets = <ThrowOnError extends boolean = false>(options: Options<GetTemplateVersionPresetsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateVersionPresetsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/presets',
-        ...options
-    });
+export const getTemplateVersionPresets = <ThrowOnError extends boolean = false>(
+  options: Options<GetTemplateVersionPresetsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateVersionPresetsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/presets",
+    ...options,
+  });
 };
 
 /**
  * Get resources by template version
  */
-export const getResourcesByTemplateVersion = <ThrowOnError extends boolean = false>(options: Options<GetResourcesByTemplateVersionData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetResourcesByTemplateVersionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/resources',
-        ...options
-    });
+export const getResourcesByTemplateVersion = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetResourcesByTemplateVersionData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetResourcesByTemplateVersionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/resources",
+    ...options,
+  });
 };
 
 /**
  * Get rich parameters by template version
  */
-export const getRichParametersByTemplateVersion = <ThrowOnError extends boolean = false>(options: Options<GetRichParametersByTemplateVersionData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetRichParametersByTemplateVersionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/rich-parameters',
-        ...options
-    });
+export const getRichParametersByTemplateVersion = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetRichParametersByTemplateVersionData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetRichParametersByTemplateVersionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/rich-parameters",
+    ...options,
+  });
 };
 
 /**
  * Removed: Get schema by template version
  */
-export const removedGetSchemaByTemplateVersion = <ThrowOnError extends boolean = false>(options: Options<RemovedGetSchemaByTemplateVersionData, ThrowOnError>) => {
-    return (options.client ?? client).get<RemovedGetSchemaByTemplateVersionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/schema',
-        ...options
-    });
+export const removedGetSchemaByTemplateVersion = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<RemovedGetSchemaByTemplateVersionData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    RemovedGetSchemaByTemplateVersionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/schema",
+    ...options,
+  });
 };
 
 /**
  * Unarchive template version
  */
-export const unarchiveTemplateVersion = <ThrowOnError extends boolean = false>(options: Options<UnarchiveTemplateVersionData, ThrowOnError>) => {
-    return (options.client ?? client).post<UnarchiveTemplateVersionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/unarchive',
-        ...options
-    });
+export const unarchiveTemplateVersion = <ThrowOnError extends boolean = false>(
+  options: Options<UnarchiveTemplateVersionData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    UnarchiveTemplateVersionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/unarchive",
+    ...options,
+  });
 };
 
 /**
  * Get template variables by template version
  */
-export const getTemplateVariablesByTemplateVersion = <ThrowOnError extends boolean = false>(options: Options<GetTemplateVariablesByTemplateVersionData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateVariablesByTemplateVersionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/templateversions/{templateversion}/variables',
-        ...options
-    });
+export const getTemplateVariablesByTemplateVersion = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTemplateVariablesByTemplateVersionData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTemplateVariablesByTemplateVersionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/templateversions/{templateversion}/variables",
+    ...options,
+  });
 };
 
 /**
  * Update check
  */
-export const updateCheck = <ThrowOnError extends boolean = false>(options?: Options<UpdateCheckData, ThrowOnError>) => {
-    return (options?.client ?? client).get<UpdateCheckResponses, unknown, ThrowOnError>({
-        url: '/updatecheck',
-        ...options
-    });
+export const updateCheck = <ThrowOnError extends boolean = false>(
+  options?: Options<UpdateCheckData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    UpdateCheckResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/updatecheck",
+    ...options,
+  });
 };
 
 /**
  * Get users
  */
-export const getUsers = <ThrowOnError extends boolean = false>(options?: Options<GetUsersData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetUsersResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users',
-        ...options
-    });
+export const getUsers = <ThrowOnError extends boolean = false>(
+  options?: Options<GetUsersData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetUsersResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users",
+    ...options,
+  });
 };
 
 /**
  * Create new user
  */
-export const createNewUser = <ThrowOnError extends boolean = false>(options: Options<CreateNewUserData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateNewUserResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createNewUser = <ThrowOnError extends boolean = false>(
+  options: Options<CreateNewUserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateNewUserResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get authentication methods
  */
-export const getAuthenticationMethods = <ThrowOnError extends boolean = false>(options?: Options<GetAuthenticationMethodsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetAuthenticationMethodsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/authmethods',
-        ...options
-    });
+export const getAuthenticationMethods = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAuthenticationMethodsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAuthenticationMethodsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/authmethods",
+    ...options,
+  });
 };
 
 /**
  * Check initial user created
  */
-export const checkInitialUserCreated = <ThrowOnError extends boolean = false>(options?: Options<CheckInitialUserCreatedData, ThrowOnError>) => {
-    return (options?.client ?? client).get<CheckInitialUserCreatedResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/first',
-        ...options
-    });
+export const checkInitialUserCreated = <ThrowOnError extends boolean = false>(
+  options?: Options<CheckInitialUserCreatedData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    CheckInitialUserCreatedResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/first",
+    ...options,
+  });
 };
 
 /**
  * Create initial user
  */
-export const createInitialUser = <ThrowOnError extends boolean = false>(options: Options<CreateInitialUserData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateInitialUserResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/first',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createInitialUser = <ThrowOnError extends boolean = false>(
+  options: Options<CreateInitialUserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateInitialUserResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/first",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Log in user
  */
-export const logInUser = <ThrowOnError extends boolean = false>(options: Options<LogInUserData, ThrowOnError>) => {
-    return (options.client ?? client).post<LogInUserResponses, unknown, ThrowOnError>({
-        url: '/users/login',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const logInUser = <ThrowOnError extends boolean = false>(
+  options: Options<LogInUserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    LogInUserResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/users/login",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Log out user
  */
-export const logOutUser = <ThrowOnError extends boolean = false>(options?: Options<LogOutUserData, ThrowOnError>) => {
-    return (options?.client ?? client).post<LogOutUserResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/logout',
-        ...options
-    });
+export const logOutUser = <ThrowOnError extends boolean = false>(
+  options?: Options<LogOutUserData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    LogOutUserResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/logout",
+    ...options,
+  });
 };
 
 /**
  * OAuth 2.0 GitHub Callback
  */
-export const oauth20GithubCallback = <ThrowOnError extends boolean = false>(options?: Options<Oauth20GithubCallbackData, ThrowOnError>) => {
-    return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/oauth2/github/callback',
-        ...options
-    });
+export const oauth20GithubCallback = <ThrowOnError extends boolean = false>(
+  options?: Options<Oauth20GithubCallbackData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/oauth2/github/callback",
+    ...options,
+  });
 };
 
 /**
  * Get Github device auth.
  */
-export const getGithubDeviceAuth = <ThrowOnError extends boolean = false>(options?: Options<GetGithubDeviceAuthData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetGithubDeviceAuthResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/oauth2/github/device',
-        ...options
-    });
+export const getGithubDeviceAuth = <ThrowOnError extends boolean = false>(
+  options?: Options<GetGithubDeviceAuthData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetGithubDeviceAuthResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/oauth2/github/device",
+    ...options,
+  });
 };
 
 /**
  * OpenID Connect Callback
  */
-export const openidConnectCallback = <ThrowOnError extends boolean = false>(options?: Options<OpenidConnectCallbackData, ThrowOnError>) => {
-    return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/oidc/callback',
-        ...options
-    });
+export const openidConnectCallback = <ThrowOnError extends boolean = false>(
+  options?: Options<OpenidConnectCallbackData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/oidc/callback",
+    ...options,
+  });
 };
 
 /**
  * Change password with a one-time passcode
  */
-export const changePasswordWithAOneTimePasscode = <ThrowOnError extends boolean = false>(options: Options<ChangePasswordWithAOneTimePasscodeData, ThrowOnError>) => {
-    return (options.client ?? client).post<ChangePasswordWithAOneTimePasscodeResponses, unknown, ThrowOnError>({
-        url: '/users/otp/change-password',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const changePasswordWithAOneTimePasscode = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ChangePasswordWithAOneTimePasscodeData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    ChangePasswordWithAOneTimePasscodeResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/users/otp/change-password",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Request one-time passcode
  */
-export const requestOneTimePasscode = <ThrowOnError extends boolean = false>(options: Options<RequestOneTimePasscodeData, ThrowOnError>) => {
-    return (options.client ?? client).post<RequestOneTimePasscodeResponses, unknown, ThrowOnError>({
-        url: '/users/otp/request',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const requestOneTimePasscode = <ThrowOnError extends boolean = false>(
+  options: Options<RequestOneTimePasscodeData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    RequestOneTimePasscodeResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/users/otp/request",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get site member roles
  */
-export const getSiteMemberRoles = <ThrowOnError extends boolean = false>(options?: Options<GetSiteMemberRolesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetSiteMemberRolesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/roles',
-        ...options
-    });
+export const getSiteMemberRoles = <ThrowOnError extends boolean = false>(
+  options?: Options<GetSiteMemberRolesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSiteMemberRolesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/roles",
+    ...options,
+  });
 };
 
 /**
  * Validate user password
  */
-export const validateUserPassword = <ThrowOnError extends boolean = false>(options: Options<ValidateUserPasswordData, ThrowOnError>) => {
-    return (options.client ?? client).post<ValidateUserPasswordResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/validate-password',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const validateUserPassword = <ThrowOnError extends boolean = false>(
+  options: Options<ValidateUserPasswordData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    ValidateUserPasswordResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/validate-password",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Delete user
  */
-export const deleteUser = <ThrowOnError extends boolean = false>(options: Options<DeleteUserData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteUserResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}',
-        ...options
-    });
+export const deleteUser = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteUserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteUserResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}",
+    ...options,
+  });
 };
 
 /**
  * Get user by name
  */
-export const getUserByName = <ThrowOnError extends boolean = false>(options: Options<GetUserByNameData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetUserByNameResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}',
-        ...options
-    });
+export const getUserByName = <ThrowOnError extends boolean = false>(
+  options: Options<GetUserByNameData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetUserByNameResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}",
+    ...options,
+  });
 };
 
 /**
  * Get user appearance settings
  */
-export const getUserAppearanceSettings = <ThrowOnError extends boolean = false>(options: Options<GetUserAppearanceSettingsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetUserAppearanceSettingsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/appearance',
-        ...options
-    });
+export const getUserAppearanceSettings = <ThrowOnError extends boolean = false>(
+  options: Options<GetUserAppearanceSettingsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetUserAppearanceSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/appearance",
+    ...options,
+  });
 };
 
 /**
  * Update user appearance settings
  */
-export const updateUserAppearanceSettings = <ThrowOnError extends boolean = false>(options: Options<UpdateUserAppearanceSettingsData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateUserAppearanceSettingsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/appearance',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateUserAppearanceSettings = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateUserAppearanceSettingsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateUserAppearanceSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/appearance",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get autofill build parameters for user
  */
-export const getAutofillBuildParametersForUser = <ThrowOnError extends boolean = false>(options: Options<GetAutofillBuildParametersForUserData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetAutofillBuildParametersForUserResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/autofill-parameters',
-        ...options
-    });
+export const getAutofillBuildParametersForUser = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetAutofillBuildParametersForUserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetAutofillBuildParametersForUserResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/autofill-parameters",
+    ...options,
+  });
 };
 
 /**
  * Convert user from password to oauth authentication
  */
-export const convertUserFromPasswordToOauthAuthentication = <ThrowOnError extends boolean = false>(options: Options<ConvertUserFromPasswordToOauthAuthenticationData, ThrowOnError>) => {
-    return (options.client ?? client).post<ConvertUserFromPasswordToOauthAuthenticationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/convert-login',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const convertUserFromPasswordToOauthAuthentication = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    ConvertUserFromPasswordToOauthAuthenticationData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).post<
+    ConvertUserFromPasswordToOauthAuthenticationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/convert-login",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get user Git SSH key
  */
-export const getUserGitSshKey = <ThrowOnError extends boolean = false>(options: Options<GetUserGitSshKeyData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetUserGitSshKeyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/gitsshkey',
-        ...options
-    });
+export const getUserGitSshKey = <ThrowOnError extends boolean = false>(
+  options: Options<GetUserGitSshKeyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetUserGitSshKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/gitsshkey",
+    ...options,
+  });
 };
 
 /**
  * Regenerate user SSH key
  */
-export const regenerateUserSshKey = <ThrowOnError extends boolean = false>(options: Options<RegenerateUserSshKeyData, ThrowOnError>) => {
-    return (options.client ?? client).put<RegenerateUserSshKeyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/gitsshkey',
-        ...options
-    });
+export const regenerateUserSshKey = <ThrowOnError extends boolean = false>(
+  options: Options<RegenerateUserSshKeyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    RegenerateUserSshKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/gitsshkey",
+    ...options,
+  });
 };
 
 /**
  * Create new session key
  */
-export const createNewSessionKey = <ThrowOnError extends boolean = false>(options: Options<CreateNewSessionKeyData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateNewSessionKeyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/keys',
-        ...options
-    });
+export const createNewSessionKey = <ThrowOnError extends boolean = false>(
+  options: Options<CreateNewSessionKeyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateNewSessionKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/keys",
+    ...options,
+  });
 };
 
 /**
  * Get user tokens
  */
-export const getUserTokens = <ThrowOnError extends boolean = false>(options: Options<GetUserTokensData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetUserTokensResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/keys/tokens',
-        ...options
-    });
+export const getUserTokens = <ThrowOnError extends boolean = false>(
+  options: Options<GetUserTokensData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetUserTokensResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/keys/tokens",
+    ...options,
+  });
 };
 
 /**
  * Create token API key
  */
-export const createTokenApiKey = <ThrowOnError extends boolean = false>(options: Options<CreateTokenApiKeyData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateTokenApiKeyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/keys/tokens',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createTokenApiKey = <ThrowOnError extends boolean = false>(
+  options: Options<CreateTokenApiKeyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateTokenApiKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/keys/tokens",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get token config
  */
-export const getTokenConfig = <ThrowOnError extends boolean = false>(options: Options<GetTokenConfigData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTokenConfigResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/keys/tokens/tokenconfig',
-        ...options
-    });
+export const getTokenConfig = <ThrowOnError extends boolean = false>(
+  options: Options<GetTokenConfigData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetTokenConfigResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/keys/tokens/tokenconfig",
+    ...options,
+  });
 };
 
 /**
  * Get API key by token name
  */
-export const getApiKeyByTokenName = <ThrowOnError extends boolean = false>(options: Options<GetApiKeyByTokenNameData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiKeyByTokenNameResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/keys/tokens/{keyname}',
-        ...options
-    });
+export const getApiKeyByTokenName = <ThrowOnError extends boolean = false>(
+  options: Options<GetApiKeyByTokenNameData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetApiKeyByTokenNameResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/keys/tokens/{keyname}",
+    ...options,
+  });
 };
 
 /**
  * Delete API key
  */
-export const deleteApiKey = <ThrowOnError extends boolean = false>(options: Options<DeleteApiKeyData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteApiKeyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/keys/{keyid}',
-        ...options
-    });
+export const deleteApiKey = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteApiKeyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteApiKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/keys/{keyid}",
+    ...options,
+  });
 };
 
 /**
  * Get API key by ID
  */
-export const getApiKeyById = <ThrowOnError extends boolean = false>(options: Options<GetApiKeyByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiKeyByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/keys/{keyid}',
-        ...options
-    });
+export const getApiKeyById = <ThrowOnError extends boolean = false>(
+  options: Options<GetApiKeyByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetApiKeyByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/keys/{keyid}",
+    ...options,
+  });
 };
 
 /**
  * Get user login type
  */
-export const getUserLoginType = <ThrowOnError extends boolean = false>(options: Options<GetUserLoginTypeData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetUserLoginTypeResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/login-type',
-        ...options
-    });
+export const getUserLoginType = <ThrowOnError extends boolean = false>(
+  options: Options<GetUserLoginTypeData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetUserLoginTypeResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/login-type",
+    ...options,
+  });
 };
 
 /**
  * Get user notification preferences
  */
-export const getUserNotificationPreferences = <ThrowOnError extends boolean = false>(options: Options<GetUserNotificationPreferencesData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetUserNotificationPreferencesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/notifications/preferences',
-        ...options
-    });
+export const getUserNotificationPreferences = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetUserNotificationPreferencesData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetUserNotificationPreferencesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/notifications/preferences",
+    ...options,
+  });
 };
 
 /**
  * Update user notification preferences
  */
-export const updateUserNotificationPreferences = <ThrowOnError extends boolean = false>(options: Options<UpdateUserNotificationPreferencesData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateUserNotificationPreferencesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/notifications/preferences',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateUserNotificationPreferences = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateUserNotificationPreferencesData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateUserNotificationPreferencesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/notifications/preferences",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get organizations by user
  */
-export const getOrganizationsByUser = <ThrowOnError extends boolean = false>(options: Options<GetOrganizationsByUserData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetOrganizationsByUserResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/organizations',
-        ...options
-    });
+export const getOrganizationsByUser = <ThrowOnError extends boolean = false>(
+  options: Options<GetOrganizationsByUserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetOrganizationsByUserResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/organizations",
+    ...options,
+  });
 };
 
 /**
  * Get organization by user and organization name
  */
-export const getOrganizationByUserAndOrganizationName = <ThrowOnError extends boolean = false>(options: Options<GetOrganizationByUserAndOrganizationNameData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetOrganizationByUserAndOrganizationNameResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/organizations/{organizationname}',
-        ...options
-    });
+export const getOrganizationByUserAndOrganizationName = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetOrganizationByUserAndOrganizationNameData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetOrganizationByUserAndOrganizationNameResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/organizations/{organizationname}",
+    ...options,
+  });
 };
 
 /**
  * Update user password
  */
-export const updateUserPassword = <ThrowOnError extends boolean = false>(options: Options<UpdateUserPasswordData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateUserPasswordResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/password',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateUserPassword = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateUserPasswordData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateUserPasswordResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/password",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Update user profile
  */
-export const updateUserProfile = <ThrowOnError extends boolean = false>(options: Options<UpdateUserProfileData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateUserProfileResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/profile',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateUserProfile = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateUserProfileData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateUserProfileResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/profile",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get user quiet hours schedule
  */
-export const getUserQuietHoursSchedule = <ThrowOnError extends boolean = false>(options: Options<GetUserQuietHoursScheduleData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetUserQuietHoursScheduleResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/quiet-hours',
-        ...options
-    });
+export const getUserQuietHoursSchedule = <ThrowOnError extends boolean = false>(
+  options: Options<GetUserQuietHoursScheduleData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetUserQuietHoursScheduleResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/quiet-hours",
+    ...options,
+  });
 };
 
 /**
  * Update user quiet hours schedule
  */
-export const updateUserQuietHoursSchedule = <ThrowOnError extends boolean = false>(options: Options<UpdateUserQuietHoursScheduleData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateUserQuietHoursScheduleResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/quiet-hours',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateUserQuietHoursSchedule = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateUserQuietHoursScheduleData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateUserQuietHoursScheduleResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/quiet-hours",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get user roles
  */
-export const getUserRoles = <ThrowOnError extends boolean = false>(options: Options<GetUserRolesData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetUserRolesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/roles',
-        ...options
-    });
+export const getUserRoles = <ThrowOnError extends boolean = false>(
+  options: Options<GetUserRolesData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetUserRolesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/roles",
+    ...options,
+  });
 };
 
 /**
  * Assign role to user
  */
-export const assignRoleToUser = <ThrowOnError extends boolean = false>(options: Options<AssignRoleToUserData, ThrowOnError>) => {
-    return (options.client ?? client).put<AssignRoleToUserResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/roles',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const assignRoleToUser = <ThrowOnError extends boolean = false>(
+  options: Options<AssignRoleToUserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    AssignRoleToUserResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/roles",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Activate user account
  */
-export const activateUserAccount = <ThrowOnError extends boolean = false>(options: Options<ActivateUserAccountData, ThrowOnError>) => {
-    return (options.client ?? client).put<ActivateUserAccountResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/status/activate',
-        ...options
-    });
+export const activateUserAccount = <ThrowOnError extends boolean = false>(
+  options: Options<ActivateUserAccountData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    ActivateUserAccountResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/status/activate",
+    ...options,
+  });
 };
 
 /**
  * Suspend user account
  */
-export const suspendUserAccount = <ThrowOnError extends boolean = false>(options: Options<SuspendUserAccountData, ThrowOnError>) => {
-    return (options.client ?? client).put<SuspendUserAccountResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/status/suspend',
-        ...options
-    });
+export const suspendUserAccount = <ThrowOnError extends boolean = false>(
+  options: Options<SuspendUserAccountData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    SuspendUserAccountResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/status/suspend",
+    ...options,
+  });
 };
 
 /**
  * Delete user webpush subscription
  */
-export const deleteUserWebpushSubscription = <ThrowOnError extends boolean = false>(options: Options<DeleteUserWebpushSubscriptionData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteUserWebpushSubscriptionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/webpush/subscription',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const deleteUserWebpushSubscription = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteUserWebpushSubscriptionData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteUserWebpushSubscriptionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/webpush/subscription",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Create user webpush subscription
  */
-export const createUserWebpushSubscription = <ThrowOnError extends boolean = false>(options: Options<CreateUserWebpushSubscriptionData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateUserWebpushSubscriptionResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/webpush/subscription',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createUserWebpushSubscription = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateUserWebpushSubscriptionData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateUserWebpushSubscriptionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/webpush/subscription",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Send a test push notification
  */
-export const sendATestPushNotification = <ThrowOnError extends boolean = false>(options: Options<SendATestPushNotificationData, ThrowOnError>) => {
-    return (options.client ?? client).post<SendATestPushNotificationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/webpush/test',
-        ...options
-    });
+export const sendATestPushNotification = <ThrowOnError extends boolean = false>(
+  options: Options<SendATestPushNotificationData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    SendATestPushNotificationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/webpush/test",
+    ...options,
+  });
 };
 
 /**
  * Get workspace metadata by user and workspace name
  */
-export const getWorkspaceMetadataByUserAndWorkspaceName = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceMetadataByUserAndWorkspaceNameData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceMetadataByUserAndWorkspaceNameResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/workspace/{workspacename}',
-        ...options
-    });
+export const getWorkspaceMetadataByUserAndWorkspaceName = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetWorkspaceMetadataByUserAndWorkspaceNameData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceMetadataByUserAndWorkspaceNameResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/workspace/{workspacename}",
+    ...options,
+  });
 };
 
 /**
  * Get workspace build by user, workspace name, and build number
  */
-export const getWorkspaceBuildByUserWorkspaceNameAndBuildNumber = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceBuildByUserWorkspaceNameAndBuildNumberData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceBuildByUserWorkspaceNameAndBuildNumberResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/workspace/{workspacename}/builds/{buildnumber}',
-        ...options
-    });
+export const getWorkspaceBuildByUserWorkspaceNameAndBuildNumber = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetWorkspaceBuildByUserWorkspaceNameAndBuildNumberData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceBuildByUserWorkspaceNameAndBuildNumberResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/workspace/{workspacename}/builds/{buildnumber}",
+    ...options,
+  });
 };
 
 /**
@@ -4055,21 +6273,27 @@ export const getWorkspaceBuildByUserWorkspaceNameAndBuildNumber = <ThrowOnError 
  * not both. If the Template ID is specified, the active version
  * of the template will be used.
  */
-export const createUserWorkspace = <ThrowOnError extends boolean = false>(options: Options<CreateUserWorkspaceData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateUserWorkspaceResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/users/{user}/workspaces',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createUserWorkspace = <ThrowOnError extends boolean = false>(
+  options: Options<CreateUserWorkspaceData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateUserWorkspaceResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/users/{user}/workspaces",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
@@ -4077,393 +6301,556 @@ export const createUserWorkspace = <ThrowOnError extends boolean = false>(option
  *
  * @deprecated
  */
-export const getWorkspaceQuotaByUserDeprecated = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceQuotaByUserDeprecatedData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceQuotaByUserDeprecatedResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspace-quota/{user}',
-        ...options
-    });
+export const getWorkspaceQuotaByUserDeprecated = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetWorkspaceQuotaByUserDeprecatedData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceQuotaByUserDeprecatedResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspace-quota/{user}",
+    ...options,
+  });
 };
 
 /**
  * Authenticate agent on AWS instance
  */
-export const authenticateAgentOnAwsInstance = <ThrowOnError extends boolean = false>(options: Options<AuthenticateAgentOnAwsInstanceData, ThrowOnError>) => {
-    return (options.client ?? client).post<AuthenticateAgentOnAwsInstanceResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/aws-instance-identity',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const authenticateAgentOnAwsInstance = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AuthenticateAgentOnAwsInstanceData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    AuthenticateAgentOnAwsInstanceResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/aws-instance-identity",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Authenticate agent on Azure instance
  */
-export const authenticateAgentOnAzureInstance = <ThrowOnError extends boolean = false>(options: Options<AuthenticateAgentOnAzureInstanceData, ThrowOnError>) => {
-    return (options.client ?? client).post<AuthenticateAgentOnAzureInstanceResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/azure-instance-identity',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const authenticateAgentOnAzureInstance = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AuthenticateAgentOnAzureInstanceData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    AuthenticateAgentOnAzureInstanceResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/azure-instance-identity",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get connection info for workspace agent generic
  */
-export const getConnectionInfoForWorkspaceAgentGeneric = <ThrowOnError extends boolean = false>(options?: Options<GetConnectionInfoForWorkspaceAgentGenericData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetConnectionInfoForWorkspaceAgentGenericResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/connection',
-        ...options
-    });
+export const getConnectionInfoForWorkspaceAgentGeneric = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<
+    GetConnectionInfoForWorkspaceAgentGenericData,
+    ThrowOnError
+  >,
+) => {
+  return (options?.client ?? client).get<
+    GetConnectionInfoForWorkspaceAgentGenericResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/connection",
+    ...options,
+  });
 };
 
 /**
  * Authenticate agent on Google Cloud instance
  */
-export const authenticateAgentOnGoogleCloudInstance = <ThrowOnError extends boolean = false>(options: Options<AuthenticateAgentOnGoogleCloudInstanceData, ThrowOnError>) => {
-    return (options.client ?? client).post<AuthenticateAgentOnGoogleCloudInstanceResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/google-instance-identity',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const authenticateAgentOnGoogleCloudInstance = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AuthenticateAgentOnGoogleCloudInstanceData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    AuthenticateAgentOnGoogleCloudInstanceResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/google-instance-identity",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Patch workspace agent app status
  */
-export const patchWorkspaceAgentAppStatus = <ThrowOnError extends boolean = false>(options: Options<PatchWorkspaceAgentAppStatusData, ThrowOnError>) => {
-    return (options.client ?? client).patch<PatchWorkspaceAgentAppStatusResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/me/app-status',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const patchWorkspaceAgentAppStatus = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PatchWorkspaceAgentAppStatusData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    PatchWorkspaceAgentAppStatusResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/me/app-status",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get workspace agent external auth
  */
-export const getWorkspaceAgentExternalAuth = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceAgentExternalAuthData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceAgentExternalAuthResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/me/external-auth',
-        ...options
-    });
+export const getWorkspaceAgentExternalAuth = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetWorkspaceAgentExternalAuthData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceAgentExternalAuthResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/me/external-auth",
+    ...options,
+  });
 };
 
 /**
  * Removed: Get workspace agent git auth
  */
-export const removedGetWorkspaceAgentGitAuth = <ThrowOnError extends boolean = false>(options: Options<RemovedGetWorkspaceAgentGitAuthData, ThrowOnError>) => {
-    return (options.client ?? client).get<RemovedGetWorkspaceAgentGitAuthResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/me/gitauth',
-        ...options
-    });
+export const removedGetWorkspaceAgentGitAuth = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<RemovedGetWorkspaceAgentGitAuthData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    RemovedGetWorkspaceAgentGitAuthResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/me/gitauth",
+    ...options,
+  });
 };
 
 /**
  * Get workspace agent Git SSH key
  */
-export const getWorkspaceAgentGitSshKey = <ThrowOnError extends boolean = false>(options?: Options<GetWorkspaceAgentGitSshKeyData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetWorkspaceAgentGitSshKeyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/me/gitsshkey',
-        ...options
-    });
+export const getWorkspaceAgentGitSshKey = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetWorkspaceAgentGitSshKeyData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetWorkspaceAgentGitSshKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/me/gitsshkey",
+    ...options,
+  });
 };
 
 /**
  * Post workspace agent log source
  */
-export const postWorkspaceAgentLogSource = <ThrowOnError extends boolean = false>(options: Options<PostWorkspaceAgentLogSourceData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostWorkspaceAgentLogSourceResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/me/log-source',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const postWorkspaceAgentLogSource = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PostWorkspaceAgentLogSourceData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    PostWorkspaceAgentLogSourceResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/me/log-source",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Patch workspace agent logs
  */
-export const patchWorkspaceAgentLogs = <ThrowOnError extends boolean = false>(options: Options<PatchWorkspaceAgentLogsData, ThrowOnError>) => {
-    return (options.client ?? client).patch<PatchWorkspaceAgentLogsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/me/logs',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const patchWorkspaceAgentLogs = <ThrowOnError extends boolean = false>(
+  options: Options<PatchWorkspaceAgentLogsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    PatchWorkspaceAgentLogsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/me/logs",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get workspace agent reinitialization
  */
-export const getWorkspaceAgentReinitialization = <ThrowOnError extends boolean = false>(options?: Options<GetWorkspaceAgentReinitializationData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetWorkspaceAgentReinitializationResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/me/reinit',
-        ...options
-    });
+export const getWorkspaceAgentReinitialization = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetWorkspaceAgentReinitializationData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetWorkspaceAgentReinitializationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/me/reinit",
+    ...options,
+  });
 };
 
 /**
  * Workspace agent RPC API
  */
-export const workspaceAgentRpcApi = <ThrowOnError extends boolean = false>(options?: Options<WorkspaceAgentRpcApiData, ThrowOnError>) => {
-    return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/me/rpc',
-        ...options
-    });
+export const workspaceAgentRpcApi = <ThrowOnError extends boolean = false>(
+  options?: Options<WorkspaceAgentRpcApiData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/me/rpc",
+    ...options,
+  });
 };
 
 /**
  * Get workspace agent by ID
  */
-export const getWorkspaceAgentById = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceAgentByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceAgentByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}',
-        ...options
-    });
+export const getWorkspaceAgentById = <ThrowOnError extends boolean = false>(
+  options: Options<GetWorkspaceAgentByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceAgentByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}",
+    ...options,
+  });
 };
 
 /**
  * Get connection info for workspace agent
  */
-export const getConnectionInfoForWorkspaceAgent = <ThrowOnError extends boolean = false>(options: Options<GetConnectionInfoForWorkspaceAgentData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetConnectionInfoForWorkspaceAgentResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}/connection',
-        ...options
-    });
+export const getConnectionInfoForWorkspaceAgent = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetConnectionInfoForWorkspaceAgentData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetConnectionInfoForWorkspaceAgentResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}/connection",
+    ...options,
+  });
 };
 
 /**
  * Get running containers for workspace agent
  */
-export const getRunningContainersForWorkspaceAgent = <ThrowOnError extends boolean = false>(options: Options<GetRunningContainersForWorkspaceAgentData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetRunningContainersForWorkspaceAgentResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}/containers',
-        ...options
-    });
+export const getRunningContainersForWorkspaceAgent = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetRunningContainersForWorkspaceAgentData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetRunningContainersForWorkspaceAgentResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}/containers",
+    ...options,
+  });
 };
 
 /**
  * Recreate devcontainer for workspace agent
  */
-export const recreateDevcontainerForWorkspaceAgent = <ThrowOnError extends boolean = false>(options: Options<RecreateDevcontainerForWorkspaceAgentData, ThrowOnError>) => {
-    return (options.client ?? client).post<RecreateDevcontainerForWorkspaceAgentResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}/containers/devcontainers/{devcontainer}/recreate',
-        ...options
-    });
+export const recreateDevcontainerForWorkspaceAgent = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<RecreateDevcontainerForWorkspaceAgentData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    RecreateDevcontainerForWorkspaceAgentResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}/containers/devcontainers/{devcontainer}/recreate",
+    ...options,
+  });
 };
 
 /**
  * Watch workspace agent for container updates.
  */
-export const watchWorkspaceAgentForContainerUpdates = <ThrowOnError extends boolean = false>(options: Options<WatchWorkspaceAgentForContainerUpdatesData, ThrowOnError>) => {
-    return (options.client ?? client).get<WatchWorkspaceAgentForContainerUpdatesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}/containers/watch',
-        ...options
-    });
+export const watchWorkspaceAgentForContainerUpdates = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<WatchWorkspaceAgentForContainerUpdatesData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    WatchWorkspaceAgentForContainerUpdatesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}/containers/watch",
+    ...options,
+  });
 };
 
 /**
  * Coordinate workspace agent
  */
-export const coordinateWorkspaceAgent = <ThrowOnError extends boolean = false>(options: Options<CoordinateWorkspaceAgentData, ThrowOnError>) => {
-    return (options.client ?? client).get<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}/coordinate',
-        ...options
-    });
+export const coordinateWorkspaceAgent = <ThrowOnError extends boolean = false>(
+  options: Options<CoordinateWorkspaceAgentData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}/coordinate",
+    ...options,
+  });
 };
 
 /**
  * Get listening ports for workspace agent
  */
-export const getListeningPortsForWorkspaceAgent = <ThrowOnError extends boolean = false>(options: Options<GetListeningPortsForWorkspaceAgentData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetListeningPortsForWorkspaceAgentResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}/listening-ports',
-        ...options
-    });
+export const getListeningPortsForWorkspaceAgent = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetListeningPortsForWorkspaceAgentData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetListeningPortsForWorkspaceAgentResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}/listening-ports",
+    ...options,
+  });
 };
 
 /**
  * Get logs by workspace agent
  */
-export const getLogsByWorkspaceAgent = <ThrowOnError extends boolean = false>(options: Options<GetLogsByWorkspaceAgentData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetLogsByWorkspaceAgentResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}/logs',
-        ...options
-    });
+export const getLogsByWorkspaceAgent = <ThrowOnError extends boolean = false>(
+  options: Options<GetLogsByWorkspaceAgentData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetLogsByWorkspaceAgentResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}/logs",
+    ...options,
+  });
 };
 
 /**
  * Open PTY to workspace agent
  */
-export const openPtyToWorkspaceAgent = <ThrowOnError extends boolean = false>(options: Options<OpenPtyToWorkspaceAgentData, ThrowOnError>) => {
-    return (options.client ?? client).get<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}/pty',
-        ...options
-    });
+export const openPtyToWorkspaceAgent = <ThrowOnError extends boolean = false>(
+  options: Options<OpenPtyToWorkspaceAgentData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}/pty",
+    ...options,
+  });
 };
 
 /**
  * Removed: Get logs by workspace agent
  */
-export const removedGetLogsByWorkspaceAgent = <ThrowOnError extends boolean = false>(options: Options<RemovedGetLogsByWorkspaceAgentData, ThrowOnError>) => {
-    return (options.client ?? client).get<RemovedGetLogsByWorkspaceAgentResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}/startup-logs',
-        ...options
-    });
+export const removedGetLogsByWorkspaceAgent = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<RemovedGetLogsByWorkspaceAgentData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    RemovedGetLogsByWorkspaceAgentResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}/startup-logs",
+    ...options,
+  });
 };
 
 /**
@@ -4471,97 +6858,142 @@ export const removedGetLogsByWorkspaceAgent = <ThrowOnError extends boolean = fa
  *
  * @deprecated
  */
-export const watchForWorkspaceAgentMetadataUpdates = <ThrowOnError extends boolean = false>(options: Options<WatchForWorkspaceAgentMetadataUpdatesData, ThrowOnError>) => {
-    return (options.client ?? client).get<WatchForWorkspaceAgentMetadataUpdatesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}/watch-metadata',
-        ...options
-    });
+export const watchForWorkspaceAgentMetadataUpdates = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<WatchForWorkspaceAgentMetadataUpdatesData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    WatchForWorkspaceAgentMetadataUpdatesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}/watch-metadata",
+    ...options,
+  });
 };
 
 /**
  * Watch for workspace agent metadata updates via WebSockets
  */
-export const watchForWorkspaceAgentMetadataUpdatesViaWebsockets = <ThrowOnError extends boolean = false>(options: Options<WatchForWorkspaceAgentMetadataUpdatesViaWebsocketsData, ThrowOnError>) => {
-    return (options.client ?? client).get<WatchForWorkspaceAgentMetadataUpdatesViaWebsocketsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceagents/{workspaceagent}/watch-metadata-ws',
-        ...options
-    });
+export const watchForWorkspaceAgentMetadataUpdatesViaWebsockets = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    WatchForWorkspaceAgentMetadataUpdatesViaWebsocketsData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).get<
+    WatchForWorkspaceAgentMetadataUpdatesViaWebsocketsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceagents/{workspaceagent}/watch-metadata-ws",
+    ...options,
+  });
 };
 
 /**
  * Get workspace build
  */
-export const getWorkspaceBuild = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceBuildData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceBuildResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspacebuilds/{workspacebuild}',
-        ...options
-    });
+export const getWorkspaceBuild = <ThrowOnError extends boolean = false>(
+  options: Options<GetWorkspaceBuildData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceBuildResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspacebuilds/{workspacebuild}",
+    ...options,
+  });
 };
 
 /**
  * Cancel workspace build
  */
-export const cancelWorkspaceBuild = <ThrowOnError extends boolean = false>(options: Options<CancelWorkspaceBuildData, ThrowOnError>) => {
-    return (options.client ?? client).patch<CancelWorkspaceBuildResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspacebuilds/{workspacebuild}/cancel',
-        ...options
-    });
+export const cancelWorkspaceBuild = <ThrowOnError extends boolean = false>(
+  options: Options<CancelWorkspaceBuildData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    CancelWorkspaceBuildResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspacebuilds/{workspacebuild}/cancel",
+    ...options,
+  });
 };
 
 /**
  * Get workspace build logs
  */
-export const getWorkspaceBuildLogs = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceBuildLogsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceBuildLogsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspacebuilds/{workspacebuild}/logs',
-        ...options
-    });
+export const getWorkspaceBuildLogs = <ThrowOnError extends boolean = false>(
+  options: Options<GetWorkspaceBuildLogsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceBuildLogsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspacebuilds/{workspacebuild}/logs",
+    ...options,
+  });
 };
 
 /**
  * Get build parameters for workspace build
  */
-export const getBuildParametersForWorkspaceBuild = <ThrowOnError extends boolean = false>(options: Options<GetBuildParametersForWorkspaceBuildData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetBuildParametersForWorkspaceBuildResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspacebuilds/{workspacebuild}/parameters',
-        ...options
-    });
+export const getBuildParametersForWorkspaceBuild = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetBuildParametersForWorkspaceBuildData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetBuildParametersForWorkspaceBuildResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspacebuilds/{workspacebuild}/parameters",
+    ...options,
+  });
 };
 
 /**
@@ -4569,645 +7001,897 @@ export const getBuildParametersForWorkspaceBuild = <ThrowOnError extends boolean
  *
  * @deprecated
  */
-export const removedGetWorkspaceResourcesForWorkspaceBuild = <ThrowOnError extends boolean = false>(options: Options<RemovedGetWorkspaceResourcesForWorkspaceBuildData, ThrowOnError>) => {
-    return (options.client ?? client).get<RemovedGetWorkspaceResourcesForWorkspaceBuildResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspacebuilds/{workspacebuild}/resources',
-        ...options
-    });
+export const removedGetWorkspaceResourcesForWorkspaceBuild = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    RemovedGetWorkspaceResourcesForWorkspaceBuildData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).get<
+    RemovedGetWorkspaceResourcesForWorkspaceBuildResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspacebuilds/{workspacebuild}/resources",
+    ...options,
+  });
 };
 
 /**
  * Get provisioner state for workspace build
  */
-export const getProvisionerStateForWorkspaceBuild = <ThrowOnError extends boolean = false>(options: Options<GetProvisionerStateForWorkspaceBuildData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetProvisionerStateForWorkspaceBuildResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspacebuilds/{workspacebuild}/state',
-        ...options
-    });
+export const getProvisionerStateForWorkspaceBuild = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetProvisionerStateForWorkspaceBuildData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetProvisionerStateForWorkspaceBuildResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspacebuilds/{workspacebuild}/state",
+    ...options,
+  });
 };
 
 /**
  * Get workspace build timings by ID
  */
-export const getWorkspaceBuildTimingsById = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceBuildTimingsByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceBuildTimingsByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspacebuilds/{workspacebuild}/timings',
-        ...options
-    });
+export const getWorkspaceBuildTimingsById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetWorkspaceBuildTimingsByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceBuildTimingsByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspacebuilds/{workspacebuild}/timings",
+    ...options,
+  });
 };
 
 /**
  * Get workspace proxies
  */
-export const getWorkspaceProxies = <ThrowOnError extends boolean = false>(options?: Options<GetWorkspaceProxiesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetWorkspaceProxiesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceproxies',
-        ...options
-    });
+export const getWorkspaceProxies = <ThrowOnError extends boolean = false>(
+  options?: Options<GetWorkspaceProxiesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetWorkspaceProxiesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceproxies",
+    ...options,
+  });
 };
 
 /**
  * Create workspace proxy
  */
-export const createWorkspaceProxy = <ThrowOnError extends boolean = false>(options: Options<CreateWorkspaceProxyData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateWorkspaceProxyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceproxies',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createWorkspaceProxy = <ThrowOnError extends boolean = false>(
+  options: Options<CreateWorkspaceProxyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateWorkspaceProxyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceproxies",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Report workspace app stats
  */
-export const reportWorkspaceAppStats = <ThrowOnError extends boolean = false>(options: Options<ReportWorkspaceAppStatsData, ThrowOnError>) => {
-    return (options.client ?? client).post<ReportWorkspaceAppStatsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceproxies/me/app-stats',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const reportWorkspaceAppStats = <ThrowOnError extends boolean = false>(
+  options: Options<ReportWorkspaceAppStatsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    ReportWorkspaceAppStatsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceproxies/me/app-stats",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Workspace Proxy Coordinate
  */
-export const workspaceProxyCoordinate = <ThrowOnError extends boolean = false>(options?: Options<WorkspaceProxyCoordinateData, ThrowOnError>) => {
-    return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceproxies/me/coordinate',
-        ...options
-    });
+export const workspaceProxyCoordinate = <ThrowOnError extends boolean = false>(
+  options?: Options<WorkspaceProxyCoordinateData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceproxies/me/coordinate",
+    ...options,
+  });
 };
 
 /**
  * Get workspace proxy crypto keys
  */
-export const getWorkspaceProxyCryptoKeys = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceProxyCryptoKeysData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceProxyCryptoKeysResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceproxies/me/crypto-keys',
-        ...options
-    });
+export const getWorkspaceProxyCryptoKeys = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetWorkspaceProxyCryptoKeysData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceProxyCryptoKeysResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceproxies/me/crypto-keys",
+    ...options,
+  });
 };
 
 /**
  * Deregister workspace proxy
  */
-export const deregisterWorkspaceProxy = <ThrowOnError extends boolean = false>(options: Options<DeregisterWorkspaceProxyData, ThrowOnError>) => {
-    return (options.client ?? client).post<DeregisterWorkspaceProxyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceproxies/me/deregister',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const deregisterWorkspaceProxy = <ThrowOnError extends boolean = false>(
+  options: Options<DeregisterWorkspaceProxyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    DeregisterWorkspaceProxyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceproxies/me/deregister",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Issue signed workspace app token
  */
-export const issueSignedWorkspaceAppToken = <ThrowOnError extends boolean = false>(options: Options<IssueSignedWorkspaceAppTokenData, ThrowOnError>) => {
-    return (options.client ?? client).post<IssueSignedWorkspaceAppTokenResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceproxies/me/issue-signed-app-token',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const issueSignedWorkspaceAppToken = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<IssueSignedWorkspaceAppTokenData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    IssueSignedWorkspaceAppTokenResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceproxies/me/issue-signed-app-token",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Register workspace proxy
  */
-export const registerWorkspaceProxy = <ThrowOnError extends boolean = false>(options: Options<RegisterWorkspaceProxyData, ThrowOnError>) => {
-    return (options.client ?? client).post<RegisterWorkspaceProxyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceproxies/me/register',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const registerWorkspaceProxy = <ThrowOnError extends boolean = false>(
+  options: Options<RegisterWorkspaceProxyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    RegisterWorkspaceProxyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceproxies/me/register",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Delete workspace proxy
  */
-export const deleteWorkspaceProxy = <ThrowOnError extends boolean = false>(options: Options<DeleteWorkspaceProxyData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteWorkspaceProxyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceproxies/{workspaceproxy}',
-        ...options
-    });
+export const deleteWorkspaceProxy = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteWorkspaceProxyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteWorkspaceProxyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceproxies/{workspaceproxy}",
+    ...options,
+  });
 };
 
 /**
  * Get workspace proxy
  */
-export const getWorkspaceProxy = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceProxyData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceProxyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceproxies/{workspaceproxy}',
-        ...options
-    });
+export const getWorkspaceProxy = <ThrowOnError extends boolean = false>(
+  options: Options<GetWorkspaceProxyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceProxyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceproxies/{workspaceproxy}",
+    ...options,
+  });
 };
 
 /**
  * Update workspace proxy
  */
-export const updateWorkspaceProxy = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceProxyData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateWorkspaceProxyResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaceproxies/{workspaceproxy}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateWorkspaceProxy = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateWorkspaceProxyData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateWorkspaceProxyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaceproxies/{workspaceproxy}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * List workspaces
  */
-export const listWorkspaces = <ThrowOnError extends boolean = false>(options?: Options<ListWorkspacesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ListWorkspacesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces',
-        ...options
-    });
+export const listWorkspaces = <ThrowOnError extends boolean = false>(
+  options?: Options<ListWorkspacesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListWorkspacesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces",
+    ...options,
+  });
 };
 
 /**
  * Get workspace metadata by ID
  */
-export const getWorkspaceMetadataById = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceMetadataByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceMetadataByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}',
-        ...options
-    });
+export const getWorkspaceMetadataById = <ThrowOnError extends boolean = false>(
+  options: Options<GetWorkspaceMetadataByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceMetadataByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}",
+    ...options,
+  });
 };
 
 /**
  * Update workspace metadata by ID
  */
-export const updateWorkspaceMetadataById = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceMetadataByIdData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateWorkspaceMetadataByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateWorkspaceMetadataById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateWorkspaceMetadataByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateWorkspaceMetadataByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Completely clears the workspace's user and group ACLs.
  */
-export const completelyClearsTheWorkspacesUserAndGroupAcls = <ThrowOnError extends boolean = false>(options: Options<CompletelyClearsTheWorkspacesUserAndGroupAclsData, ThrowOnError>) => {
-    return (options.client ?? client).delete<CompletelyClearsTheWorkspacesUserAndGroupAclsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/acl',
-        ...options
-    });
+export const completelyClearsTheWorkspacesUserAndGroupAcls = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    CompletelyClearsTheWorkspacesUserAndGroupAclsData,
+    ThrowOnError
+  >,
+) => {
+  return (options.client ?? client).delete<
+    CompletelyClearsTheWorkspacesUserAndGroupAclsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/acl",
+    ...options,
+  });
 };
 
 /**
  * Get workspace ACLs
  */
-export const getWorkspaceAcls = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceAclsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceAclsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/acl',
-        ...options
-    });
+export const getWorkspaceAcls = <ThrowOnError extends boolean = false>(
+  options: Options<GetWorkspaceAclsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceAclsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/acl",
+    ...options,
+  });
 };
 
 /**
  * Update workspace ACL
  */
-export const updateWorkspaceAcl = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceAclData, ThrowOnError>) => {
-    return (options.client ?? client).patch<UpdateWorkspaceAclResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/acl',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateWorkspaceAcl = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateWorkspaceAclData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    UpdateWorkspaceAclResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/acl",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Update workspace autostart schedule by ID
  */
-export const updateWorkspaceAutostartScheduleById = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceAutostartScheduleByIdData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateWorkspaceAutostartScheduleByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/autostart',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateWorkspaceAutostartScheduleById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateWorkspaceAutostartScheduleByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateWorkspaceAutostartScheduleByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/autostart",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Update workspace automatic updates by ID
  */
-export const updateWorkspaceAutomaticUpdatesById = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceAutomaticUpdatesByIdData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateWorkspaceAutomaticUpdatesByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/autoupdates',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateWorkspaceAutomaticUpdatesById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateWorkspaceAutomaticUpdatesByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateWorkspaceAutomaticUpdatesByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/autoupdates",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get workspace builds by workspace ID
  */
-export const getWorkspaceBuildsByWorkspaceId = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceBuildsByWorkspaceIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceBuildsByWorkspaceIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/builds',
-        ...options
-    });
+export const getWorkspaceBuildsByWorkspaceId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetWorkspaceBuildsByWorkspaceIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceBuildsByWorkspaceIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/builds",
+    ...options,
+  });
 };
 
 /**
  * Create workspace build
  */
-export const createWorkspaceBuild = <ThrowOnError extends boolean = false>(options: Options<CreateWorkspaceBuildData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateWorkspaceBuildResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/builds',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const createWorkspaceBuild = <ThrowOnError extends boolean = false>(
+  options: Options<CreateWorkspaceBuildData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    CreateWorkspaceBuildResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/builds",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Update workspace dormancy status by id.
  */
-export const updateWorkspaceDormancyStatusById = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceDormancyStatusByIdData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateWorkspaceDormancyStatusByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/dormant',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateWorkspaceDormancyStatusById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateWorkspaceDormancyStatusByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateWorkspaceDormancyStatusByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/dormant",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Extend workspace deadline by ID
  */
-export const extendWorkspaceDeadlineById = <ThrowOnError extends boolean = false>(options: Options<ExtendWorkspaceDeadlineByIdData, ThrowOnError>) => {
-    return (options.client ?? client).put<ExtendWorkspaceDeadlineByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/extend',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const extendWorkspaceDeadlineById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ExtendWorkspaceDeadlineByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    ExtendWorkspaceDeadlineByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/extend",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get workspace external agent credentials
  */
-export const getWorkspaceExternalAgentCredentials = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceExternalAgentCredentialsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceExternalAgentCredentialsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/external-agent/{agent}/credentials',
-        ...options
-    });
+export const getWorkspaceExternalAgentCredentials = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetWorkspaceExternalAgentCredentialsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceExternalAgentCredentialsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/external-agent/{agent}/credentials",
+    ...options,
+  });
 };
 
 /**
  * Unfavorite workspace by ID.
  */
-export const unfavoriteWorkspaceById = <ThrowOnError extends boolean = false>(options: Options<UnfavoriteWorkspaceByIdData, ThrowOnError>) => {
-    return (options.client ?? client).delete<UnfavoriteWorkspaceByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/favorite',
-        ...options
-    });
+export const unfavoriteWorkspaceById = <ThrowOnError extends boolean = false>(
+  options: Options<UnfavoriteWorkspaceByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    UnfavoriteWorkspaceByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/favorite",
+    ...options,
+  });
 };
 
 /**
  * Favorite workspace by ID.
  */
-export const favoriteWorkspaceById = <ThrowOnError extends boolean = false>(options: Options<FavoriteWorkspaceByIdData, ThrowOnError>) => {
-    return (options.client ?? client).put<FavoriteWorkspaceByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/favorite',
-        ...options
-    });
+export const favoriteWorkspaceById = <ThrowOnError extends boolean = false>(
+  options: Options<FavoriteWorkspaceByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    FavoriteWorkspaceByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/favorite",
+    ...options,
+  });
 };
 
 /**
  * Delete workspace agent port share
  */
-export const deleteWorkspaceAgentPortShare = <ThrowOnError extends boolean = false>(options: Options<DeleteWorkspaceAgentPortShareData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteWorkspaceAgentPortShareResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/port-share',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const deleteWorkspaceAgentPortShare = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteWorkspaceAgentPortShareData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    DeleteWorkspaceAgentPortShareResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/port-share",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Get workspace agent port shares
  */
-export const getWorkspaceAgentPortShares = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceAgentPortSharesData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceAgentPortSharesResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/port-share',
-        ...options
-    });
+export const getWorkspaceAgentPortShares = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetWorkspaceAgentPortSharesData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceAgentPortSharesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/port-share",
+    ...options,
+  });
 };
 
 /**
  * Upsert workspace agent port share
  */
-export const upsertWorkspaceAgentPortShare = <ThrowOnError extends boolean = false>(options: Options<UpsertWorkspaceAgentPortShareData, ThrowOnError>) => {
-    return (options.client ?? client).post<UpsertWorkspaceAgentPortShareResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/port-share',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const upsertWorkspaceAgentPortShare = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpsertWorkspaceAgentPortShareData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    UpsertWorkspaceAgentPortShareResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/port-share",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Resolve workspace autostart by id.
  */
-export const resolveWorkspaceAutostartById = <ThrowOnError extends boolean = false>(options: Options<ResolveWorkspaceAutostartByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<ResolveWorkspaceAutostartByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/resolve-autostart',
-        ...options
-    });
+export const resolveWorkspaceAutostartById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ResolveWorkspaceAutostartByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    ResolveWorkspaceAutostartByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/resolve-autostart",
+    ...options,
+  });
 };
 
 /**
  * Get workspace timings by ID
  */
-export const getWorkspaceTimingsById = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceTimingsByIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetWorkspaceTimingsByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/timings',
-        ...options
-    });
+export const getWorkspaceTimingsById = <ThrowOnError extends boolean = false>(
+  options: Options<GetWorkspaceTimingsByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    GetWorkspaceTimingsByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/timings",
+    ...options,
+  });
 };
 
 /**
  * Update workspace TTL by ID
  */
-export const updateWorkspaceTtlById = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceTtlByIdData, ThrowOnError>) => {
-    return (options.client ?? client).put<UpdateWorkspaceTtlByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/ttl',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const updateWorkspaceTtlById = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateWorkspaceTtlByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    UpdateWorkspaceTtlByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/ttl",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
  * Post Workspace Usage by ID
  */
-export const postWorkspaceUsageById = <ThrowOnError extends boolean = false>(options: Options<PostWorkspaceUsageByIdData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostWorkspaceUsageByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/usage',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
+export const postWorkspaceUsageById = <ThrowOnError extends boolean = false>(
+  options: Options<PostWorkspaceUsageByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    PostWorkspaceUsageByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/usage",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 };
 
 /**
@@ -5215,31 +7899,45 @@ export const postWorkspaceUsageById = <ThrowOnError extends boolean = false>(opt
  *
  * @deprecated
  */
-export const watchWorkspaceById = <ThrowOnError extends boolean = false>(options: Options<WatchWorkspaceByIdData, ThrowOnError>) => {
-    return (options.client ?? client).sse.get<WatchWorkspaceByIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/watch',
-        ...options
-    });
+export const watchWorkspaceById = <ThrowOnError extends boolean = false>(
+  options: Options<WatchWorkspaceByIdData, ThrowOnError>,
+) => {
+  return (options.client ?? client).sse.get<
+    WatchWorkspaceByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/watch",
+    ...options,
+  });
 };
 
 /**
  * Watch workspace by ID via WebSockets
  */
-export const watchWorkspaceByIdViaWebsockets = <ThrowOnError extends boolean = false>(options: Options<WatchWorkspaceByIdViaWebsocketsData, ThrowOnError>) => {
-    return (options.client ?? client).get<WatchWorkspaceByIdViaWebsocketsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                name: 'Coder-Session-Token',
-                type: 'apiKey'
-            }
-        ],
-        url: '/workspaces/{workspace}/watch-ws',
-        ...options
-    });
+export const watchWorkspaceByIdViaWebsockets = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<WatchWorkspaceByIdViaWebsocketsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    WatchWorkspaceByIdViaWebsocketsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: "Coder-Session-Token",
+        type: "apiKey",
+      },
+    ],
+    url: "/workspaces/{workspace}/watch-ws",
+    ...options,
+  });
 };

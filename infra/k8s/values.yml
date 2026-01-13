@@ -48,4 +48,3 @@ postgres:
 workspacePVC:
   storageClassName: ""
   size: 10Gi
-

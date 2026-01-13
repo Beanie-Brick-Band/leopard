@@ -4,7 +4,7 @@ metadata:
   name: letsencrypt-prod
 spec:
   acme:
-    email: ahmadinejadarian@gmail.com   
+    email: ahmadinejadarian@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-prod
@@ -12,4 +12,3 @@ spec:
       - http01:
           ingress:
             class: traefik
-

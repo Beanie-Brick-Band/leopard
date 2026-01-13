@@ -37,8 +37,8 @@ releases:
     chart: coder-v2/coder
     version: 2.28.0
     values:
-      - ./values.yml              
-      - ./rbac.yml         # This is needed when the workspaces are running in a separated namespace         
+      - ./values.yml
+      - ./rbac.yml # This is needed when the workspaces are running in a separated namespace
 
   # --- Traefik CRDs ---
   - name: traefik-crd
