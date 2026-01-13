@@ -1,10 +1,11 @@
-import {mutation} from "../_generated/server"
 import { v } from "convex/values";
+
+import { mutation } from "../_generated/server";
 
 // export const updateSessionToken = mutation({
 //     args: {
 //         workspaceId: v.id("workspaces"),
-//         coderSessionId: v.string(), 
+//         coderSessionId: v.string(),
 //         coderSessionGeneratedTime: v.string()
 //     },
 //     handler: async (ctx, args) => {
@@ -16,4 +17,3 @@ import { v } from "convex/values";
 //         });
 //     },
 // });
-
