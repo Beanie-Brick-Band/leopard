@@ -1,10 +1,16 @@
-import type { CreateAuth } from "@convex-dev/better-auth";
-import { getToken as getTokenNextjs } from "@convex-dev/better-auth/nextjs";
+import { convexBetterAuthNextJs } from "@convex-dev/better-auth/nextjs";
 
-import type { DataModel } from "@package/backend/convex/_generated/dataModel";
-import { createAuth } from "@package/backend/convex/auth";
+import { env } from "~/env";
 
-export const getToken = () => {
-  // TODO: Investigate why CreateAuth<DataModel> is not being inferred correctly
-  return getTokenNextjs(createAuth as unknown as CreateAuth<DataModel>);
-};
+export const {
+  handler,
+  preloadAuthQuery,
+  isAuthenticated,
+  getToken,
+  fetchAuthQuery,
+  fetchAuthMutation,
+  fetchAuthAction,
+} = convexBetterAuthNextJs({
+  convexUrl: env.NEXT_PUBLIC_CONVEX_URL,
+  convexSiteUrl: env.NEXT_PUBLIC_CONVEX_SITE_URL,
+});
