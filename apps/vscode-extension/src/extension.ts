@@ -13,9 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
   // This line of code will only be executed once when your extension is activated
   console.log('Congratulations, your extension "leopard" is now active!');
   const channel = vscode.window.createOutputChannel("eventlogger");
-  const client = new ConvexHttpClient(
-    "https://optimistic-kangaroo-331.convex.cloud",
-  );
+  const client = new ConvexHttpClient("https://tough-gazelle-941.convex.cloud");
 
   function timestamp() {
     return Date.now();
