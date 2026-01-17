@@ -3,18 +3,18 @@ packages:
   - packages/*
   - tooling/*
   - docs
-  - '!docs/content'
-  - '!docs/scripts'
-  - '!docs/lib'
-  - '!docs/vault'
+  - "!docs/content"
+  - "!docs/scripts"
+  - "!docs/lib"
+  - "!docs/vault"
 
 catalog:
-  '@eslint/js': ^9.38.0
-  '@tailwindcss/postcss': ^4.1.16
-  '@tailwindcss/vite': ^4.1.16
-  '@tanstack/react-form': ^1.25.0
-  '@types/node': 22.18.12
-  '@vitejs/plugin-react': 5.1.0
+  "@eslint/js": ^9.38.0
+  "@tailwindcss/postcss": ^4.1.16
+  "@tailwindcss/vite": ^4.1.16
+  "@tanstack/react-form": ^1.25.0
+  "@types/node": 22.18.12
+  "@vitejs/plugin-react": 5.1.0
   eslint: ^9.38.0
   prettier: ^3.6.2
   tailwindcss: ^4.1.16
@@ -24,26 +24,26 @@ catalog:
 
 catalogs:
   react19:
-    '@types/react': ^19.1.12
-    '@types/react-dom': ^19.1.9
+    "@types/react": ^19.1.12
+    "@types/react-dom": ^19.1.9
     react: 19.1.1
     react-dom: 19.1.1
 
 linkWorkspacePackages: true
 
 onlyBuiltDependencies:
-  - '@tailwindcss/oxide'
+  - "@tailwindcss/oxide"
   - core-js-pure
   - esbuild
   - sharp
 
 overrides:
-  '@types/minimatch': 5.1.2
+  "@types/minimatch": 5.1.2
   vite: 7.1.12
 
 patchedDependencies:
-  '@types/vscode': patches/@types__vscode.patch
+  "@types/vscode": patches/@types__vscode.patch
 
 publicHoistPattern:
-  - '@ianvs/prettier-plugin-sort-imports'
+  - "@ianvs/prettier-plugin-sort-imports"
   - prettier-plugin-tailwindcss
