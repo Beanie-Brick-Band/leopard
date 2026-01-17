@@ -1,6 +1,6 @@
 ## Blog: Session Cookie Domain Limitation
 
-We have a next action that sets the session cookie. This only works on the main domain and not on localhost.
+We have a Next server action that sets the session cookie. This only works on the main domain and not on localhost.
 
 ### Technical Details
 
