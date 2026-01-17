@@ -1,0 +1,27 @@
+packages/ui/package.json
+  0ad9b0c353f76385 25-26
+turbo.json
+  0ad9b0c353f76385 29,32
+packages/ui/vitest.config.ts
+  0ad9b0c353f76385 1-7,11-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.34",
+  "base_commit_sha": "c48610b6dd5e3d0ac807c0cac365273719f9f271",
+  "prompts": {
+    "0ad9b0c353f76385": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_432c4676affeYDjPJZ95TJEqQS",
+        "model": "opencode/glm-4.7-free"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 57,
+      "total_deletions": 5,
+      "accepted_lines": 29,
+      "overriden_lines": 6
+    }
+  }
+}
