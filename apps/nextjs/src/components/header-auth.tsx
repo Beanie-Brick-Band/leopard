@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Authenticated, Unauthenticated } from "convex/react";
 
 import { Button } from "@package/ui/button";
+
+import { Authenticated, Unauthenticated } from "~/lib/auth";
 
 function HeaderAuth() {
   return (
