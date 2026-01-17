@@ -22,6 +22,8 @@
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint --flag unstable_native_nodejs_ts_config",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "ui-add": "pnpm dlx shadcn@latest add && prettier src --write --list-different"
   },
@@ -41,11 +43,19 @@
     "@package/eslint-config": "workspace:*",
     "@package/prettier-config": "workspace:*",
     "@package/tsconfig": "workspace:*",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "catalog:react19",
+    "@vitejs/plugin-react": "catalog:",
     "eslint": "catalog:",
+    "jsdom": "^27.4.0",
     "prettier": "catalog:",
     "react": "catalog:react19",
+    "react-dom": "19.1.1",
     "typescript": "catalog:",
+    "vitest": "^4.0.17",
     "zod": "catalog:"
   },
   "peerDependencies": {
