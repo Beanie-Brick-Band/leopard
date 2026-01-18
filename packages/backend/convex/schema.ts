@@ -21,7 +21,7 @@ export default defineSchema({
     timestamp: v.number(),
     workspaceId: v.id("workspaces"),
     metadata: v.record(v.string(), v.any()),
-  }),
+  }).index("workspaceId_timestamp", ["workspaceId", "timestamp"]),
   flags: defineTable({
     description: v.string(),
     timestamp: v.number(),
