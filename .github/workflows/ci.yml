@@ -19,8 +19,21 @@ env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
 jobs:
+  optimize_ci:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check_skip.outputs.skip }}
+    steps:
+      - name: Optimize CI
+        id: check_skip
+        uses: withgraphite/graphite-ci-action@main
+        with:
+          graphite_token: ${{ secrets.GRAPHITE_CI_OPTIMIZE_TOKEN }}
+
   lint:
     runs-on: ubuntu-latest
+    needs: optimize_ci
+    if: needs.optimize_ci.outputs.skip == 'false'
     steps:
       - uses: actions/checkout@v5
 
@@ -36,6 +49,8 @@ jobs:
 
   format:
     runs-on: ubuntu-latest
+    needs: optimize_ci
+    if: needs.optimize_ci.outputs.skip == 'false'
     steps:
       - uses: actions/checkout@v5
 
@@ -47,6 +62,8 @@ jobs:
 
   typecheck:
     runs-on: ubuntu-latest
+    needs: optimize_ci
+    if: needs.optimize_ci.outputs.skip == 'false'
     steps:
       - uses: actions/checkout@v5
 
@@ -62,6 +79,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    needs: optimize_ci
+    if: needs.optimize_ci.outputs.skip == 'false'
     steps:
       - uses: actions/checkout@v5
 
@@ -77,6 +96,8 @@ jobs:
 
   next-build:
     runs-on: ubuntu-latest
+    needs: optimize_ci
+    if: needs.optimize_ci.outputs.skip == 'false'
     steps:
       - uses: actions/checkout@v5
 
@@ -93,7 +114,8 @@ jobs:
   semantic-commits-pr-lint:
     name: Run Semantic Commit PR Check
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    needs: optimize_ci
+    if: github.event_name == 'pull_request' && needs.optimize_ci.outputs.skip == 'false'
     permissions:
       pull-requests: write
       contents: read
