@@ -18,9 +18,9 @@
     "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
+    "test": "turbo run test --filter=!./apps/vscode-extension",
     "typecheck": "turbo run typecheck",
-    "ui-add": "turbo run ui-add",
-    "test": "echo 'TODO'"
+    "ui-add": "turbo run ui-add"
   },
   "devDependencies": {
     "@package/prettier-config": "workspace:*",
