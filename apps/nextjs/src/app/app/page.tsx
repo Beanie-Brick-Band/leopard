@@ -1,13 +1,7 @@
 "use client";
 
 import { startTransition, useActionState, useEffect } from "react";
-import {
-  Authenticated,
-  AuthLoading,
-  Unauthenticated,
-  useMutation,
-  useQuery,
-} from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
@@ -17,6 +11,7 @@ import { Button } from "@package/ui/button";
 import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
+import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 import { launchWorkspace } from "./actions";
 
 function AssignmentItem({
