@@ -65,7 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeTextDocument(async (e) => {
-      if (!e.document.isDirty) {
+      if (e.contentChanges.length === 0) {
         return;
       }
 
