@@ -64,42 +64,6 @@ export function activate(context: vscode.ExtensionContext) {
   // );
 
   context.subscriptions.push(
-    vscode.workspace.onDidCloseTextDocument((e) => {
-      channel.appendLine(`[${timestamp()}] ${e.uri.fsPath} - closed`);
-    }),
-  );
-
-  context.subscriptions.push(
-    vscode.workspace.onDidCreateFiles((e) => {
-      channel.appendLine(
-        `[${timestamp()}] ${e.files.map((file) => file.fsPath).join(", ")} - created`,
-      );
-    }),
-  );
-
-  context.subscriptions.push(
-    vscode.workspace.onDidDeleteFiles((e) => {
-      channel.appendLine(
-        `[${timestamp()}] ${e.files.map((file) => file.fsPath).join(", ")} - deleted`,
-      );
-    }),
-  );
-
-  context.subscriptions.push(
-    vscode.workspace.onDidRenameFiles((e) => {
-      channel.appendLine(
-        `[${timestamp()}] ${e.files.map((file) => file.oldUri.fsPath).join(", ")} - ${e.files.map((file) => file.newUri.fsPath).join(", ")} - renamed`,
-      );
-    }),
-  );
-
-  context.subscriptions.push(
-    vscode.workspace.onDidSaveTextDocument((e) => {
-      channel.appendLine(`[${timestamp()}] ${e.uri.fsPath} - saved`);
-    }),
-  );
-
-  context.subscriptions.push(
     vscode.workspace.onDidChangeTextDocument(async (e) => {
       if (!e.document.isDirty) {
         return;
