@@ -16,7 +16,9 @@
   "scripts": {
     "generate": "dotenv -e ../../.env -e ../../.env.local -- openapi-ts",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "dotenv -e ../../.env -e ../../.env.local -- vitest run",
+    "test:watch": "dotenv -e ../../.env -e ../../.env.local -- vitest"
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.8",
@@ -26,6 +28,7 @@
     "@hey-api/openapi-ts": "^0.87.3",
     "@package/tsconfig": "workspace:*",
     "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "^4.0.17"
   }
 }
