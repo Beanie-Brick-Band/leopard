@@ -19,8 +19,8 @@ export default defineSchema({
   events: defineTable({
     eventType: v.string(),
     timestamp: v.number(),
+    data: v.record(v.string(), v.any()),
     workspaceId: v.id("workspaces"),
-    metadata: v.record(v.string(), v.any()),
   }),
   flags: defineTable({
     description: v.string(),

@@ -12,7 +12,7 @@ export const addBatchedChangesMutation = mutation({
       v.object({
         eventType: v.string(),
         timestamp: v.number(),
-        metadata: v.record(v.string(), v.any()),
+        data: v.record(v.string(), v.any()),
       }),
     ),
   },
@@ -44,7 +44,7 @@ export const addBatchedChangesMutation = mutation({
         eventType: change.eventType,
         timestamp: change.timestamp,
         workspaceId: "ks74y4q2sn8x2t0t31nq5cb32s7vvjy5" as Id<"workspaces">, //workspace._id,
-        metadata: change.metadata,
+        data: change.data,
       };
       const eventId = await ctx.db.insert("events", newEvent);
       insertedIds.push(eventId);

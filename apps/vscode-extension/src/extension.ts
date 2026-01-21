@@ -79,7 +79,7 @@ export function activate(context: vscode.ExtensionContext) {
             {
               timestamp: timestamp(),
               eventType: workspaceEventName.parse("DID_CHANGE_TEXT_DOCUMENT"),
-              metadata: {
+              data: {
                 // contentChanges: e.contentChanges.map((change) => ({
                 //   // range: {
                 //   //   start: {
