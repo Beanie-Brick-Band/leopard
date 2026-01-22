@@ -3,19 +3,26 @@ import { v } from "convex/values";
 
 export default defineSchema({
   assignments: defineTable({
-    dueDate: v.string(),
+    classroomId: v.id("classrooms"),
+    description: v.optional(v.string()),
+    dueDate: v.number(),
     name: v.string(),
+    releaseDate: v.number(),
+    workspaceConfig: v.optional(v.record(v.string(), v.any())),
   }),
   classrooms: defineTable({
     assignments: v.array(v.id("assignments")),
     className: v.string(),
     metadata: v.string(),
     ownerId: v.string(), // map this to betterAuth user id
+    assistantIds: v.array(v.string()), // map this to betterAuth user ids
   }),
   classroomStudentsRelations: defineTable({
     classroomId: v.id("classrooms"),
     studentId: v.string(), // map this to betterAuth user id
-  }).index("studentId_classrooms", ["studentId", "classroomId"]),
+  })
+  .index("studentId_classroomId", ["studentId", "classroomId"])
+  .index("classroomId_studentId", ["classroomId", "studentId"]),
   events: defineTable({
     eventType: v.string(),
     timestamp: v.number(),
@@ -30,11 +37,18 @@ export default defineSchema({
   submissions: defineTable({
     assignmentId: v.id("assignments"),
     flags: v.array(v.id("flags")),
-    grade: v.float64(),
+    grade: v.optional(v.float64()),
     studentId: v.string(), // map this to betterAuth user id
-    submitted: v.boolean(),
-    workspaceId: v.id("workspaces"),
-  }),
+    submissionFeedback: v.optional(v.string()),
+    workspaceId: v.optional(v.id("workspaces")),
+    submittedAt: v.number(),
+    gradedBy: v.optional(v.string()), // map this to betterAuth user id
+    gradedAt: v.optional(v.number()),
+    gradesReleased: v.boolean(),
+  })
+  .index("studentId_assignmentId", ["studentId", "assignmentId"])
+  .index("assignmentId_studentId", ["assignmentId", "studentId"])
+  ,
   workspaces: defineTable({
     coderWorkspaceId: v.string(),
     isActive: v.boolean(),
@@ -42,4 +56,12 @@ export default defineSchema({
   })
     .index("coderWorkspaceId", ["coderWorkspaceId"])
     .index("userId_isActive", ["userId", "isActive"]),
+  users: defineTable({
+    uid: v.string(), // map this to betterAuth user id
+    role: v.union(
+      v.literal("admin"),
+      v.literal("student"), 
+      v.literal("teacher"),
+    )
+  }).index("uid", ["uid"]),
 });
