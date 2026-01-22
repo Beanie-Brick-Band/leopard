@@ -1,37 +1,37 @@
 :root {
-  /* Snow Leopard Light Theme - Cool silver-gray with blue undertones */
+  /* Snow Leopard Light Theme - Cool silver-gray with bright blue undertones */
   --background: oklch(0.98 0.005 230);
   --foreground: oklch(0.25 0.015 230);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.25 0.015 230);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.25 0.015 230);
-  --primary: oklch(0.55 0.08 230); /* Cool blue-gray */
+  --primary: oklch(0.60 0.15 220); /* Brighter, more vibrant blue */
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.95 0.01 230);
   --secondary-foreground: oklch(0.45 0.02 230);
   --muted: oklch(0.95 0.01 230);
   --muted-foreground: oklch(0.55 0.02 230);
-  --accent: oklch(0.94 0.015 220); /* Subtle blue accent */
-  --accent-foreground: oklch(0.5 0.08 230);
+  --accent: oklch(0.92 0.03 215); /* Brighter blue accent */
+  --accent-foreground: oklch(0.55 0.15 220);
   --destructive: oklch(0.55 0.15 25);
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.92 0.01 230);
   --input: oklch(1 0 0);
-  --ring: oklch(0.55 0.08 230);
-  --chart-1: oklch(0.55 0.08 230); /* Cool blue-gray */
-  --chart-2: oklch(0.6 0.1 220); /* Lighter blue */
-  --chart-3: oklch(0.7 0.08 210); /* Sky blue */
-  --chart-4: oklch(0.8 0.05 200); /* Pale blue */
-  --chart-5: oklch(0.85 0.03 230); /* Very pale blue-gray */
+  --ring: oklch(0.60 0.15 220);
+  --chart-1: oklch(0.60 0.15 220); /* Bright blue */
+  --chart-2: oklch(0.65 0.16 210); /* Vibrant sky blue */
+  --chart-3: oklch(0.70 0.14 200); /* Bright cyan-blue */
+  --chart-4: oklch(0.75 0.12 215); /* Light bright blue */
+  --chart-5: oklch(0.80 0.08 225); /* Pale bright blue */
   --sidebar: oklch(0.96 0.008 230);
-  --sidebar-foreground: oklch(0.4 0.02 230);
-  --sidebar-primary: oklch(0.55 0.08 230);
+  --sidebar-foreground: oklch(0.40 0.02 230);
+  --sidebar-primary: oklch(0.60 0.15 220);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.92 0.01 230);
-  --sidebar-accent-foreground: oklch(0.5 0.08 230);
-  --sidebar-border: oklch(0.9 0.015 230);
-  --sidebar-ring: oklch(0.55 0.08 230);
+  --sidebar-accent-foreground: oklch(0.55 0.15 220);
+  --sidebar-border: oklch(0.90 0.015 230);
+  --sidebar-ring: oklch(0.60 0.15 220);
   --radius: 0.75rem;
   --shadow-2xs: 0px 2px 10px 0px hsl(0 0% 0% / 0.03);
   --shadow-xs: 0px 2px 10px 0px hsl(0 0% 0% / 0.03);
@@ -50,39 +50,39 @@
   --spacing: 0.25rem;
 
   @variant dark {
-    /* Snow Leopard Dark Theme - Deep charcoal with cool blue undertones */
+    /* Snow Leopard Dark Theme - Deep charcoal with bright blue accents */
     --background: oklch(0.18 0.012 230);
     --foreground: oklch(0.95 0.008 230);
-    --card: oklch(0.2 0.012 230);
+    --card: oklch(0.20 0.012 230);
     --card-foreground: oklch(0.95 0.008 230);
-    --popover: oklch(0.2 0.012 230);
+    --popover: oklch(0.20 0.012 230);
     --popover-foreground: oklch(0.95 0.008 230);
-    --primary: oklch(0.65 0.1 220); /* Brighter blue-gray for dark mode */
-    --primary-foreground: oklch(0.18 0.012 230);
+    --primary: oklch(0.70 0.18 215); /* Much brighter, vibrant blue */
+    --primary-foreground: oklch(0.98 0 0);
     --secondary: oklch(0.28 0.015 230);
     --secondary-foreground: oklch(0.75 0.01 230);
     --muted: oklch(0.28 0.015 230);
     --muted-foreground: oklch(0.65 0.015 230);
-    --accent: oklch(0.3 0.02 220);
-    --accent-foreground: oklch(0.7 0.1 220);
+    --accent: oklch(0.35 0.04 215);
+    --accent-foreground: oklch(0.75 0.18 215);
     --destructive: oklch(0.45 0.15 25);
     --destructive-foreground: oklch(1 0 0);
     --border: oklch(0.32 0.018 230);
     --input: oklch(0.28 0.015 230);
-    --ring: oklch(0.65 0.1 220);
-    --chart-1: oklch(0.65 0.1 220);
-    --chart-2: oklch(0.6 0.12 210);
-    --chart-3: oklch(0.55 0.1 200);
-    --chart-4: oklch(0.5 0.08 230);
-    --chart-5: oklch(0.45 0.06 240);
+    --ring: oklch(0.70 0.18 215);
+    --chart-1: oklch(0.70 0.18 215); /* Bright blue */
+    --chart-2: oklch(0.68 0.20 205); /* Vibrant cyan */
+    --chart-3: oklch(0.65 0.18 195); /* Bright aqua */
+    --chart-4: oklch(0.60 0.16 210); /* Electric blue */
+    --chart-5: oklch(0.55 0.14 220); /* Deep bright blue */
     --sidebar: oklch(0.22 0.012 230);
     --sidebar-foreground: oklch(0.75 0.01 230);
-    --sidebar-primary: oklch(0.65 0.1 220);
-    --sidebar-primary-foreground: oklch(0.18 0.012 230);
+    --sidebar-primary: oklch(0.70 0.18 215);
+    --sidebar-primary-foreground: oklch(0.98 0 0);
     --sidebar-accent: oklch(0.28 0.015 230);
-    --sidebar-accent-foreground: oklch(0.7 0.1 220);
-    --sidebar-border: oklch(0.3 0.018 230);
-    --sidebar-ring: oklch(0.65 0.1 220);
+    --sidebar-accent-foreground: oklch(0.75 0.18 215);
+    --sidebar-border: oklch(0.30 0.018 230);
+    --sidebar-ring: oklch(0.70 0.18 215);
     --radius: 0.75rem;
     --shadow-2xs: 0px 2px 10px 0px hsl(0 0% 0% / 0.1);
     --shadow-xs: 0px 2px 10px 0px hsl(0 0% 0% / 0.1);
@@ -98,6 +98,7 @@
       0px 2px 10px 0px hsl(0 0% 0% / 0.2), 0px 8px 10px -1px hsl(0 0% 0% / 0.2);
     --shadow-2xl: 0px 2px 10px 0px hsl(0 0% 0% / 0.5);
   }
+}
 }
 
 @theme inline {
