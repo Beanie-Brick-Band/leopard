@@ -35,7 +35,8 @@
               "title": "Graphite Cheatsheet"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -183,7 +184,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "b49e5e8bb4111aa7",
+  "active": "acc0bc6be98fbbb0",
   "lastOpenFiles": [
     "Convex Setup.md",
     "Graphite Cheatsheet.md",

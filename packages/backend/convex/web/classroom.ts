@@ -18,7 +18,7 @@ export const getEnrolled = query({
       ctx.db,
       "classroomStudentsRelations",
       "classroomId",
-      "studentId_classrooms",
+      "studentId_classroomId",
       user._id,
       "studentId",
     );
@@ -44,7 +44,7 @@ export const getAvailableToEnroll = query({
       ctx.db,
       "classroomStudentsRelations",
       "classroomId",
-      "studentId_classrooms",
+      "studentId_classroomId",
       user._id,
       "studentId",
     );
@@ -76,7 +76,7 @@ export const enroll = mutation({
     // Check if already enrolled
     const existingRelation = await ctx.db
       .query("classroomStudentsRelations")
-      .withIndex("studentId_classrooms", (q) =>
+      .withIndex("studentId_classroomId", (q) =>
         q.eq("studentId", user._id).eq("classroomId", args.classroomId),
       )
       .first();
