@@ -18,12 +18,20 @@ function AssignmentItem({
   assignmentId,
   isLast = false,
   isEnrolled,
+  classroomId,
 }: {
   assignmentId: Id<"assignments">;
   isLast?: boolean;
   isEnrolled: boolean;
+  classroomId: Id<"classrooms">;
 }) {
   const assignment = useQuery(api.web.assignment.getById, { id: assignmentId });
+  const submission = useQuery(
+    api.web.submissions.getMySubmissionForAssignment,
+    { assignmentId },
+  );
+  const submitAssignment = useMutation(api.web.submissions.submitAssignment);
+
   // We must use server actions to set appropriate cookies
   const [state, action, pending] = useActionState(
     () => launchWorkspace(assignmentId),
@@ -36,27 +44,138 @@ function AssignmentItem({
     }
   }, [state]);
 
+  const handleSubmit = async () => {
+    try {
+      await submitAssignment({ assignmentId });
+      toast.success("Assignment submitted successfully!");
+    } catch (error) {
+      toast.error("Failed to submit assignment");
+      console.error(error);
+    }
+  };
+
   if (!assignment) return null;
+
+  const isSubmitted = submission?.submitted ?? false;
+  const isGraded = submission?.grade !== undefined;
 
   return (
     <div className={cn("border-t py-4 text-sm", isLast && "border-b")}>
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex-1">
           <div className="font-medium">{assignment.name}</div>
           <div className="text-muted-foreground text-xs">
             Due: {new Date(assignment.dueDate).toLocaleDateString()}
           </div>
+          {assignment.description && (
+            <div
+              className="text-muted-foreground prose prose-sm dark:prose-invert mt-1 line-clamp-2 max-w-none text-xs"
+              dangerouslySetInnerHTML={{ __html: assignment.description }}
+            />
+          )}
+          {isSubmitted && (
+            <div className="mt-1 flex items-center gap-2">
+              <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                Submitted
+              </span>
+              {isGraded && (
+                <span className="text-xs">
+                  Grade: {submission.grade}
+                  {submission.feedback && ` - ${submission.feedback}`}
+                </span>
+              )}
+            </div>
+          )}
         </div>
         {isEnrolled && (
-          <Button
-            onClick={() => {
-              startTransition(action);
-            }}
-          >
-            {pending ? <Spinner></Spinner> : "Launch Workspace"}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => {
+                startTransition(action);
+              }}
+              variant="outline"
+              size="sm"
+            >
+              {pending ? <Spinner></Spinner> : "Launch Workspace"}
+            </Button>
+            {!isSubmitted && !isGraded && (
+              <Button onClick={handleSubmit} size="sm">
+                Submit
+              </Button>
+            )}
+          </div>
         )}
       </div>
+    </div>
+  );
+}
+
+type Classroom = {
+  _id: Id<"classrooms">;
+  _creationTime: number;
+  description: string;
+  createdAt: number;
+  className: string;
+  ownerId: string;
+  enrollmentRequiresApproval: boolean;
+};
+
+function ClassroomCard({
+  classroom,
+  isEnrolled,
+}: {
+  classroom: Classroom;
+  isEnrolled: boolean;
+}) {
+  const assignments = useQuery(
+    api.web.teacherAssignments.getAssignmentsByClassroom,
+    isEnrolled ? { classroomId: classroom._id } : "skip",
+  );
+  const enroll = useMutation(api.web.classroom.enroll);
+
+  const handleEnroll = async () => {
+    try {
+      await enroll({ classroomId: classroom._id });
+      toast.success("Enrolled successfully!");
+    } catch (error) {
+      toast.error("Failed to enroll in classroom.");
+      console.error(error);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold">{classroom.className}</h3>
+          <p className="text-muted-foreground text-sm">
+            {classroom.description}
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-muted-foreground text-sm">
+            {assignments?.length ?? 0} assignments
+          </span>
+          {!isEnrolled && (
+            <Button onClick={handleEnroll} size="sm">
+              Enroll
+            </Button>
+          )}
+        </div>
+      </div>
+      {assignments && assignments.length > 0 && (
+        <div className="flex flex-col">
+          {assignments.map((assignment, index) => (
+            <AssignmentItem
+              key={assignment._id}
+              assignmentId={assignment._id}
+              isLast={index === assignments.length - 1}
+              isEnrolled={isEnrolled}
+              classroomId={classroom._id}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -66,16 +185,6 @@ function Content() {
   const classroomsAvailableToEnroll = useQuery(
     api.web.classroom.getAvailableToEnroll,
   );
-  const enroll = useMutation(api.web.classroom.enroll);
-
-  const handleEnroll = async (classroomId: Id<"classrooms">) => {
-    try {
-      await enroll({ classroomId });
-    } catch (error) {
-      toast.error("Failed to enroll in classroom.");
-      console.error(error);
-    }
-  };
 
   return (
     <div className="container mx-auto space-y-12 p-6">
@@ -89,43 +198,10 @@ function Content() {
                 (classroom): classroom is NonNullable<typeof classroom> =>
                   classroom !== null,
               )
-              .sort((a, b) => b.assignments.length - a.assignments.length)
               .map((classroom) => (
                 <div key={classroom._id}>
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold">
-                          {classroom.className}
-                        </h3>
-                        <p className="text-muted-foreground text-sm">
-                          Enrolled classroom
-                        </p>
-                      </div>
-                      <span className="text-muted-foreground text-sm">
-                        {classroom.assignments.length} assignments
-                      </span>
-                    </div>
-                    {classroom.assignments.length > 0 && (
-                      <div className="flex flex-col gap-2">
-                        <h4 className="text-muted-foreground text-sm font-medium">
-                          Assignments:
-                        </h4>
-                        <div className="flex flex-col">
-                          {classroom.assignments.map((assignmentId, index) => (
-                            <AssignmentItem
-                              key={assignmentId}
-                              assignmentId={assignmentId}
-                              isLast={
-                                index === classroom.assignments.length - 1
-                              }
-                              isEnrolled={true}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  <ClassroomCard classroom={classroom} isEnrolled={true} />
+                  <Separator className="mt-6" />
                 </div>
               ))}
           </div>
@@ -143,45 +219,7 @@ function Content() {
               <div className="space-y-6">
                 {classroomsAvailableToEnroll.map((classroom, index) => (
                   <div key={classroom._id}>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-lg font-semibold">
-                            {classroom.className}
-                          </h3>
-                          <p className="text-muted-foreground text-sm">
-                            Available for enrollment
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span className="text-muted-foreground text-sm">
-                            {classroom.assignments.length} assignments
-                          </span>
-                          <Button
-                            onClick={() => handleEnroll(classroom._id)}
-                            size="sm"
-                          >
-                            Enroll
-                          </Button>
-                        </div>
-                      </div>
-                      {classroom.assignments.length > 0 && (
-                        <div className="ml-4 space-y-2">
-                          <h4 className="text-muted-foreground text-sm font-medium">
-                            Assignments:
-                          </h4>
-                          <div className="space-y-2">
-                            {classroom.assignments.map((assignmentId) => (
-                              <AssignmentItem
-                                key={assignmentId}
-                                assignmentId={assignmentId}
-                                isEnrolled={false}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    <ClassroomCard classroom={classroom} isEnrolled={false} />
                     {index < classroomsAvailableToEnroll.length - 1 && (
                       <Separator className="mt-6" />
                     )}
