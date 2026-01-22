@@ -1,0 +1,23 @@
+tooling/tailwind/theme.css
+  25f52ae6a3b9918e 2-4,6,8-17,19,21-29,31-34,53-68,70-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.37",
+  "base_commit_sha": "bb0be219c135f622d14c8bc68f5a715d6e810cb0",
+  "prompts": {
+    "25f52ae6a3b9918e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_41ccb239affeASNWXh4Meldnd8",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 60,
+      "total_deletions": 58,
+      "accepted_lines": 60,
+      "overriden_lines": 0
+    }
+  }
+}
