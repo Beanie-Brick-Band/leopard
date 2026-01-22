@@ -1,0 +1,78 @@
+apps/nextjs/src/app/student/page.tsx
+  a9a03f71f7e2f774 60,62,138
+apps/nextjs/src/app/teacher/classroom/new/page.tsx
+  a9a03f71f7e2f774 97
+apps/nextjs/src/app/student/classroom/[id]/page.tsx
+  25f52ae6a3b9918e 3,96-99,258,260-261
+  a9a03f71f7e2f774 148-149,157-159,196,198
+apps/nextjs/src/components/markdown-viewer.tsx
+  25f52ae6a3b9918e 1-18
+apps/nextjs/src/app/app/page.tsx
+  bfa913aea675a50b 21,26,29-34,47-56,59-61,65,70-71,75-88,91-106,113-131,138-139,146-152,157-174,178-187,203-204,222
+  25f52ae6a3b9918e 72-74
+  a9a03f71f7e2f774 132
+apps/nextjs/src/app/student/classroom/[id]/assignment/[assignmentId]/page.tsx
+  25f52ae6a3b9918e 7-12,88-89,97-102,104-113,115-116,121-122,126,130-131,134,137-140,143-144,148,152-153,161-196,198-264,268-278,280-299,304-307,310-332,334-335
+  a9a03f71f7e2f774 92,94,343,345-347
+apps/nextjs/src/app/teacher/classroom/[id]/assignment/new/page.tsx
+  25f52ae6a3b9918e 23,100-103,105
+  a9a03f71f7e2f774 1-22,24-99,104,106-204
+apps/nextjs/src/components/editor.tsx
+  25f52ae6a3b9918e 1-201
+apps/nextjs/src/app/styles.css
+  25f52ae6a3b9918e 39-399
+apps/nextjs/src/app/teacher/page.tsx
+  a9a03f71f7e2f774 17,53,62,78-79,99-103,113-115,119-121,124-125
+  bfa913aea675a50b 1-4,6-16,18-52,54-61,63-77,80-98,104-112,116-118,122-123,126-163
+apps/nextjs/src/app/teacher/classroom/[id]/assignment/[assignmentId]/page.tsx
+  25f52ae6a3b9918e 1-541
+apps/nextjs/src/app/teacher/classroom/[id]/page.tsx
+  a9a03f71f7e2f774 73,77,88,99,140,142,343,345-346
+  25f52ae6a3b9918e 303-308
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.37",
+  "base_commit_sha": "a53aaa42becd31e0169cfa90dcec964909585c3f",
+  "prompts": {
+    "25f52ae6a3b9918e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_41ccb239affeASNWXh4Meldnd8",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 1381,
+      "total_deletions": 109,
+      "accepted_lines": 1348,
+      "overriden_lines": 0
+    },
+    "a9a03f71f7e2f774": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_41ce6dfccffeJtmAScpecNDIZg",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 1091,
+      "total_deletions": 298,
+      "accepted_lines": 915,
+      "overriden_lines": 0
+    },
+    "bfa913aea675a50b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_41d2799b5ffe67DeOw0A5jruE4",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 3412,
+      "total_deletions": 424,
+      "accepted_lines": 3107,
+      "overriden_lines": 1
+    }
+  }
+}
