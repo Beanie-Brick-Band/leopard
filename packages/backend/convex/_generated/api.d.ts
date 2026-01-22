@@ -14,8 +14,14 @@ import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as web_assignment from "../web/assignment.js";
 import type * as web_classroom from "../web/classroom.js";
+import type * as web_clearData from "../web/clearData.js";
 import type * as web_index from "../web/index.js";
+import type * as web_notifications from "../web/notifications.js";
 import type * as web_replay from "../web/replay.js";
+import type * as web_submissions from "../web/submissions.js";
+import type * as web_teacher from "../web/teacher.js";
+import type * as web_teacherAssignments from "../web/teacherAssignments.js";
+import type * as web_userProfile from "../web/userProfile.js";
 
 import type {
   ApiFromModules,
@@ -30,8 +36,14 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "web/assignment": typeof web_assignment;
   "web/classroom": typeof web_classroom;
+  "web/clearData": typeof web_clearData;
   "web/index": typeof web_index;
+  "web/notifications": typeof web_notifications;
   "web/replay": typeof web_replay;
+  "web/submissions": typeof web_submissions;
+  "web/teacher": typeof web_teacher;
+  "web/teacherAssignments": typeof web_teacherAssignments;
+  "web/userProfile": typeof web_userProfile;
 }>;
 
 /**

@@ -13,6 +13,7 @@
     "./label": "./src/label.tsx",
     "./separator": "./src/separator.tsx",
     "./spinner": "./src/spinner.tsx",
+    "./textarea": "./src/textarea.tsx",
     "./theme": "./src/theme.tsx",
     "./toast": "./src/toast.tsx",
     "./input-group": "./src/input-group.tsx"

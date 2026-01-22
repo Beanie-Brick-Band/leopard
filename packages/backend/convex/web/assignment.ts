@@ -51,6 +51,7 @@ export const setUserActiveWorkspace = internalMutation({
   args: {
     userId: v.string(),
     coderWorkspaceId: v.string(),
+    assignmentId: v.optional(v.id("assignments")),
   },
   handler: async (ctx, args) => {
     const workspaces = await ctx.db.query("workspaces").collect();
@@ -68,6 +69,8 @@ export const setUserActiveWorkspace = internalMutation({
     await ctx.db.insert("workspaces", {
       userId: args.userId,
       coderWorkspaceId: args.coderWorkspaceId,
+      assignmentId: args.assignmentId,
+      createdAt: Date.now(),
     });
 
     return;
@@ -260,6 +263,7 @@ export const launchWorkspace = action({
     await ctx.runMutation(internal.web.assignment.setUserActiveWorkspace, {
       userId: coderUserId,
       coderWorkspaceId: workspaceMetadata.data.id!,
+      assignmentId: args.assignmentId,
     });
 
     const coderApiUrl = new URL(process.env.CODER_API_URL!);

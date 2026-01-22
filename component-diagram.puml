@@ -1,0 +1,32 @@
+@startuml
+left to right direction
+
+package "Frontend" {
+  [Next.js Web App]
+  [VSCode Extension]
+}
+
+package "Convex Backend" {
+  [Web APIs]
+  [Extension APIs]
+  [Database]
+}
+
+package "Coder Infrastructure" {
+  [Coder Server]
+  [Workspaces]
+}
+
+[Next.js Web App] --> [Web APIs] : Real-time subscriptions
+[Next.js Web App] ..> [Coder Server] : Launch workspaces
+
+[VSCode Extension] --> [Extension APIs] : HTTP POST events
+[VSCode Extension] ..> [Workspaces] : Runs inside
+
+[Web APIs] --> [Database] : read/write
+[Extension APIs] --> [Database] : insert events
+
+[Web APIs] --> [Coder Server] : Provision workspaces
+[Coder Server] --> [Workspaces] : manages
+
+@enduml

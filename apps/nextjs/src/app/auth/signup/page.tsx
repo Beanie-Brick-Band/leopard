@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
+import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { api } from "@package/backend/convex/_generated/api";
 import { Button } from "@package/ui/button";
 import {
   Card,
@@ -23,8 +25,10 @@ import {
   FieldLabel,
 } from "@package/ui/field";
 import { Input } from "@package/ui/input";
+import { Label } from "@package/ui/label";
 
 import { authClient } from "~/lib/auth-client";
+import { getDashboardRoute } from "~/lib/role-utils";
 
 const signupSchema = z
   .object({
@@ -38,6 +42,9 @@ const signupSchema = z
         "Password must contain at least one uppercase letter, one lowercase letter, and one number",
       ),
     confirmPassword: z.string().min(1, "Please confirm your password"),
+    role: z.enum(["student", "teacher"], {
+      message: "Please select a role",
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -47,6 +54,7 @@ const signupSchema = z
 export default function SignupPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const createProfile = useMutation(api.web.userProfile.createProfile);
 
   const form = useForm({
     defaultValues: {
@@ -54,31 +62,41 @@ export default function SignupPage() {
       email: "",
       password: "",
       confirmPassword: "",
+      role: "student" as "student" | "teacher",
     },
     validators: {
       onSubmit: signupSchema,
     },
     onSubmit: async ({ value }) => {
-      await authClient.signUp.email({
-        email: value.email,
-        password: value.password,
-        name: value.name,
-        fetchOptions: {
-          onRequest: () => {
-            setIsSubmitting(true);
-          },
-          onComplete: () => {
-            setIsSubmitting(false);
-          },
-          onSuccess: () => {
-            toast.success("Account created successfully!");
-            router.push("/app");
-          },
-          onError: (ctx) => {
-            toast.error(ctx.error.message);
-          },
-        },
-      });
+      setIsSubmitting(true);
+      try {
+        // First, create the auth account
+        const result = await authClient.signUp.email({
+          email: value.email,
+          password: value.password,
+          name: value.name,
+        });
+
+        if (result.error) {
+          toast.error(result.error.message);
+          setIsSubmitting(false);
+          return;
+        }
+
+        // Then create the user profile with role
+        await createProfile({ role: value.role });
+
+        toast.success("Account created successfully!");
+        const dashboardRoute = getDashboardRoute(value.role);
+        router.push(dashboardRoute);
+      } catch (error) {
+        console.error("Signup error:", error);
+        toast.error(
+          error instanceof Error ? error.message : "Failed to create account",
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     },
   });
 
@@ -199,6 +217,89 @@ export default function SignupPage() {
                       placeholder="••••••••"
                       autoComplete="new-password"
                     />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            />
+
+            <form.Field
+              name="role"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel>I am a...</FieldLabel>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button
+                        type="button"
+                        onClick={() => field.handleChange("student")}
+                        className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all ${
+                          field.state.value === "student"
+                            ? "border-primary bg-primary/10"
+                            : "border-border hover:border-primary/50"
+                        }`}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="32"
+                          height="32"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                          <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                        </svg>
+                        <span className="font-medium">Student</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => field.handleChange("teacher")}
+                        className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all ${
+                          field.state.value === "teacher"
+                            ? "border-primary bg-primary/10"
+                            : "border-border hover:border-primary/50"
+                        }`}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="32"
+                          height="32"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <rect
+                            width="18"
+                            height="18"
+                            x="3"
+                            y="4"
+                            rx="2"
+                            ry="2"
+                          />
+                          <line x1="16" x2="16" y1="2" y2="6" />
+                          <line x1="8" x2="8" y1="2" y2="6" />
+                          <line x1="3" x2="21" y1="10" y2="10" />
+                          <path d="M8 14h.01" />
+                          <path d="M12 14h.01" />
+                          <path d="M16 14h.01" />
+                          <path d="M8 18h.01" />
+                          <path d="M12 18h.01" />
+                          <path d="M16 18h.01" />
+                        </svg>
+                        <span className="font-medium">Teacher</span>
+                      </button>
+                    </div>
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
