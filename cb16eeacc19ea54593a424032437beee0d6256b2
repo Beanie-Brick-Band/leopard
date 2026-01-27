@@ -1,0 +1,23 @@
+apps/nextjs/src/app/app/page.tsx
+  673739764575450d 74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.37",
+  "base_commit_sha": "cb16eeacc19ea54593a424032437beee0d6256b2",
+  "prompts": {
+    "673739764575450d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fe48a768ffeYaD0T5qOvlwDUl",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 41,
+      "total_deletions": 58,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
