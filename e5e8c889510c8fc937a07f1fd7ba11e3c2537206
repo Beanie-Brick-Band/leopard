@@ -1,0 +1,39 @@
+packages/coder-sdk/vitest.config.ts
+  673739764575450d 7
+apps/nextjs/src/app/app/actions.ts
+  8ee1c35acb37008b 27-29,32-40,42-45,47-51,58
+  673739764575450d 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.37",
+  "base_commit_sha": "e5e8c889510c8fc937a07f1fd7ba11e3c2537206",
+  "prompts": {
+    "673739764575450d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fe48a768ffeYaD0T5qOvlwDUl",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 41,
+      "total_deletions": 58,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    },
+    "8ee1c35acb37008b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fe8cb85effeD7dIeyQPpvlzD0",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 1210,
+      "total_deletions": 169,
+      "accepted_lines": 23,
+      "overriden_lines": 0
+    }
+  }
+}
