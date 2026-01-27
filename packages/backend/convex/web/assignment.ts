@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
 import {
+  activateUserAccount,
   createNewSessionKey,
   createNewUser,
   createUserWorkspace,
@@ -150,6 +151,16 @@ export const launchWorkspace = action({
       throw new Error("Failed to create or fetch user in Coder");
     }
 
+    // Activate the user account to ensure they're not dormant
+    const activateResp = await activateUserAccount({
+      client: coderClient,
+      path: { user: coderUserId },
+    });
+
+    if (activateResp.error) {
+      // Don't throw here - continue with workspace launch even if activation fails
+    }
+
     // get templates
     const templatesResp = await getTemplatesByOrganization({
       client: coderClient,
@@ -174,9 +185,6 @@ export const launchWorkspace = action({
 
     if (workspaceMetadata.error) {
       // create workspace
-      console.log(
-        `Workspace not found for user ${coderUserId} and assignment ${args.assignmentId.toString()}, creating...`,
-      );
       await createUserWorkspace({
         client: coderClient,
         body: {
@@ -234,11 +242,7 @@ export const launchWorkspace = action({
         },
       });
       if (workspaceStop.error) {
-        console.error(
-          `Failed to stop workspace ${ws.id} for user ${coderUserId}: ${JSON.stringify(
-            workspaceStop.error,
-          )}`,
-        );
+        // Failed to stop workspace, but continue with other workspaces
       }
     }
 

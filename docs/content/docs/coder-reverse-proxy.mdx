@@ -1,0 +1,588 @@
+---
+title: Coder Reverse Proxy for Local Development
+description: How to use the local reverse proxy to access Coder workspaces in development
+---
+
+## Overview
+
+For local development, we use a reverse proxy to access Coder workspaces at `coder.nolapse.tech` through a local domain. This allows you to:
+
+- Test workspace launching locally without modifying production
+- Set cookies on `localhost` domain instead of `.nolapse.tech`
+- Debug issues with workspace sessions and authentication
+- Access full VS Code functionality including WebSockets for terminals
+
+**Quick commands:**
+
+```bash
+# Start (automatically runs with pnpm dev)
+pnpm dev:proxy
+
+# Or using package filter
+pnpm --filter @package/dev-proxy start
+
+# Stop
+pnpm --filter @package/dev-proxy stop
+
+# Logs (with cookies for debugging)
+pnpm --filter @package/dev-proxy logs
+
+# Status
+pnpm --filter @package/dev-proxy status
+
+# Direct docker commands (if needed)
+docker ps | grep reverse-proxy
+docker logs -f reverse-proxy
+
+# Test cookie setter
+curl http://coder.localhost/set-cookie.html
+
+# Test main proxy
+curl -H "Cookie: coder_session_token=test" http://coder.localhost
+```
+
+## How It Works
+
+### The Problem
+
+In production, when users launch a workspace:
+
+1. A session token is set as a cookie on domain `.nolapse.tech`
+2. The user is redirected to `https://coder.nolapse.tech/workspace/...`
+3. The browser sends the cookie with the request, authenticating the user
+
+In local development, we face several challenges:
+
+- Your app runs on `localhost:3000`
+- You can't set cookies for `.nolapse.tech` from localhost
+- Redirecting to production Coder would lose the session context
+- Cookies set on `localhost:3000` won't be sent to `coder.localhost` (different hostname)
+- Coder validates origin headers and expects HTTPS connections
+
+### The Solution
+
+The reverse proxy acts as a local gateway to the production Coder instance with a special cookie-setting flow:
+
+```
+Browser (localhost:3000)
+    ↓
+Click "Launch Workspace"
+    ↓
+Redirect to http://coder.localhost/set-cookie.html?token=...&redirect=...
+    ↓
+JavaScript sets cookie on coder.localhost domain
+    ↓
+Redirect to http://coder.localhost/workspace/...
+    ↓
+Nginx Reverse Proxy (makes it look like HTTPS from coder.nolapse.tech)
+    ↓
+https://coder.nolapse.tech (actual Coder instance)
+```
+
+**Architecture Components:**
+
+1. **Docker container** runs nginx on port 80
+2. **nginx** forwards all requests to `https://coder.nolapse.tech`
+3. **nginx** rewrites headers to make requests appear as HTTPS from the real domain
+4. **Browser** thinks it's talking to `coder.localhost`
+5. **Cookies** are set via an intermediate HTML page served by nginx
+6. **WebSockets** work because nginx properly upgrades connections
+
+### Why `.localhost` Domains Work
+
+According to [RFC 6761](https://tools.ietf.org/html/rfc6761), all `.localhost` domains automatically resolve to `127.0.0.1` on modern operating systems and browsers. This means:
+
+- No need to edit `/etc/hosts`
+- No DNS configuration required
+- Works out of the box on macOS, Linux, and Windows
+
+## Setup
+
+### Automatic Start with `pnpm dev`
+
+The reverse proxy automatically starts when you run:
+
+```bash
+pnpm dev
+```
+
+This is the recommended way as it ensures the proxy is running before your Next.js app starts.
+
+### Manual Control
+
+You can also manage the proxy independently:
+
+**Start the proxy:**
+
+```bash
+pnpm dev:proxy
+# or
+pnpm --filter @package/dev-proxy start
+```
+
+**Stop the proxy:**
+
+```bash
+pnpm --filter @package/dev-proxy stop
+```
+
+**View logs:**
+
+```bash
+pnpm --filter @package/dev-proxy logs
+```
+
+**Check status:**
+
+```bash
+pnpm --filter @package/dev-proxy status
+```
+
+**Restart the proxy:**
+
+```bash
+pnpm --filter @package/dev-proxy restart
+```
+
+### What Happens on Start
+
+The reverse proxy is organized as a package at `packages/dev-proxy/`:
+
+```
+packages/dev-proxy/
+├── package.json              # Package configuration with scripts
+├── docker-compose.yml        # Docker Compose configuration
+├── nginx.conf                # Nginx reverse proxy config
+├── set-coder-cookie.html     # Cookie-setting bridge page
+└── README.md                 # Quick reference
+```
+
+## Configuration Files
+
+### docker-compose.yml
+
+Located at `packages/dev-proxy/docker-compose.yml`:
+
+```yaml
+services:
+  reverse-proxy:
+    image: nginx:alpine
+    container_name: reverse-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./set-coder-cookie.html:/usr/share/nginx/html/set-cookie.html:ro
+    restart: unless-stopped
+```
+
+**Key points:**
+
+- Maps host port `80` to container port `80`
+- Mounts `nginx.conf` as read-only
+- Mounts `set-coder-cookie.html` for the cookie-setting flow
+- Auto-restarts unless manually stopped
+
+#### 1. WebSocket Support
+
+```nginx
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+```
+
+This mapping ensures that:
+
+- Regular HTTP requests get `Connection: close`
+- WebSocket upgrade requests get `Connection: upgrade`
+- Without this, all connections would be forced to upgrade, breaking regular HTTP
+
+#### 2. Header Rewriting for Coder Authentication
+
+```nginx
+proxy_set_header X-Forwarded-Proto https;
+proxy_set_header Origin https://coder.nolapse.tech;
+```
+
+**Why this is critical:**
+
+- Coder's signed app tokens validate the request origin and protocol
+- Without these headers, you get 403 Forbidden errors
+- `X-Forwarded-Proto https` makes Coder think the request came over HTTPS
+- `Origin https://coder.nolapse.tech` makes Coder accept the request as legitimate
+
+#### 3. Long Timeouts for WebSockets
+
+```nginx
+proxy_connect_timeout 7d;
+proxy_send_timeout 7d;
+proxy_read_timeout 7d;
+```
+
+WebSocket connections (like VS Code terminals) are long-lived. The 7-day timeout ensures:
+
+- Terminal sessions don't disconnect
+- File watchers stay connected
+- Language server protocol (LSP) connections remain stable
+
+#### 4. Cookie Logging
+
+```nginx
+log_format debug_format '... Cookies: "$http_cookie"';
+```
+
+This logs all cookies sent with each request, making it easy to debug authentication issues.
+
+### set-coder-cookie.html
+
+Located at `packages/dev-proxy/set-coder-cookie.html`:
+
+The cookie-setter page solves a critical problem: **cookies can't be shared between different hostnames**, even if both are localhost-based.
+
+- When you're on `localhost:3000`, cookies set there won't be sent to `coder.localhost`
+- This intermediate page runs on `coder.localhost` domain
+- JavaScript sets the cookie directly on that domain
+- Then redirects to the actual workspace URL
+- Now the cookie is available for all subsequent requests
+
+## Application Integration
+
+### Development vs Production Detection
+
+The `launchWorkspace` action in `apps/nextjs/src/app/app/actions.ts` automatically detects the environment:
+
+```typescript
+const isDevelopment =
+  process.env.NODE_ENV === "development" ||
+  process.env.VERCEL_ENV !== "production";
+```
+
+## Testing
+
+### 1. Start the Reverse Proxy
+
+The proxy should start automatically with `pnpm dev`, but you can also start it manually:
+
+```bash
+pnpm dev:proxy
+```
+
+### 2. Verify It's Running
+
+```bash
+docker ps | grep reverse-proxy
+```
+
+You should see:
+
+```
+CONTAINER ID   IMAGE          PORTS                    NAMES
+abc123def456   nginx:alpine   0.0.0.0:80->80/tcp       reverse-proxy
+```
+
+### 3. Test in Browser
+
+1. Start your Next.js app: `pnpm dev`
+2. Navigate to an assignment
+3. Click "Launch Workspace"
+4. You should see the "Setting up workspace..." page briefly
+5. Then redirect to VS Code at `http://coder.localhost/...`
+6. Terminal and other WebSocket features should work
+
+### 4. Verify Cookies
+
+Open browser DevTools → Application → Cookies → `http://coder.localhost`
+
+You should see:
+
+- `coder_session_token` cookie
+- `coder_signed_app_token` cookie (set by Coder)
+- Domain: `coder.localhost`
+
+### 5. Check Logs for Debugging
+
+```bash
+docker logs -f reverse-proxy
+```
+
+Look for:
+
+- Requests to `/set-cookie.html` (should return 200)
+- Subsequent requests with `coder_session_token` in cookies
+- No 403 errors (which indicate authentication problems)
+
+## Troubleshooting
+
+### WebSocket Errors (1006)
+
+**Symptom:** "WebSocket close with status code 1006" in VS Code
+
+**Causes:**
+
+1. **Origin header not set correctly**
+   - Check nginx.conf has `proxy_set_header Origin https://coder.nolapse.tech;`
+2. **X-Forwarded-Proto not HTTPS**
+   - Check nginx.conf has `proxy_set_header X-Forwarded-Proto https;`
+3. **Connection header hardcoded to "upgrade"**
+   - Should use `$connection_upgrade` variable from the map
+
+**Solution:** Ensure nginx.conf matches the configuration above exactly.
+
+### 403 Forbidden Errors
+
+**Symptom:** Requests fail with 403, or you see "Access Denied" in Coder
+
+**Causes:**
+
+1. **Missing Origin header**
+   - Coder validates the Origin header against signed app tokens
+2. **Wrong protocol in X-Forwarded-Proto**
+   - Coder expects HTTPS, not HTTP
+
+**Check logs:**
+
+```bash
+docker logs reverse-proxy | grep 403
+```
+
+**Solution:** Verify these headers in nginx.conf:
+
+```nginx
+proxy_set_header X-Forwarded-Proto https;
+proxy_set_header Origin https://coder.nolapse.tech;
+```
+
+### Cookie Not Being Set
+
+**Symptom:** Redirected to Coder login page, no authentication
+
+**Debug steps:**
+
+1. **Check if cookie-setter page loads:**
+
+   ```bash
+   curl http://coder.localhost/set-cookie.html
+   ```
+
+   Should return the HTML page
+
+2. **Verify cookie in browser:**
+   - Open DevTools → Application → Cookies
+   - Look under `http://coder.localhost`
+   - Should see `coder_session_token`
+
+3. **Check if cookie is sent:**
+   ```bash
+   docker logs reverse-proxy | grep coder_session_token
+   ```
+   You should see the cookie in subsequent requests
+
+**Common issues:**
+
+- JavaScript disabled in browser
+- Browser blocking cookies
+- Redirect happening too fast (increase delay in set-cookie.html)
+
+### Port 80 Already in Use
+
+**Symptom:** "port already allocated" error
+
+**Solution:**
+
+Find what's using the port:
+
+```bash
+sudo lsof -i :80
+```
+
+Options:
+
+1. Stop the conflicting service
+2. Use a different port:
+
+```yaml
+# packages/dev-proxy/docker-compose.yml
+ports:
+  - "8080:80"
+```
+
+Then update `apps/nextjs/src/app/app/actions.ts`:
+
+```typescript
+const intermediateUrl = `http://coder.localhost:8080/set-cookie.html?...`;
+```
+
+### Can't Access coder.localhost
+
+1. **Verify DNS resolution:**
+
+   ```bash
+   ping coder.localhost
+   ```
+
+   Should show: `PING coder.localhost (127.0.0.1)`
+
+2. **Check container is running:**
+
+   ```bash
+   docker ps | grep reverse-proxy
+   ```
+
+3. **Check nginx logs:**
+
+   ```bash
+   docker logs reverse-proxy
+   ```
+
+4. **Test nginx directly:**
+   ```bash
+   curl -v http://coder.localhost
+   ```
+
+### Workspace Loads But Terminal Doesn't Work
+
+**Symptom:** VS Code interface loads, but terminal shows connection error
+
+**Likely cause:** WebSocket upgrade not working
+
+**Check:**
+
+1. **Browser DevTools → Network → WS tab**
+   - Look for WebSocket connections
+   - Status should be 101 (Switching Protocols)
+   - If 403 or other error, check Origin header
+
+2. **Verify nginx WebSocket config:**
+
+   ```bash
+   docker exec reverse-proxy cat /etc/nginx/nginx.conf | grep -A 2 "WebSocket"
+   ```
+
+3. **Check timeouts aren't too short:**
+   Should be 7 days, not seconds
+
+## Security Notes
+
+### Development Only
+
+This setup is **only for local development**. Never use it in production because:
+
+- No HTTPS/SSL certificates (uses HTTP)
+- Cookies set with `secure: false`
+- Direct proxy to production backend exposes it
+- Debug logging may log sensitive information
+- No rate limiting or protection
+
+### Production Configuration
+
+In production (when `NODE_ENV !== "development"`):
+
+- Direct connection to `https://coder.nolapse.tech`
+- Cookies with `secure: true` (HTTPS only)
+- Domain set to `.nolapse.tech`
+- HttpOnly cookies prevent JavaScript access
+- No reverse proxy needed
+
+### Sensitive Data in Logs
+
+The nginx configuration logs cookies for debugging. In a more secure setup, you might want to:
+
+1. Remove cookie logging:
+
+   ```nginx
+   log_format main '$remote_addr - $remote_user [$time_local] '
+                   '"$request" $status $body_bytes_sent';
+   ```
+
+2. Disable access logs entirely:
+   ```nginx
+   access_log off;
+   ```
+
+## Advanced Configuration
+
+### Custom Coder Backend
+
+To proxy to a different Coder instance, edit `nginx.conf`:
+
+```nginx
+proxy_pass https://your-custom-coder.example.com;
+proxy_set_header Host your-custom-coder.example.com;
+proxy_set_header Origin https://your-custom-coder.example.com;
+```
+
+Also update `apps/nextjs/src/app/app/actions.ts` to use the new domain in development.
+
+### Additional Logging
+
+To log more details (like request/response headers):
+
+```nginx
+http {
+    log_format detailed '$remote_addr - $remote_user [$time_local] '
+                       '"$request" $status $body_bytes_sent '
+                       '"$http_referer" "$http_user_agent" '
+                       'Cookies: "$http_cookie" '
+                       'Upgrade: "$http_upgrade" '
+                       'Connection: "$connection_upgrade"';
+
+    access_log /var/log/nginx/access.log detailed;
+}
+```
+
+Then view logs:
+
+```bash
+docker logs -f reverse-proxy
+```
+
+### Performance Tuning
+
+For heavy usage, adjust worker connections:
+
+```nginx
+events {
+    worker_connections 2048;  # Increase from 1024
+}
+```
+
+### HTTPS with Self-Signed Certificate (Optional)
+
+If you want to test with HTTPS locally:
+
+1. Generate self-signed certificate:
+
+   ```bash
+   openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+     -keyout localhost.key -out localhost.crt \
+     -subj "/CN=coder.localhost"
+   ```
+
+2. Update `packages/dev-proxy/docker-compose.yml`:
+
+   ```yaml
+   volumes:
+     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+     - ./set-coder-cookie.html:/usr/share/nginx/html/set-cookie.html:ro
+     - ./localhost.crt:/etc/nginx/ssl/cert.crt:ro
+     - ./localhost.key:/etc/nginx/ssl/cert.key:ro
+   ```
+
+3. Update `packages/dev-proxy/nginx.conf`:
+
+   ```nginx
+   server {
+       listen 443 ssl;
+       server_name coder.localhost;
+
+       ssl_certificate /etc/nginx/ssl/cert.crt;
+       ssl_certificate_key /etc/nginx/ssl/cert.key;
+
+       # ... rest of config
+   }
+   ```
+
+4. Update actions.ts to use `https://coder.localhost`
+
+**Note:** You'll need to accept the self-signed certificate in your browser.

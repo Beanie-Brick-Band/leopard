@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Setting up workspace...</title>
+    <style>
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background: #f5f5f5;
+      }
+      .container {
+        text-align: center;
+        padding: 2rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="spinner"></div>
+      <h2>Setting up your workspace...</h2>
+      <p>You'll be redirected shortly.</p>
+    </div>
+    <script>
+      // Get URL parameters
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+      const redirect = params.get("redirect");
+
+      if (token && redirect) {
+        // Set the cookie using document.cookie (non-httpOnly for this bridge)
+        // The actual httpOnly cookie will be set by Coder
+        document.cookie = `coder_session_token=${token}; path=/; SameSite=Lax`;
+
+        // Redirect after a short delay
+        setTimeout(() => {
+          window.location.href = redirect;
+        }, 500);
+      } else {
+        document.body.innerHTML =
+          '<div class="container"><h2>Error</h2><p>Missing required parameters</p></div>';
+      }
+    </script>
+  </body>
+</html>

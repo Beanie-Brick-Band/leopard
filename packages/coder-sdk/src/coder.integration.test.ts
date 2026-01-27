@@ -1,6 +1,7 @@
-import { describe, expect, it, beforeAll } from "vitest";
-import { buildInfo } from "./sdk.gen";
+import { beforeAll, describe, expect, it } from "vitest";
+
 import { createClient, createConfig } from "./client";
+import { buildInfo } from "./sdk.gen";
 
 describe("Coder integration tests", () => {
   let client: ReturnType<typeof createClient>;
@@ -8,11 +9,15 @@ describe("Coder integration tests", () => {
   beforeAll(() => {
     const coderUrl = process.env.CODER_URL;
     if (!coderUrl) {
-      throw new Error("CODER_URL environment variable is required for integration tests");
+      throw new Error(
+        "CODER_URL environment variable is required for integration tests",
+      );
     }
-    client = createClient(createConfig({
-      baseUrl: `${coderUrl}/api/v2`,
-    }));
+    client = createClient(
+      createConfig({
+        baseUrl: `${coderUrl}/api/v2`,
+      }),
+    );
   });
 
   it("should check if the production version of coder matches local schema version", async () => {

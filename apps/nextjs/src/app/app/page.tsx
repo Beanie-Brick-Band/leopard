@@ -71,9 +71,8 @@ function Content() {
   const handleEnroll = async (classroomId: Id<"classrooms">) => {
     try {
       await enroll({ classroomId });
-    } catch (error) {
+    } catch {
       toast.error("Failed to enroll in classroom.");
-      console.error(error);
     }
   };
 
