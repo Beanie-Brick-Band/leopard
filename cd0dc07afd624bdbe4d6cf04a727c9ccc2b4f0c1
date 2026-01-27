@@ -1,0 +1,48 @@
+docs/content/docs/coder-reverse-proxy.mdx
+  8ee1c35acb37008b 1-847
+apps/nextjs/src/app/app/page.tsx
+  8ee1c35acb37008b 90,94,112-113,129,131
+docker-compose.reverse-proxy.yml
+  8ee1c35acb37008b 1-12
+apps/nextjs/src/app/app/actions.ts
+  8ee1c35acb37008b 26-34,38-45,47-59,66,69
+set-coder-cookie.html
+  8ee1c35acb37008b 1-73
+nginx.conf
+  8ee1c35acb37008b 1-59
+packages/backend/convex/web/assignment.ts
+  8ee1c35acb37008b 4,154-166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.37",
+  "base_commit_sha": "cd0dc07afd624bdbe4d6cf04a727c9ccc2b4f0c1",
+  "prompts": {
+    "371535a6c0900525": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_417e38270ffe9yZy4uQgK0FwXh",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 1277,
+      "total_deletions": 0,
+      "accepted_lines": 1277,
+      "overriden_lines": 0
+    },
+    "8ee1c35acb37008b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fe8cb85effeD7dIeyQPpvlzD0",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 1210,
+      "total_deletions": 169,
+      "accepted_lines": 1051,
+      "overriden_lines": 1
+    }
+  }
+}
