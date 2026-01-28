@@ -1,0 +1,36 @@
+packages/dev-proxy/package.json
+  28de418f6476cc04 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.37",
+  "base_commit_sha": "cb7015e393e4c19ca4a108a8da93971d4e58f0fe",
+  "prompts": {
+    "28de418f6476cc04": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fd37fa3affefhkdIp46uoEguD",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "c8d793308ad791dc": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fe0f48c6ffeCDiDIdB9ANk6KV",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 32,
+      "total_deletions": 1,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
