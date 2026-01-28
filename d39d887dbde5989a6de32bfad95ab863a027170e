@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.37",
+  "base_commit_sha": "d39d887dbde5989a6de32bfad95ab863a027170e",
+  "prompts": {
+    "ca75a6dbc9253ed2": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fd2910abffeOy2RGneuFIgn1w",
+        "model": "github-copilot/gpt-5-mini"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
