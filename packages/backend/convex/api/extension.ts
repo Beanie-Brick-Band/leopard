@@ -39,12 +39,11 @@ export const addBatchedChangesMutation = mutation({
     //   return;
     // }
 
+    // TODO: implement workspace session retrieval flow
     for (const change of args.changes) {
       const newEvent: WithoutSystemFields<Doc<"events">> = {
-        eventType: change.eventType,
-        timestamp: change.timestamp,
-        workspaceId: "ks74y4q2sn8x2t0t31nq5cb32s7vvjy5" as Id<"workspaces">, //workspace._id,
-        metadata: change.metadata,
+        workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf" as Id<"workspaces">, //workspace._id,
+        ...change,
       };
       const eventId = await ctx.db.insert("events", newEvent);
       insertedIds.push(eventId);
