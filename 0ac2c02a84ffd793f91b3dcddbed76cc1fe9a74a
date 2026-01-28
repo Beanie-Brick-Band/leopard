@@ -1,0 +1,36 @@
+packages/coder-sdk/src/coder.integration.test.ts
+  c8d793308ad791dc 1-2,4,12-14,16-20,32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.37",
+  "base_commit_sha": "0ac2c02a84ffd793f91b3dcddbed76cc1fe9a74a",
+  "prompts": {
+    "673739764575450d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fe48a768ffeYaD0T5qOvlwDUl",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 41,
+      "total_deletions": 58,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "c8d793308ad791dc": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fe0f48c6ffeCDiDIdB9ANk6KV",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 32,
+      "total_deletions": 1,
+      "accepted_lines": 32,
+      "overriden_lines": 0
+    }
+  }
+}
