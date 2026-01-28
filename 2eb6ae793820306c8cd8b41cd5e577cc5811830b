@@ -1,0 +1,52 @@
+packages/dev-proxy/start.sh
+  02e3d1b6f29a3eca 1-20,27-29
+  de21f006990478df 21-26
+packages/dev-proxy/package.json
+  02e3d1b6f29a3eca 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.37",
+  "base_commit_sha": "2eb6ae793820306c8cd8b41cd5e577cc5811830b",
+  "prompts": {
+    "02e3d1b6f29a3eca": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fd2fd1a0ffexp68RuWM3D5hck",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 24,
+      "total_deletions": 1,
+      "accepted_lines": 24,
+      "overriden_lines": 0
+    },
+    "28de418f6476cc04": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fd37fa3affefhkdIp46uoEguD",
+        "model": "github-copilot/claude-sonnet-4.5"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "de21f006990478df": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fd2ea1f9ffekW3ty1t3YPH53G",
+        "model": "github-copilot/gpt-5-mini"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 0,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
