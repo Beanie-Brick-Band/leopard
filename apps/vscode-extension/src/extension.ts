@@ -6,6 +6,8 @@ import * as vscode from "vscode";
 import { api } from "@package/backend/convex/_generated/api";
 import { workspaceEventName } from "@package/validators";
 
+import { env } from "./env";
+
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -13,7 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
   // This line of code will only be executed once when your extension is activated
   console.log('Congratulations, your extension "leopard" is now active!');
   const channel = vscode.window.createOutputChannel("eventlogger");
-  const client = new ConvexHttpClient("https://tough-gazelle-941.convex.cloud");
+  const client = new ConvexHttpClient(env.CONVEX_URL);
 
   function timestamp() {
     return Date.now();
