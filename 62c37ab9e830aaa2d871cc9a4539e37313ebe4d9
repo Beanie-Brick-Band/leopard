@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.37",
+  "base_commit_sha": "62c37ab9e830aaa2d871cc9a4539e37313ebe4d9",
+  "prompts": {
+    "ca75a6dbc9253ed2": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3fd2910abffeOy2RGneuFIgn1w",
+        "model": "github-copilot/gpt-5-mini"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 0,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
