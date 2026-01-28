@@ -10,6 +10,10 @@
     "./workspaceEvents": {
       "types": "./dist/workspaceEvents.d.ts",
       "default": "./src/workspaceEvents.ts"
+    },
+    "./assert": {
+      "types": "./dist/assert.d.ts",
+      "default": "./src/assert.ts"
     }
   },
   "license": "MIT",
