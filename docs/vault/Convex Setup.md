@@ -14,3 +14,5 @@ Currently, there are the following ENV Vars on Convex (set them up in your dashb
 - `BETTER_AUTH_SECRET` - Generate one locally with `openssl rand -base64 32`
 - `WEB_DEPLOYMENT_URL` - Where the Next.js app is running. Recommend to be set as `http://localhost:3000` for development.
 - `CONVEX_SITE_URL` - Usually in the format `https://some-phrase-num.convex.site`. This variable should be auto injected by Convex.
+- `CODER_API_URL` - The base URL for the Coder API (e.g., `https://coder.nolapse.tech/`)
+- `CODER_API_KEY` - API key for authenticating with Coder to create and manage workspaces
