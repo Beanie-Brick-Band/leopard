@@ -1,7 +1,11 @@
 {
-  "name": "leopard",
+  "name": "vscode-extension",
   "displayName": "leopard",
   "description": "Verify the legitamacy of student assignments by analyzing a granular version history of their work process. VSCode extension for the Leopard IDE.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Beanie-Brick-Band/leopard.git"
+  },
   "version": "0.0.1",
   "type": "module",
   "engines": {
@@ -10,9 +14,12 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "scripts": {
+    "build": "pnpx @vscode/vsce package --no-dependencies",
     "vscode:prepublish": "pnpm run package",
     "compile": "pnpm run check-types && pnpm run lint && node esbuild.mjs",
     "watch": "npm-run-all -p watch:*",
