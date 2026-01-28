@@ -16,6 +16,7 @@ import type * as web_assignment from "../web/assignment.js";
 import type * as web_classroom from "../web/classroom.js";
 import type * as web_index from "../web/index.js";
 import type * as web_replay from "../web/replay.js";
+import type * as web_submission from "../web/submission.js";
 
 import type {
   ApiFromModules,
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   "web/classroom": typeof web_classroom;
   "web/index": typeof web_index;
   "web/replay": typeof web_replay;
+  "web/submission": typeof web_submission;
 }>;
 
 /**
