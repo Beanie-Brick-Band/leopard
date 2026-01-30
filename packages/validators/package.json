@@ -6,6 +6,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./src/index.ts"
+    },
+    "./workspaceEvents": {
+      "types": "./dist/workspaceEvents.d.ts",
+      "default": "./src/workspaceEvents.ts"
     }
   },
   "license": "MIT",

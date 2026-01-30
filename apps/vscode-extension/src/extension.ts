@@ -4,7 +4,7 @@ import { ConvexHttpClient } from "convex/browser";
 import * as vscode from "vscode";
 
 import { api } from "@package/backend/convex/_generated/api";
-import { workspaceEventName } from "@package/validators";
+import * as WorkspaceEvents from "@package/validators/workspaceEvents";
 
 import { env } from "./env";
 
@@ -73,38 +73,37 @@ export function activate(context: vscode.ExtensionContext) {
         `[${timestamp()}] ${e.document.uri.fsPath} - ${e.contentChanges.map((change) => `${change.range.start.line}:${change.range.start.character} - ${change.range.end.line}:${change.range.end.character}; ${change.rangeOffset}:${change.rangeLength} - ${change.text}`).join(" --- ")}`,
       );
 
+      // TODO implement reliable recovery in case of disconnections/failed mutations
       try {
         await client.mutation(api.api.extension.addBatchedChangesMutation, {
           changes: [
             {
               timestamp: timestamp(),
-              eventType: workspaceEventName.parse("DID_CHANGE_TEXT_DOCUMENT"),
+              eventType: WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT,
               metadata: {
-                // contentChanges: e.contentChanges.map((change) => ({
-                //   // range: {
-                //   //   start: {
-                //   //     line: change.range.start.line,
-                //   //     column: change.range.start.character,
-                //   //   },
-                //   //   end: {
-                //   //     line: change.range.end.line,
-                //   //     column: change.range.end.character,
-                //   //   },
-                //   // },
-                //   text: change.text,
-                //   filePath: e.document.uri.fsPath,
-                // })),
-                content: e.document.getText(),
-                filePath: e.document.uri.fsPath,
+                contentChanges: e.contentChanges.map((change) => ({
+                  range: {
+                    start: {
+                      line: change.range.start.line,
+                      column: change.range.start.character,
+                    },
+                    end: {
+                      line: change.range.end.line,
+                      column: change.range.end.character,
+                    },
+                  },
+                  text: change.text,
+                  filePath: e.document.uri.fsPath,
+                })),
               },
             },
           ],
         });
       } catch (e) {
         console.log(e);
-        // vscode.window.showInformationMessage(
-        // `Error, failed to send to prod: ${JSON.stringify(e)}`,
-        // );
+        vscode.window.showInformationMessage(
+          `Error, failed to upload: ${JSON.stringify(e)}`,
+        );
       }
     }),
   );
