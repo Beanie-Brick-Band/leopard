@@ -13,6 +13,7 @@ import "react-scrubber/lib/scrubber.css";
 
 export const TextReplayScrubberComponent: React.FC = () => {
 <<<<<<< HEAD
+<<<<<<< HEAD
   // TODO: FiX THIS TO BE PROPER REPLAY INSTEAD OF DEV OVERWRITE WORKSPACE
   const searchParams = useSearchParams();
 
@@ -60,6 +61,8 @@ fizzbuzz3(100)`;
 
 =======
 >>>>>>> 5d18aad (auto replay and hard coded text removal)
+=======
+>>>>>>> e41353d (auto replay and hard coded text removal)
   // A list of line numbers and the character added. The line numbers have the line first, followed by the column.
   // If the previous column is one greater than the current, that means that a character was deleted
   // TODO: implement workspace session retrieval flow
@@ -258,7 +261,11 @@ fizzbuzz3(100)`;
           aria-label={isPlaying ? "Pause" : "Play"}
         >
           {isPlaying ? (
+<<<<<<< HEAD
             <span className="-m-1 text-4xl">⏸</span>
+=======
+            <span className="m-[-4] text-4xl">⏸</span>
+>>>>>>> e41353d (auto replay and hard coded text removal)
           ) : (
             <span className="text-2xl">▶</span>
           )}
@@ -298,6 +305,7 @@ export function insertText(
 
 export function deleteText(lines: string[], range: Range): void {
 <<<<<<< HEAD
+<<<<<<< HEAD
   // assert(range.start.line < lines.length, "Start line index out of bounds");
   // assert(range.end.line < lines.length, "End line index out of bounds");
   // assert(
@@ -311,6 +319,8 @@ export function deleteText(lines: string[], range: Range): void {
 
 =======
 >>>>>>> 5d18aad (auto replay and hard coded text removal)
+=======
+>>>>>>> e41353d (auto replay and hard coded text removal)
   const isMultiLineDeletion = range.start.line !== range.end.line;
 
   if (!isMultiLineDeletion) {
