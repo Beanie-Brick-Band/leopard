@@ -12,6 +12,7 @@ import { api } from "@package/backend/convex/_generated/api";
 import "react-scrubber/lib/scrubber.css";
 
 export const TextReplayScrubberComponent: React.FC = () => {
+<<<<<<< HEAD
   // TODO: FiX THIS TO BE PROPER REPLAY INSTEAD OF DEV OVERWRITE WORKSPACE
   const searchParams = useSearchParams();
 
@@ -57,6 +58,8 @@ def fizzbuzz3(n):
 
 fizzbuzz3(100)`;
 
+=======
+>>>>>>> 5d18aad (auto replay and hard coded text removal)
   // A list of line numbers and the character added. The line numbers have the line first, followed by the column.
   // If the previous column is one greater than the current, that means that a character was deleted
   // TODO: implement workspace session retrieval flow
@@ -66,7 +69,7 @@ fizzbuzz3(100)`;
 
   const SNAP_RELEASE_THRESHOLD = 0.5; // when released within this distance, snap to marker
   const STICK_THRESHOLD = 0.5; // while dragging, within this distance the cursor will "stick"
-  const STICK_HYSTERESIS = 1.0; // distance to leave a stick once engaged
+  const STICK_HYSTERESIS = 1.0; // distance to leave a marker once engaged
 
   const markers = [30.7, 70.4];
 
@@ -81,11 +84,32 @@ fizzbuzz3(100)`;
     isScrubbing?: boolean;
     stickingTo?: number | null;
   }>({
-    value: 50,
+    value: 0,
     state: "None",
     isScrubbing: false,
     stickingTo: null,
   });
+
+  const [isPlaying, setIsPlaying] = React.useState(false);
+
+  // Auto-play effect
+  React.useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      setState((s) => {
+        if (s.value >= 100) {
+          setIsPlaying(false);
+          return s;
+        }
+        // Advance by a small increment (adjust speed as needed)
+        const newValue = Math.min(s.value + 0.5, 100);
+        return { ...s, value: newValue };
+      });
+    }, 50); // Update every 50ms for smooth playback
+
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   const nearestMarker = (
     v: number,
@@ -107,6 +131,7 @@ fizzbuzz3(100)`;
   };
 
   const handleScrubStart = (value: number) => {
+    setIsPlaying(false); // Pause when user starts scrubbing
     setState((s) => ({ ...s, value, state: "Scrub Start", isScrubbing: true }));
   };
 
@@ -167,10 +192,6 @@ fizzbuzz3(100)`;
     });
   };
 
-  // Original character-based scrubbing (simple version)
-  const charCount = Math.round((state.value / 100) * testToReplay.length);
-  const displayedTextSimple = testToReplay.slice(0, charCount);
-
   // Calculate how many events to replay based on scrubber position
   const totalEvents = userTranscript?.length ?? 0;
   const eventsToReplay = Math.round((state.value / 100) * totalEvents);
@@ -199,13 +220,6 @@ fizzbuzz3(100)`;
     return lines.join("\n");
   }, [displayedUserTranscript]);
 
-  // Choose which display mode to use
-  // Set to true to use action-based replay, false to use simple character scrubbing
-  const useActionBasedReplay = Boolean(true);
-  const displayedText = useActionBasedReplay
-    ? displayedOutputText
-    : displayedTextSimple;
-
   return (
     <div className="h-max w-full space-y-4">
       <div className="flex h-[75vh] flex-col-reverse overflow-y-auto rounded-md">
@@ -220,7 +234,7 @@ fizzbuzz3(100)`;
           showLineNumbers={true}
           showLanguage={true}
         >
-          {displayedText}
+          {displayedOutputText}
         </ShikiHighlighter>
       </div>
 
@@ -237,11 +251,18 @@ fizzbuzz3(100)`;
         />
       </div>
 
-      <div className="text-md mt-4 flex gap-8 text-center text-gray-300">
-        <p>Position: {state.value.toFixed(1)}</p>
-        <p>
-          Remaining Characters: {charCount}/{testToReplay.length}
-        </p>
+      <div className="flex justify-center pb-8">
+        <button
+          onClick={() => setIsPlaying(!isPlaying)}
+          className="flex w-20 items-center justify-center rounded-md bg-blue-500 px-6 py-2 text-white transition-colors hover:bg-blue-600"
+          aria-label={isPlaying ? "Pause" : "Play"}
+        >
+          {isPlaying ? (
+            <span className="-m-1 text-4xl">⏸</span>
+          ) : (
+            <span className="text-2xl">▶</span>
+          )}
+        </button>
       </div>
     </div>
   );
@@ -276,6 +297,7 @@ export function insertText(
 }
 
 export function deleteText(lines: string[], range: Range): void {
+<<<<<<< HEAD
   // assert(range.start.line < lines.length, "Start line index out of bounds");
   // assert(range.end.line < lines.length, "End line index out of bounds");
   // assert(
@@ -287,7 +309,10 @@ export function deleteText(lines: string[], range: Range): void {
   //   "End column index out of bounds",
   // );
 
+=======
+>>>>>>> 5d18aad (auto replay and hard coded text removal)
   const isMultiLineDeletion = range.start.line !== range.end.line;
+
   if (!isMultiLineDeletion) {
     const currentLine = lines[range.start.line] ?? "";
     lines[range.start.line] =
