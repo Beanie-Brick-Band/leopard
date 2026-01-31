@@ -12,54 +12,11 @@ import { api } from "@package/backend/convex/_generated/api";
 import "react-scrubber/lib/scrubber.css";
 
 export const TextReplayScrubberComponent: React.FC = () => {
-<<<<<<< HEAD
   // TODO: FiX THIS TO BE PROPER REPLAY INSTEAD OF DEV OVERWRITE WORKSPACE
   const searchParams = useSearchParams();
 
   const workspaceId = (searchParams.get("workspaceId") ??
     "jx757hjx7ze0r9pgqnb7atp6eh80fyxc") as Id<"workspaces">;
-
-  const testToReplay = `def fizzbuzz(n):
-    for i in range(1, n + 1):
-        if i % 3 == 0 and i % 5 == 0:
-            print("FizzBuzz")
-        elif i % 3 == 0:
-            print("Fizz")
-        elif i % 5 == 0:
-            print("Buzz")
-        else:
-            print(i)
-
-fizzbuzz(100)
-
-# String concatenation implementation
-def fizzbuzz2(n):
-    result = []
-    for i in range(1, n + 1):
-        output = ""
-        if i % 3 == 0:
-            output += "Fizz"
-        if i % 5 == 0:
-            output += "Buzz"
-        result.append(output if output else str(i))
-    
-    for item in result:
-        print(item)
-
-fizzbuzz2(100)
-
-# Join implementation
-def fizzbuzz3(n):
-    fizz_buzz_map = {3: "Fizz", 5: "Buzz"}
-    
-    for i in range(1, n + 1):
-        output = "".join(word for divisor, word in fizz_buzz_map.items() if i % divisor == 0)
-        print(output or i)
-
-fizzbuzz3(100)`;
-
-=======
->>>>>>> 5d18aad (auto replay and hard coded text removal)
   // A list of line numbers and the character added. The line numbers have the line first, followed by the column.
   // If the previous column is one greater than the current, that means that a character was deleted
   // TODO: implement workspace session retrieval flow
@@ -297,20 +254,7 @@ export function insertText(
 }
 
 export function deleteText(lines: string[], range: Range): void {
-<<<<<<< HEAD
-  // assert(range.start.line < lines.length, "Start line index out of bounds");
-  // assert(range.end.line < lines.length, "End line index out of bounds");
-  // assert(
-  //   range.start.column <= (lines[range.start.line]?.length ?? 0),
-  //   "Start column index out of bounds",
-  // );
-  // assert(
-  //   range.end.column <= (lines[range.end.line]?.length ?? 0),
-  //   "End column index out of bounds",
-  // );
 
-=======
->>>>>>> 5d18aad (auto replay and hard coded text removal)
   const isMultiLineDeletion = range.start.line !== range.end.line;
 
   if (!isMultiLineDeletion) {
