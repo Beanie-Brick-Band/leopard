@@ -38,5 +38,5 @@ export default defineSchema({
   workspaces: defineTable({
     coderWorkspaceId: v.string(),
     userId: v.string(), // map this to betterAuth user id
-  }),
+  }).index("coderWorkspaceId", ["coderWorkspaceId"]),
 });
