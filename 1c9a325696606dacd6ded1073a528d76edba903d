@@ -1,0 +1,23 @@
+apps/vscode-extension/src/extension.ts
+  d6eb5e90dbcbcd31 104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "1c9a325696606dacd6ded1073a528d76edba903d",
+  "prompts": {
+    "d6eb5e90dbcbcd31": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3df496d19ffemiCzQvFkSqImVI",
+        "model": "opencode/gpt-5-nano"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 15,
+      "total_deletions": 7,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
