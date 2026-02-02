@@ -1,5 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
+import * as os from "os";
 import { ConvexHttpClient } from "convex/browser";
 import * as vscode from "vscode";
 
@@ -12,11 +13,19 @@ export function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
   console.log('Congratulations, your extension "leopard" is now active!');
-  const channel = vscode.window.createOutputChannel("eventlogger");
+  const channel = vscode.window.createOutputChannel("Leopard Event Logger");
 
-  const configuration = vscode.workspace.getConfiguration("leopard");
-  const convexUrl = configuration.get<string>("convexUrl") ?? "";
+  // Get configuration from VSCode settings
+  const config = vscode.workspace.getConfiguration("leopard");
+  const convexUrl = config.get<string>("convexUrl") ?? "";
+
   const client = new ConvexHttpClient(convexUrl);
+
+  // Log configuration info
+  channel.appendLine(`[INIT] Leopard extension activated`);
+  channel.appendLine(`[INIT] Convex URL: ${convexUrl}`);
+  channel.appendLine(`[INIT] Hostname: ${os.hostname()}`);
+  channel.show();
 
   function timestamp() {
     return Date.now();
@@ -76,13 +85,23 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
+      // Ignore changes to output channels (including our own logger)
+      if (e.document.uri.scheme === "output") {
+        return;
+      }
+
+      const changeCount = e.contentChanges.length;
       channel.appendLine(
-        `[${timestamp()}] ${e.document.uri.fsPath} - ${e.contentChanges.map((change) => `${change.range.start.line}:${change.range.start.character} - ${change.range.end.line}:${change.range.end.character}; ${change.rangeOffset}:${change.rangeLength} - ${change.text}`).join(" --- ")}`,
+        `[${timestamp()}] LOCAL: ${e.document.uri.fsPath} - ${changeCount} change(s)`,
       );
 
       // TODO implement reliable recovery in case of disconnections/failed mutations
       try {
+        channel.appendLine(
+          `[${timestamp()}] SENDING: ${changeCount} change(s) to Convex...`,
+        );
         await client.mutation(api.api.extension.addBatchedChangesMutation, {
+          hostname: os.hostname(),
           changes: [
             {
               timestamp: timestamp(),
@@ -106,10 +125,17 @@ export function activate(context: vscode.ExtensionContext) {
             },
           ],
         });
-      } catch (e) {
-        console.log(e);
-        vscode.window.showInformationMessage(
-          `Error, failed to upload: ${JSON.stringify(e)}`,
+        channel.appendLine(
+          `[${timestamp()}] SUCCESS: Event uploaded to Convex`,
+        );
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        channel.appendLine(
+          `[${timestamp()}] ERROR: Failed to upload - ${errorMsg}`,
+        );
+        console.error(error);
+        vscode.window.showWarningMessage(
+          `Leopard: Failed to upload event - ${errorMsg}`,
         );
       }
     }),

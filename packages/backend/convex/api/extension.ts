@@ -8,6 +8,7 @@ import { authComponent } from "../auth";
 
 export const addBatchedChangesMutation = mutation({
   args: {
+    hostname: v.string(),
     changes: v.array(
       v.object({
         eventType: v.string(),
