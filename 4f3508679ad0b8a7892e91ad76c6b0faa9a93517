@@ -1,0 +1,23 @@
+apps/vscode-extension/src/extension.ts
+  a2d44900a109aff5 3,16-30,90-93,95,97,102-104,106,130-140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "4f3508679ad0b8a7892e91ad76c6b0faa9a93517",
+  "prompts": {
+    "a2d44900a109aff5": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3df50ebdeffeWKn6zeUwmzDtuy",
+        "model": "opencode/kimi-k2.5-free"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 42,
+      "total_deletions": 13,
+      "accepted_lines": 42,
+      "overriden_lines": 0
+    }
+  }
+}
