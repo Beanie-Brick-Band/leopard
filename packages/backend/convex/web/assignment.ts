@@ -55,21 +55,24 @@ export const setUserActiveWorkspace = internalMutation({
   },
   handler: async (ctx, args) => {
     const workspaces = await ctx.db.query("workspaces").collect();
+    let existingWorkspace = null;
 
     for (const ws of workspaces) {
-      // delete any existing active workspaces for this user
-      if (
-        ws.userId === args.userId &&
-        ws.coderWorkspaceId !== args.coderWorkspaceId
-      ) {
-        await ctx.db.delete(ws._id);
+      if (ws.userId === args.userId) {
+        if (ws.coderWorkspaceId === args.coderWorkspaceId) {
+          existingWorkspace = ws;
+        } else {
+          await ctx.db.delete(ws._id);
+        }
       }
     }
 
-    await ctx.db.insert("workspaces", {
-      userId: args.userId,
-      coderWorkspaceId: args.coderWorkspaceId,
-    });
+    if (!existingWorkspace) {
+      await ctx.db.insert("workspaces", {
+        userId: args.userId,
+        coderWorkspaceId: args.coderWorkspaceId,
+      });
+    }
 
     return;
   },
