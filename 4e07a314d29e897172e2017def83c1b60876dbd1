@@ -1,0 +1,23 @@
+packages/backend/convex/schema.ts
+  3f28f0652ee70d1c 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "4e07a314d29e897172e2017def83c1b60876dbd1",
+  "prompts": {
+    "3f28f0652ee70d1c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3df37bf9cffeRSKNb8JDCpJmr3",
+        "model": "opencode/gpt-5-nano"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
