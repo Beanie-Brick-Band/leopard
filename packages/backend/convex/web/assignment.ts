@@ -208,6 +208,31 @@ export const launchWorkspace = action({
       throw new Error("Failed to fetch or create workspace metadata in Coder");
     }
 
+    // start the workspace if it's not running
+    const workspaceStatus = workspaceMetadata.data.latest_build?.status;
+    const targetWorkspaceId = workspaceMetadata.data.id;
+
+    if (
+      workspaceStatus === "stopped" ||
+      workspaceStatus === "failed" ||
+      workspaceStatus === "pending"
+    ) {
+      const workspaceStart = await createWorkspaceBuild({
+        client: coderClient,
+        path: {
+          workspace: targetWorkspaceId!,
+        },
+        body: {
+          transition: "start",
+        },
+      });
+      if (workspaceStart.error) {
+        throw new Error(
+          `Failed to start workspace: ${JSON.stringify(workspaceStart.error)}`,
+        );
+      }
+    }
+
     // close all other workspaces for this user
     const workspaces = await listWorkspaces({
       client: coderClient,
