@@ -1,0 +1,23 @@
+packages/backend/convex/api/extension.ts
+  a2d44900a109aff5 4-5,9,21-26,30-35,37-38,40-44,46,48-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "84f3e9095ebab27f529f84d6ba326bdc1b00480b",
+  "prompts": {
+    "a2d44900a109aff5": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3df50ebdeffeWKn6zeUwmzDtuy",
+        "model": "opencode/kimi-k2.5-free"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 33,
+      "total_deletions": 23,
+      "accepted_lines": 28,
+      "overriden_lines": 0
+    }
+  }
+}
