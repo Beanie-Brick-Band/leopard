@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { createClient, createConfig } from "./client";
-import { buildInfo } from "./sdk.gen";
+import { buildInfo } from "@package/coder-sdk";
+import { createClient, createConfig } from "@package/coder-sdk/client";
 
 describe("Coder integration tests", () => {
   let client: ReturnType<typeof createClient>;
