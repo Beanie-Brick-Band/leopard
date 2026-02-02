@@ -22,14 +22,15 @@ If you have any requirements or dependencies, add a section describing those and
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-- `myExtension.enable`: Enable/disable this extension.
-- `myExtension.thing`: Set to `blah` to do something.
+- `leopard.convexUrl`: The URL of the Convex deployment to send events to. Defaults to `https://optimistic-kangaroo-331.convex.cloud`.
+
+To configure the Convex URL:
+
+1. Open VS Code settings (File > Preferences > Settings or `Cmd/Ctrl + ,`)
+2. Search for "Leopard"
+3. Update the "Convex URL" setting with your Convex deployment URL
 
 ## Known Issues
 
