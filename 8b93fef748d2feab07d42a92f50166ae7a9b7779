@@ -1,0 +1,23 @@
+packages/backend/convex/web/assignment.ts
+  a2d44900a109aff5 58,61-64,66,70,75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "8b93fef748d2feab07d42a92f50166ae7a9b7779",
+  "prompts": {
+    "a2d44900a109aff5": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3df50ebdeffeWKn6zeUwmzDtuy",
+        "model": "opencode/kimi-k2.5-free"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 13,
+      "total_deletions": 10,
+      "accepted_lines": 8,
+      "overriden_lines": 0
+    }
+  }
+}
