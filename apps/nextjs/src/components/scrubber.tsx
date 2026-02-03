@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "convex/react";
 import { Scrubber } from "react-scrubber";
@@ -35,7 +35,7 @@ export const TextReplayScrubberComponent: React.FC = () => {
     end: m + 0.3,
   }));
 
-  const [state, setState] = React.useState<{
+  const [state, setState] = useState<{
     value: number;
     state: string;
     isScrubbing?: boolean;
@@ -47,10 +47,10 @@ export const TextReplayScrubberComponent: React.FC = () => {
     stickingTo: null,
   });
 
-  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Auto-play effect
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isPlaying) return;
 
     const interval = setInterval(() => {
@@ -254,7 +254,6 @@ export function insertText(
 }
 
 export function deleteText(lines: string[], range: Range): void {
-
   const isMultiLineDeletion = range.start.line !== range.end.line;
 
   if (!isMultiLineDeletion) {
