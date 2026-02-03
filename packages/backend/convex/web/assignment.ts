@@ -54,23 +54,29 @@ export const setUserActiveWorkspace = internalMutation({
     coderWorkspaceId: v.string(),
   },
   handler: async (ctx, args) => {
-    const workspaces = await ctx.db.query("workspaces").collect();
-    let existingWorkspace = null;
+    const userWorkspaces = await ctx.db
+      .query("workspaces")
+      .withIndex("userId_isActive", (q) => q.eq("userId", args.userId))
+      .collect();
 
-    for (const ws of workspaces) {
-      if (ws.userId === args.userId) {
-        if (ws.coderWorkspaceId === args.coderWorkspaceId) {
-          existingWorkspace = ws;
-        } else {
-          await ctx.db.delete(ws._id);
+    let targetWorkspace = null;
+
+    for (const ws of userWorkspaces) {
+      if (ws.coderWorkspaceId === args.coderWorkspaceId) {
+        targetWorkspace = ws;
+        if (!ws.isActive) {
+          await ctx.db.patch(ws._id, { isActive: true });
         }
+      } else if (ws.isActive) {
+        await ctx.db.patch(ws._id, { isActive: false });
       }
     }
 
-    if (!existingWorkspace) {
+    if (!targetWorkspace) {
       await ctx.db.insert("workspaces", {
         userId: args.userId,
         coderWorkspaceId: args.coderWorkspaceId,
+        isActive: true,
       });
     }
 
@@ -83,7 +89,9 @@ export const getUserActiveWorkspace = internalQuery({
   handler: async (ctx, args) => {
     const workspace = await ctx.db
       .query("workspaces")
-      .filter((q) => q.eq(q.field("userId"), args.userId))
+      .withIndex("userId_isActive", (q) =>
+        q.eq("userId", args.userId).eq("isActive", true),
+      )
       .first();
     return workspace;
   },
