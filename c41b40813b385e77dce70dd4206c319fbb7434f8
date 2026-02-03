@@ -1,0 +1,36 @@
+apps/vscode-extension/README.md
+  7f3f4315f8a3b843 25,27,29,31-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "c41b40813b385e77dce70dd4206c319fbb7434f8",
+  "prompts": {
+    "7f3f4315f8a3b843": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3df180555ffeQsOu4sC8WNKFO9",
+        "model": "opencode/kimi-k2.5-free"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 5,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    },
+    "d6eb5e90dbcbcd31": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3df496d19ffemiCzQvFkSqImVI",
+        "model": "opencode/gpt-5-nano"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 15,
+      "total_deletions": 7,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
