@@ -18,6 +18,18 @@
     "onStartupFinished"
   ],
   "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Leopard",
+      "properties": {
+        "leopard.convexUrl": {
+          "type": "string",
+          "default": "https://optimistic-kangaroo-331.convex.cloud",
+          "description": "The URL of the Convex deployment to send events to"
+        }
+      }
+    }
+  },
   "scripts": {
     "build": "pnpx @vscode/vsce package --no-dependencies",
     "vscode:prepublish": "pnpm run package",
@@ -37,7 +49,6 @@
     "@package/backend": "workspace:*",
     "@package/prettier-config": "workspace:*",
     "@package/validators": "workspace:*",
-    "@t3-oss/env-core": "^0.13.8",
     "convex": "^1.29.0",
     "zod": "catalog:"
   },
