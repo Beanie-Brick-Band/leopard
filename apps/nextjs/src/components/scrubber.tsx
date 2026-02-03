@@ -1,17 +1,23 @@
 "use client";
 
 import React from "react";
+import { useSearchParams } from "next/navigation";
 import { useQuery } from "convex/react";
 import { Scrubber } from "react-scrubber";
 import ShikiHighlighter from "react-shiki";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
 import { api } from "@package/backend/convex/_generated/api";
-import { assert } from "@package/validators/assert";
 
 import "react-scrubber/lib/scrubber.css";
 
 export const TextReplayScrubberComponent: React.FC = () => {
+  // TODO: FiX THIS TO BE PROPER REPLAY INSTEAD OF DEV OVERWRITE WORKSPACE
+  const searchParams = useSearchParams();
+
+  const workspaceId = (searchParams.get("workspaceId") ??
+    "jx757hjx7ze0r9pgqnb7atp6eh80fyxc") as Id<"workspaces">;
+
   const testToReplay = `def fizzbuzz(n):
     for i in range(1, n + 1):
         if i % 3 == 0 and i % 5 == 0:
@@ -55,7 +61,7 @@ fizzbuzz3(100)`;
   // If the previous column is one greater than the current, that means that a character was deleted
   // TODO: implement workspace session retrieval flow
   const userTranscript = useQuery(api.web.replay.getReplay, {
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf" as Id<"workspaces">,
+    workspaceId: workspaceId,
   });
 
   const SNAP_RELEASE_THRESHOLD = 0.5; // when released within this distance, snap to marker
@@ -176,12 +182,6 @@ fizzbuzz3(100)`;
 
     displayedUserTranscript?.forEach((event) => {
       event.metadata.contentChanges.forEach((change) => {
-        assert(
-          change.range.start.column <=
-            (lines[change.range.start.line]?.length ?? 0),
-          "Column index out of bounds",
-        );
-
         const isInsertion =
           change.range.start.line === change.range.end.line &&
           change.range.start.column === change.range.end.column;
@@ -276,16 +276,16 @@ export function insertText(
 }
 
 export function deleteText(lines: string[], range: Range): void {
-  assert(range.start.line < lines.length, "Start line index out of bounds");
-  assert(range.end.line < lines.length, "End line index out of bounds");
-  assert(
-    range.start.column <= (lines[range.start.line]?.length ?? 0),
-    "Start column index out of bounds",
-  );
-  assert(
-    range.end.column <= (lines[range.end.line]?.length ?? 0),
-    "End column index out of bounds",
-  );
+  // assert(range.start.line < lines.length, "Start line index out of bounds");
+  // assert(range.end.line < lines.length, "End line index out of bounds");
+  // assert(
+  //   range.start.column <= (lines[range.start.line]?.length ?? 0),
+  //   "Start column index out of bounds",
+  // );
+  // assert(
+  //   range.end.column <= (lines[range.end.line]?.length ?? 0),
+  //   "End column index out of bounds",
+  // );
 
   const isMultiLineDeletion = range.start.line !== range.end.line;
   if (!isMultiLineDeletion) {
