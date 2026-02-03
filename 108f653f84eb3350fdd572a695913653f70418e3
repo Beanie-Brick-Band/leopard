@@ -1,0 +1,38 @@
+packages/backend/convex/schema.ts
+  23b6f051cdd7bc44 40,44
+packages/backend/convex/web/assignment.ts
+  23b6f051cdd7bc44 57,59-60,62-64,66-68,70-71,75,79,92-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "108f653f84eb3350fdd572a695913653f70418e3",
+  "prompts": {
+    "23b6f051cdd7bc44": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3df24b115ffeCpX7EwGJBuJnka",
+        "model": "opencode/kimi-k2.5-free"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 22,
+      "total_deletions": 11,
+      "accepted_lines": 17,
+      "overriden_lines": 0
+    },
+    "4ee015c806f7c8ff": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3df2d58b9ffeJlOeNC7B703SwU",
+        "model": "opencode/kimi-k2.5-free"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 7,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
