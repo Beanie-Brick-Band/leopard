@@ -1,0 +1,23 @@
+apps/nextjs/src/components/scrubber.tsx
+  af1b96b52b46085c 4,15-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "21ae039ed9b4eb8ea9d6b69d0d029bc0ab6c6dfe",
+  "prompts": {
+    "af1b96b52b46085c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3de45c424ffebs04tXxRmzR1Wx",
+        "model": "opencode/kimi-k2.5-free"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 1,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
