@@ -1,0 +1,70 @@
+name: VS Code Extension
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "apps/vscode-extension/**"
+      - "packages/backend/**"
+      - "packages/validators/**"
+      - "pnpm-lock.yaml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FORCE_COLOR: 3
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup
+        uses: ./tooling/github/setup
+
+      - name: Build VS Code Extension
+        run: pnpm --filter vscode-extension run build
+
+      - name: Get extension version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./apps/vscode-extension/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extension version: $VERSION"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-extension-${{ steps.version.outputs.version }}
+          path: apps/vscode-extension/*.vsix
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: vscode-extension-v${{ steps.version.outputs.version }}-${{ github.run_number }}
+          name: VS Code Extension v${{ steps.version.outputs.version }} (Build ${{ github.run_number }})
+          files: apps/vscode-extension/*.vsix
+          generate_release_notes: true
+
+      - name: Update latest release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: vscode-extension-latest
+          name: VS Code Extension (Latest)
+          files: apps/vscode-extension/*.vsix
+          body: |
+            Latest VS Code extension build.
+
+            **Version:** ${{ steps.version.outputs.version }}
+            **Build:** ${{ github.run_number }}
+            **Commit:** ${{ github.sha }}
+
+            This release is automatically updated with each build on main.
+          make_latest: false
