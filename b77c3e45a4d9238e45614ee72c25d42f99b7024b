@@ -1,0 +1,23 @@
+packages/backend/convex/api/extension.ts
+  d1c2b361596c035c 30-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "b77c3e45a4d9238e45614ee72c25d42f99b7024b",
+  "prompts": {
+    "d1c2b361596c035c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3df1303ffffeP0lZTdAA4Pk60X",
+        "model": "opencode/kimi-k2.5-free"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 5,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
