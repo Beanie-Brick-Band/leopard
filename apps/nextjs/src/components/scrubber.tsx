@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "convex/react";
 import { Scrubber } from "react-scrubber";
@@ -17,46 +17,6 @@ export const TextReplayScrubberComponent: React.FC = () => {
 
   const workspaceId = (searchParams.get("workspaceId") ??
     "jx757hjx7ze0r9pgqnb7atp6eh80fyxc") as Id<"workspaces">;
-
-  const testToReplay = `def fizzbuzz(n):
-    for i in range(1, n + 1):
-        if i % 3 == 0 and i % 5 == 0:
-            print("FizzBuzz")
-        elif i % 3 == 0:
-            print("Fizz")
-        elif i % 5 == 0:
-            print("Buzz")
-        else:
-            print(i)
-
-fizzbuzz(100)
-
-# String concatenation implementation
-def fizzbuzz2(n):
-    result = []
-    for i in range(1, n + 1):
-        output = ""
-        if i % 3 == 0:
-            output += "Fizz"
-        if i % 5 == 0:
-            output += "Buzz"
-        result.append(output if output else str(i))
-    
-    for item in result:
-        print(item)
-
-fizzbuzz2(100)
-
-# Join implementation
-def fizzbuzz3(n):
-    fizz_buzz_map = {3: "Fizz", 5: "Buzz"}
-    
-    for i in range(1, n + 1):
-        output = "".join(word for divisor, word in fizz_buzz_map.items() if i % divisor == 0)
-        print(output or i)
-
-fizzbuzz3(100)`;
-
   // A list of line numbers and the character added. The line numbers have the line first, followed by the column.
   // If the previous column is one greater than the current, that means that a character was deleted
   // TODO: implement workspace session retrieval flow
@@ -66,7 +26,7 @@ fizzbuzz3(100)`;
 
   const SNAP_RELEASE_THRESHOLD = 0.5; // when released within this distance, snap to marker
   const STICK_THRESHOLD = 0.5; // while dragging, within this distance the cursor will "stick"
-  const STICK_HYSTERESIS = 1.0; // distance to leave a stick once engaged
+  const STICK_HYSTERESIS = 1.0; // distance to leave a marker once engaged
 
   const markers = [30.7, 70.4];
 
@@ -75,17 +35,38 @@ fizzbuzz3(100)`;
     end: m + 0.3,
   }));
 
-  const [state, setState] = React.useState<{
+  const [state, setState] = useState<{
     value: number;
     state: string;
     isScrubbing?: boolean;
     stickingTo?: number | null;
   }>({
-    value: 50,
+    value: 0,
     state: "None",
     isScrubbing: false,
     stickingTo: null,
   });
+
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // Auto-play effect
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      setState((s) => {
+        if (s.value >= 100) {
+          setIsPlaying(false);
+          return s;
+        }
+        // Advance by a small increment (adjust speed as needed)
+        const newValue = Math.min(s.value + 0.5, 100);
+        return { ...s, value: newValue };
+      });
+    }, 50); // Update every 50ms for smooth playback
+
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   const nearestMarker = (
     v: number,
@@ -107,6 +88,7 @@ fizzbuzz3(100)`;
   };
 
   const handleScrubStart = (value: number) => {
+    setIsPlaying(false); // Pause when user starts scrubbing
     setState((s) => ({ ...s, value, state: "Scrub Start", isScrubbing: true }));
   };
 
@@ -167,10 +149,6 @@ fizzbuzz3(100)`;
     });
   };
 
-  // Original character-based scrubbing (simple version)
-  const charCount = Math.round((state.value / 100) * testToReplay.length);
-  const displayedTextSimple = testToReplay.slice(0, charCount);
-
   // Calculate how many events to replay based on scrubber position
   const totalEvents = userTranscript?.length ?? 0;
   const eventsToReplay = Math.round((state.value / 100) * totalEvents);
@@ -199,13 +177,6 @@ fizzbuzz3(100)`;
     return lines.join("\n");
   }, [displayedUserTranscript]);
 
-  // Choose which display mode to use
-  // Set to true to use action-based replay, false to use simple character scrubbing
-  const useActionBasedReplay = Boolean(true);
-  const displayedText = useActionBasedReplay
-    ? displayedOutputText
-    : displayedTextSimple;
-
   return (
     <div className="h-max w-full space-y-4">
       <div className="flex h-[75vh] flex-col-reverse overflow-y-auto rounded-md">
@@ -220,7 +191,7 @@ fizzbuzz3(100)`;
           showLineNumbers={true}
           showLanguage={true}
         >
-          {displayedText}
+          {displayedOutputText}
         </ShikiHighlighter>
       </div>
 
@@ -237,11 +208,18 @@ fizzbuzz3(100)`;
         />
       </div>
 
-      <div className="text-md mt-4 flex gap-8 text-center text-gray-300">
-        <p>Position: {state.value.toFixed(1)}</p>
-        <p>
-          Remaining Characters: {charCount}/{testToReplay.length}
-        </p>
+      <div className="flex justify-center pb-8">
+        <button
+          onClick={() => setIsPlaying(!isPlaying)}
+          className="flex w-20 items-center justify-center rounded-md bg-blue-500 px-6 py-2 text-white transition-colors hover:bg-blue-600"
+          aria-label={isPlaying ? "Pause" : "Play"}
+        >
+          {isPlaying ? (
+            <span className="-m-1 text-4xl">⏸</span>
+          ) : (
+            <span className="text-2xl">▶</span>
+          )}
+        </button>
       </div>
     </div>
   );
@@ -276,18 +254,8 @@ export function insertText(
 }
 
 export function deleteText(lines: string[], range: Range): void {
-  // assert(range.start.line < lines.length, "Start line index out of bounds");
-  // assert(range.end.line < lines.length, "End line index out of bounds");
-  // assert(
-  //   range.start.column <= (lines[range.start.line]?.length ?? 0),
-  //   "Start column index out of bounds",
-  // );
-  // assert(
-  //   range.end.column <= (lines[range.end.line]?.length ?? 0),
-  //   "End column index out of bounds",
-  // );
-
   const isMultiLineDeletion = range.start.line !== range.end.line;
+
   if (!isMultiLineDeletion) {
     const currentLine = lines[range.start.line] ?? "";
     lines[range.start.line] =
