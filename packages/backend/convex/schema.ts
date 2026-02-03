@@ -37,6 +37,9 @@ export default defineSchema({
   }),
   workspaces: defineTable({
     coderWorkspaceId: v.string(),
+    isActive: v.boolean(),
     userId: v.string(), // map this to betterAuth user id
-  }).index("coderWorkspaceId", ["coderWorkspaceId"]),
+  })
+    .index("coderWorkspaceId", ["coderWorkspaceId"])
+    .index("userId_isActive", ["userId", "isActive"]),
 });
