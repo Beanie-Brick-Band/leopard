@@ -93,7 +93,7 @@ importers:
     dependencies:
       '@convex-dev/better-auth':
         specifier: ^0.10.10
-        version: 0.10.10(@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1))(@better-auth/utils@0.3.0)(@standard-schema/spec@1.0.0)(better-auth@1.4.9(next@16.0.10(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2)))(better-call@1.1.7(zod@4.1.12))(convex@1.29.0(react@19.2.0))(nanostores@1.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
+        version: 0.10.10(@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1))(@better-auth/utils@0.3.0)(@standard-schema/spec@1.0.0)(better-auth@1.4.9(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2)))(better-call@1.1.7(zod@4.1.12))(convex@1.29.0(react@19.2.0))(nanostores@1.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
       '@package/backend':
         specifier: workspace:*
         version: link:../../packages/backend
@@ -111,7 +111,10 @@ importers:
         version: 1.25.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       better-auth:
         specifier: 1.4.9
-        version: 1.4.9(next@16.0.10(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2))
+        version: 1.4.9(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2))
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
       convex:
         specifier: ^1.29.0
         version: 1.29.0(react@19.2.0)
@@ -6848,6 +6851,17 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
+  '@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1)':
+    dependencies:
+      '@better-auth/utils': 0.3.0
+      '@better-fetch/fetch': 1.1.18
+      '@standard-schema/spec': 1.0.0
+      better-call: 1.1.7(zod@4.1.12)
+      jose: 6.1.1
+      kysely: 0.28.8
+      nanostores: 1.0.1
+      zod: 4.1.12
+
   '@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1)':
     dependencies:
       '@better-auth/utils': 0.3.0
@@ -6856,6 +6870,18 @@ snapshots:
       better-call: 1.1.7(zod@4.1.12)
       jose: 6.1.1
       kysely: 0.28.8
+      nanostores: 1.0.1
+      zod: 4.1.12
+
+  '@better-auth/passkey@1.4.9(@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1))(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-auth@1.4.9(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2)))(better-call@1.1.7(zod@4.1.12))(nanostores@1.0.1)':
+    dependencies:
+      '@better-auth/core': 1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1)
+      '@better-auth/utils': 0.3.0
+      '@better-fetch/fetch': 1.1.18
+      '@simplewebauthn/browser': 13.2.2
+      '@simplewebauthn/server': 13.2.2
+      better-auth: 1.4.9(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2))
+      better-call: 1.1.7(zod@4.1.12)
       nanostores: 1.0.1
       zod: 4.1.12
 
@@ -6871,6 +6897,12 @@ snapshots:
       nanostores: 1.0.1
       zod: 4.1.12
 
+  '@better-auth/telemetry@1.4.9(@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1))':
+    dependencies:
+      '@better-auth/core': 1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1)
+      '@better-auth/utils': 0.3.0
+      '@better-fetch/fetch': 1.1.21
+
   '@better-auth/telemetry@1.4.9(@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1))':
     dependencies:
       '@better-auth/core': 1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1)
@@ -6882,6 +6914,30 @@ snapshots:
   '@better-fetch/fetch@1.1.18': {}
 
   '@better-fetch/fetch@1.1.21': {}
+
+  '@convex-dev/better-auth@0.10.10(@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1))(@better-auth/utils@0.3.0)(@standard-schema/spec@1.0.0)(better-auth@1.4.9(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2)))(better-call@1.1.7(zod@4.1.12))(convex@1.29.0(react@19.2.0))(nanostores@1.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)':
+    dependencies:
+      '@better-auth/passkey': 1.4.9(@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1))(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-auth@1.4.9(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2)))(better-call@1.1.7(zod@4.1.12))(nanostores@1.0.1)
+      '@better-fetch/fetch': 1.1.18
+      better-auth: 1.4.9(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2))
+      common-tags: 1.8.2
+      convex: 1.29.0(react@19.2.0)
+      convex-helpers: 0.1.105(@standard-schema/spec@1.0.0)(convex@1.29.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.1.12)
+      jose: 6.1.1
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      remeda: 2.32.0
+      semver: 7.7.3
+      type-fest: 4.41.0
+      zod: 4.1.12
+    transitivePeerDependencies:
+      - '@better-auth/core'
+      - '@better-auth/utils'
+      - '@standard-schema/spec'
+      - better-call
+      - hono
+      - nanostores
+      - typescript
 
   '@convex-dev/better-auth@0.10.10(@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1))(@better-auth/utils@0.3.0)(@standard-schema/spec@1.0.0)(better-auth@1.4.9(next@16.0.10(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2)))(better-call@1.1.7(zod@4.1.12))(convex@1.29.0(react@19.2.0))(nanostores@1.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)':
     dependencies:
@@ -9327,6 +9383,26 @@ snapshots:
   baseline-browser-mapping@2.8.16: {}
 
   basic-ftp@5.0.5: {}
+
+  better-auth@1.4.9(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2)):
+    dependencies:
+      '@better-auth/core': 1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1)
+      '@better-auth/telemetry': 1.4.9(@better-auth/core@1.4.9(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.7(zod@4.1.12))(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1))
+      '@better-auth/utils': 0.3.0
+      '@better-fetch/fetch': 1.1.21
+      '@noble/ciphers': 2.0.1
+      '@noble/hashes': 2.0.1
+      better-call: 1.1.7(zod@4.1.12)
+      defu: 6.1.4
+      jose: 6.1.1
+      kysely: 0.28.8
+      nanostores: 1.0.1
+      zod: 4.1.12
+    optionalDependencies:
+      next: 16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      vitest: 4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2)
 
   better-auth@1.4.9(next@16.0.10(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2)):
     dependencies:
