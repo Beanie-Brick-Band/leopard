@@ -7,14 +7,21 @@ import { ConvexReactClient } from "convex/react";
 import { env } from "~/env";
 import { authClient } from "~/lib/auth-client";
 
-const convex = new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL, {
-  // Optionally pause queries until the user is authenticated
-  expectAuth: env.NODE_ENV === "production",
-});
+const convex = new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL);
 
-export function ConvexClientProvider({ children }: { children: ReactNode }) {
+export function ConvexClientProvider({
+  children,
+  initialToken,
+}: {
+  children: ReactNode;
+  initialToken?: string | null;
+}) {
   return (
-    <ConvexBetterAuthProvider client={convex} authClient={authClient}>
+    <ConvexBetterAuthProvider
+      client={convex}
+      authClient={authClient}
+      initialToken={initialToken}
+    >
       {children}
     </ConvexBetterAuthProvider>
   );

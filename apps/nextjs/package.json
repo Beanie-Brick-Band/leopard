@@ -15,13 +15,13 @@
     "with-env": "dotenv -e ../../.env -e ./.env --"
   },
   "dependencies": {
-    "@convex-dev/better-auth": "0.9.7",
+    "@convex-dev/better-auth": "^0.10.10",
     "@package/backend": "workspace:*",
     "@package/ui": "workspace:*",
     "@package/validators": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.8",
     "@tanstack/react-form": "catalog:",
-    "better-auth": "1.3.27",
+    "better-auth": "1.4.9",
     "convex": "^1.29.0",
     "next": "16.0.10",
     "react": "catalog:react19",
