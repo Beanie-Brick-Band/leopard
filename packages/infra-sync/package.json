@@ -1,0 +1,23 @@
+{
+  "name": "@package/infra-sync",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync": "dotenv -e ../../.env -e ../../.env.local -- tsx src/sync-templates.ts",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@package/coder-sdk": "workspace:*",
+    "@t3-oss/env-core": "^0.13.8",
+    "tar": "^7.4.3",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@package/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "dotenv-cli": "^10.0.0",
+    "tsx": "^4.19.4",
+    "typescript": "catalog:"
+  }
+}
