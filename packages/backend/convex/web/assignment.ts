@@ -19,32 +19,77 @@ import {
   action,
   internalMutation,
   internalQuery,
+  QueryCtx,
   mutation,
   query,
 } from "../_generated/server";
+import type { Id } from "../_generated/dataModel";
 import { authComponent } from "../auth";
+import { getUserRole } from "../helpers/roles";
+
+const ensureCanAccessAssignment = async (
+  ctx: QueryCtx,
+  userId: string,
+  assignmentId: Id<"assignments">,
+) => {
+  const assignment = await ctx.db.get(assignmentId);
+
+  if (!assignment) {
+    throw new Error("Assignment not found");
+  }
+
+  const classroom = await ctx.db.get(assignment.classroomId);
+
+  if (!classroom) {
+    throw new Error("Classroom not found");
+  }
+
+  if (classroom.ownerId === userId || classroom.assistantIds.includes(userId)) {
+    return assignment;
+  }
+
+  const role = await getUserRole(ctx, userId);
+
+  if (role === "student") {
+    const relation = await ctx.db
+      .query("classroomStudentsRelations")
+      .withIndex("studentId_classroomId", (q) =>
+        q.eq("studentId", userId).eq("classroomId", classroom._id),
+      )
+      .first();
+
+    if (!relation) {
+      throw new Error("Not authorized to view this assignment");
+    }
+
+    return assignment;
+  }
+
+  throw new Error("Not authorized to view this assignment");
+};
 
 export const getById = query({
   args: { id: v.id("assignments") },
   handler: async (ctx, args) => {
-    const auth = authComponent.getAuthUser(ctx);
+    const auth = await authComponent.safeGetAuthUser(ctx);
     if (!auth) {
       throw new Error("Unauthorized");
     }
-    const assignment = await ctx.db.get(args.id);
-    return assignment;
+    return ensureCanAccessAssignment(ctx, auth._id, args.id);
   },
 });
 
 export const getByIds = query({
   args: { ids: v.array(v.id("assignments")) },
   handler: async (ctx, args) => {
-    const auth = authComponent.getAuthUser(ctx);
+    const auth = await authComponent.safeGetAuthUser(ctx);
     if (!auth) {
       throw new Error("Unauthorized");
     }
-    const assignments = await Promise.all(args.ids.map((id) => ctx.db.get(id)));
-    return assignments.filter(Boolean);
+
+    return Promise.all(
+      args.ids.map((id) => ensureCanAccessAssignment(ctx, auth._id, id)),
+    );
   },
 });
 
