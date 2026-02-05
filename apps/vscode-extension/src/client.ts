@@ -1,3 +1,4 @@
+import * as os from "os";
 import type { TestConvex } from "convex-test";
 import { convexTest } from "convex-test";
 import { ConvexHttpClient } from "convex/browser";
@@ -33,4 +34,14 @@ export function createClient(convexUrl: string): ConvexHttpClient {
     return mockClient as unknown as ConvexHttpClient;
   }
   return new ConvexHttpClient(convexUrl);
+}
+
+let mockHostname: string | null = null;
+
+export function setMockHostname(hostname: string) {
+  mockHostname = hostname;
+}
+
+export function hostname() {
+  return mockHostname ?? os.hostname();
 }

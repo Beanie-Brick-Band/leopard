@@ -1,12 +1,11 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as os from "os";
 import * as vscode from "vscode";
 
 import { api } from "@package/backend/convex/_generated/api";
 import * as WorkspaceEvents from "@package/validators/workspaceEvents";
 
-import { createClient } from "./client";
+import { createClient, hostname } from "./client";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -25,7 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Log configuration info
   channel.appendLine(`[INIT] Leopard extension activated`);
   channel.appendLine(`[INIT] Convex URL: ${convexUrl}`);
-  channel.appendLine(`[INIT] Hostname: ${os.hostname()}`);
+  channel.appendLine(`[INIT] Hostname: ${hostname()}`);
   channel.show();
 
   function timestamp() {
@@ -102,7 +101,7 @@ export function activate(context: vscode.ExtensionContext) {
           `[${timestamp()}] SENDING: ${changeCount} change(s) to Convex...`,
         );
         await client.mutation(api.api.extension.addBatchedChangesMutation, {
-          hostname: os.hostname(),
+          hostname: hostname(),
           changes: [
             {
               timestamp: timestamp(),
