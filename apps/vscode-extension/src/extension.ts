@@ -19,17 +19,13 @@ export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("leopard");
   const convexUrl = config.get<string>("convexUrl") ?? "";
 
-  const client = new ConvexHttpClient(convexUrl);
+  const batchedClient = new BatchedConvexHttpClient(convexUrl, channel, 1000);
 
   // Log configuration info
   channel.appendLine(`[INIT] Leopard extension activated`);
   channel.appendLine(`[INIT] Convex URL: ${convexUrl}`);
   channel.appendLine(`[INIT] Hostname: ${os.hostname()}`);
   channel.show();
-
-  function timestamp() {
-    return Date.now();
-  }
 
   // TODO: workspace ingestion flow implementation for this event is low priority but could potentially be useful
   // context.subscriptions.push(
@@ -79,8 +75,9 @@ export function activate(context: vscode.ExtensionContext) {
   //   }),
   // );
 
+  // TODO implement reliable recovery in case of disconnections/failed mutations
   context.subscriptions.push(
-    vscode.workspace.onDidChangeTextDocument(async (e) => {
+    vscode.workspace.onDidChangeTextDocument((e) => {
       if (e.contentChanges.length === 0) {
         return;
       }
@@ -90,54 +87,26 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const changeCount = e.contentChanges.length;
-      channel.appendLine(
-        `[${timestamp()}] LOCAL: ${e.document.uri.fsPath} - ${changeCount} change(s)`,
-      );
-
-      // TODO implement reliable recovery in case of disconnections/failed mutations
-      try {
-        channel.appendLine(
-          `[${timestamp()}] SENDING: ${changeCount} change(s) to Convex...`,
-        );
-        await client.mutation(api.api.extension.addBatchedChangesMutation, {
-          hostname: os.hostname(),
-          changes: [
-            {
-              timestamp: timestamp(),
-              eventType: WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT,
-              metadata: {
-                contentChanges: e.contentChanges.map((change) => ({
-                  range: {
-                    start: {
-                      line: change.range.start.line,
-                      column: change.range.start.character,
-                    },
-                    end: {
-                      line: change.range.end.line,
-                      column: change.range.end.character,
-                    },
-                  },
-                  text: change.text,
-                  filePath: e.document.uri.fsPath,
-                })),
+      batchedClient.addEvent({
+        timestamp: timestamp(),
+        eventType: WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT,
+        metadata: {
+          contentChanges: e.contentChanges.map((change) => ({
+            range: {
+              start: {
+                line: change.range.start.line,
+                column: change.range.start.character,
+              },
+              end: {
+                line: change.range.end.line,
+                column: change.range.end.character,
               },
             },
-          ],
-        });
-        channel.appendLine(
-          `[${timestamp()}] SUCCESS: Event uploaded to Convex`,
-        );
-      } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : String(error);
-        channel.appendLine(
-          `[${timestamp()}] ERROR: Failed to upload - ${errorMsg}`,
-        );
-        console.error(error);
-        vscode.window.showWarningMessage(
-          `Leopard: Failed to upload event - ${errorMsg}`,
-        );
-      }
+            text: change.text,
+            filePath: e.document.uri.fsPath,
+          })),
+        },
+      });
     }),
   );
 
@@ -190,3 +159,78 @@ export function activate(context: vscode.ExtensionContext) {
 // This method is called when your extension is deactivated
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export function deactivate() {}
+
+class BatchedConvexHttpClient {
+  private client: ConvexHttpClient;
+  private debouncer: NodeJS.Timeout | null = null;
+  private eventBuffer: Parameters<
+    typeof this.client.mutation<
+      typeof api.api.extension.addBatchedChangesMutation
+    >
+  >[1]["changes"];
+  private channel: vscode.OutputChannel;
+  private debounceDelay: number;
+
+  constructor(
+    convexUrl: string,
+    channel: vscode.OutputChannel,
+    debounceDelay: number,
+  ) {
+    this.client = new ConvexHttpClient(convexUrl);
+    this.channel = channel;
+    this.debounceDelay = debounceDelay;
+    this.eventBuffer = [];
+  }
+
+  private async submitEvents() {
+    if (this.eventBuffer.length === 0) {
+      return;
+    }
+
+    // Create a copy to avoid race conditions: the eventBuffer could be modified while
+    // sending events (e.g., new events arriving during the async mutation).
+    const eventsToSend = [...this.eventBuffer];
+    this.eventBuffer = [];
+
+    try {
+      this.channel.appendLine(
+        `[${timestamp()}] SENDING: ${eventsToSend.length} batched event(s) to Convex...`,
+      );
+      await this.client.mutation(api.api.extension.addBatchedChangesMutation, {
+        hostname: os.hostname(),
+        changes: eventsToSend,
+      });
+      this.channel.appendLine(
+        `[${timestamp()}] SUCCESS: ${eventsToSend.length} batched event(s) uploaded to Convex`,
+      );
+    } catch (error) {
+      this.eventBuffer.unshift(...eventsToSend);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      this.channel.appendLine(
+        `[${timestamp()}] ERROR: Failed to upload batched events - ${errorMsg}`,
+      );
+      console.error(error);
+      vscode.window.showWarningMessage(
+        `Leopard: Failed to upload batched events - ${errorMsg}`,
+      );
+    }
+  }
+
+  public addEvent(event: (typeof this.eventBuffer)[0]): void {
+    this.channel.appendLine(
+      `[${event.timestamp}] Logged an event: ${event.eventType}`,
+    );
+
+    this.eventBuffer.push(event);
+    if (this.debouncer) {
+      clearTimeout(this.debouncer);
+    }
+    this.debouncer = setTimeout(() => {
+      void this.submitEvents();
+    }, this.debounceDelay);
+  }
+}
+
+function timestamp() {
+  return Date.now();
+}
