@@ -47,8 +47,10 @@ export const createMock = internalMutation(async (ctx) => {
     releaseDate: 1704067200000, // December 31, 2023 - in the past
   });
 
+  // Use some placeholder workspace ID that matches the requirements specified in
+  // addBatchedChangesMutation
   const workspaceId = await ctx.db.insert("workspaces", {
-    coderWorkspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
+    coderWorkspaceId: "273044a0-03a7-49ef-b1a4-e1bbc3c49d9b",
     isActive: true,
     userId: "user_123", // sample user that does not exist
   });
