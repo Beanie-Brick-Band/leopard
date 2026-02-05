@@ -39,7 +39,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "pnpm run check-types && pnpm run lint && node esbuild.mjs --production",
     "compile-tests": "node esbuild.test.mjs",
-    "watch-tests": "tsc -p . -w --outDir out",
+    "watch-tests": "node esbuild.test.mjs --watch",
     "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
