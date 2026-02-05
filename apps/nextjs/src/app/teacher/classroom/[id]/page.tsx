@@ -36,8 +36,13 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
     );
   }
 
-  const { classroom, assignments, studentCount, pendingEnrollments, enrolledStudents } =
-    classroomDetails;
+  const {
+    classroom,
+    assignments,
+    studentCount,
+    pendingEnrollments,
+    enrolledStudents,
+  } = classroomDetails;
 
   const handleRemoveStudent = async (studentId: string) => {
     try {
@@ -74,7 +79,10 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
   return (
     <div className="container mx-auto max-w-5xl space-y-6 p-6">
       <div className="space-y-2">
-        <Link href="/teacher" className="text-sm text-muted-foreground underline">
+        <Link
+          href="/teacher"
+          className="text-muted-foreground text-sm underline"
+        >
           Back to Teacher Dashboard
         </Link>
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -125,7 +133,7 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
         <h2 className="text-xl font-semibold">Assignments</h2>
         {assignments.length === 0 ? (
           <Card>
-            <CardContent className="py-6 text-sm text-muted-foreground">
+            <CardContent className="text-muted-foreground py-6 text-sm">
               No assignments yet.
             </CardContent>
           </Card>
@@ -136,7 +144,7 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
                 key={assignment._id}
                 href={`/teacher/classroom/${classroomId}/assignment/${assignment._id}`}
               >
-                <Card className="h-full transition-colors hover:border-primary">
+                <Card className="hover:border-primary h-full transition-colors">
                   <CardHeader>
                     <CardTitle>{assignment.name}</CardTitle>
                     <CardDescription>
@@ -154,7 +162,7 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
         <h2 className="text-xl font-semibold">Enrolled Students</h2>
         {enrolledStudents.length === 0 ? (
           <Card>
-            <CardContent className="py-6 text-sm text-muted-foreground">
+            <CardContent className="text-muted-foreground py-6 text-sm">
               No students are enrolled.
             </CardContent>
           </Card>
@@ -165,8 +173,9 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
                 <CardContent className="flex items-center justify-between gap-2 py-4">
                   <div>
                     <p className="font-medium">{enrollment.studentId}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Added {new Date(enrollment._creationTime).toLocaleString()}
+                    <p className="text-muted-foreground text-xs">
+                      Added{" "}
+                      {new Date(enrollment._creationTime).toLocaleString()}
                     </p>
                   </div>
                   <Button
@@ -200,9 +209,7 @@ export default function TeacherClassroomPage({
           <Card>
             <CardHeader>
               <CardTitle>Sign In Required</CardTitle>
-              <CardDescription>
-                Sign in to view this classroom.
-              </CardDescription>
+              <CardDescription>Sign in to view this classroom.</CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild>

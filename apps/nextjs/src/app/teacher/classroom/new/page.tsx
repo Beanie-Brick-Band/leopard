@@ -91,9 +91,7 @@ export default function NewClassroomPage() {
           <Card>
             <CardHeader>
               <CardTitle>Sign In Required</CardTitle>
-              <CardDescription>
-                Sign in to create a classroom.
-              </CardDescription>
+              <CardDescription>Sign in to create a classroom.</CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild>

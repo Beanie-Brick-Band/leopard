@@ -12,7 +12,11 @@ import {
 
 import StudentDashboard from "~/components/student-dashboard";
 import TeacherDashboard from "~/components/teacher-dashboard";
-import { fetchAuthMutation, fetchAuthQuery, isAuthenticated } from "~/lib/auth-server";
+import {
+  fetchAuthMutation,
+  fetchAuthQuery,
+  isAuthenticated,
+} from "~/lib/auth-server";
 
 async function getDashboardRole() {
   try {
@@ -32,9 +36,7 @@ export default async function Page() {
         <Card>
           <CardHeader>
             <CardTitle>Sign In Required</CardTitle>
-            <CardDescription>
-              Sign in to open your dashboard.
-            </CardDescription>
+            <CardDescription>Sign in to open your dashboard.</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild>
@@ -49,5 +51,9 @@ export default async function Page() {
   await fetchAuthMutation(api.web.user.ensureCurrentUserRole, {});
   const role = await getDashboardRole();
 
-  return <main>{role === "teacher" ? <TeacherDashboard /> : <StudentDashboard />}</main>;
+  return (
+    <main>
+      {role === "teacher" ? <TeacherDashboard /> : <StudentDashboard />}
+    </main>
+  );
 }

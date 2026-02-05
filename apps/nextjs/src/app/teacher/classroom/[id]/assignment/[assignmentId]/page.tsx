@@ -132,13 +132,22 @@ function AssignmentContent({
   assignmentId: Id<"assignments">;
 }) {
   const assignment = useQuery(api.web.assignment.getById, { id: assignmentId });
-  const submissions = useQuery(api.web.teacherAssignments.getSubmissionsByAssignment, {
-    assignmentId,
-  });
+  const submissions = useQuery(
+    api.web.teacherAssignments.getSubmissionsByAssignment,
+    {
+      assignmentId,
+    },
+  );
 
-  const updateAssignment = useMutation(api.web.teacherAssignments.updateAssignment);
-  const deleteAssignment = useMutation(api.web.teacherAssignments.deleteAssignment);
-  const gradeSubmission = useMutation(api.web.teacherAssignments.gradeSubmission);
+  const updateAssignment = useMutation(
+    api.web.teacherAssignments.updateAssignment,
+  );
+  const deleteAssignment = useMutation(
+    api.web.teacherAssignments.deleteAssignment,
+  );
+  const gradeSubmission = useMutation(
+    api.web.teacherAssignments.gradeSubmission,
+  );
   const provideSubmissionFeedback = useMutation(
     api.web.teacherAssignments.provideSubmissionFeedback,
   );
@@ -242,12 +251,12 @@ function AssignmentContent({
       <div className="space-y-2">
         <Link
           href={`/teacher/classroom/${classroomId}`}
-          className="text-sm text-muted-foreground underline"
+          className="text-muted-foreground text-sm underline"
         >
           Back to Classroom
         </Link>
         <h1 className="text-3xl font-bold">{assignment.name}</h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Release {new Date(assignment.releaseDate).toLocaleString()} • Due{" "}
           {new Date(assignment.dueDate).toLocaleString()}
         </p>
@@ -260,7 +269,10 @@ function AssignmentContent({
             <CardDescription>Edit assignment settings</CardDescription>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setIsEditing((value) => !value)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditing((value) => !value)}
+            >
               {isEditing ? "Cancel" : "Edit"}
             </Button>
             <Button
@@ -313,7 +325,10 @@ function AssignmentContent({
                   />
                 </div>
               </div>
-              <Button onClick={handleSaveAssignment} disabled={isSavingAssignment}>
+              <Button
+                onClick={handleSaveAssignment}
+                disabled={isSavingAssignment}
+              >
                 {isSavingAssignment ? "Saving..." : "Save Assignment"}
               </Button>
             </>
@@ -322,10 +337,10 @@ function AssignmentContent({
               <p className="text-sm whitespace-pre-wrap">
                 {assignment.description ?? "No description"}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Release {new Date(assignment.releaseDate).toLocaleString()}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Due {new Date(assignment.dueDate).toLocaleString()}
               </p>
             </>
@@ -343,7 +358,7 @@ function AssignmentContent({
           </div>
         ) : submissions.length === 0 ? (
           <Card>
-            <CardContent className="py-6 text-sm text-muted-foreground">
+            <CardContent className="text-muted-foreground py-6 text-sm">
               No submissions yet.
             </CardContent>
           </Card>
@@ -377,7 +392,9 @@ export default function TeacherAssignmentPage({
           <Card>
             <CardHeader>
               <CardTitle>Sign In Required</CardTitle>
-              <CardDescription>Sign in to view this assignment.</CardDescription>
+              <CardDescription>
+                Sign in to view this assignment.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild>

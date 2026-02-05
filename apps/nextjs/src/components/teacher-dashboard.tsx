@@ -60,14 +60,14 @@ export default function TeacherDashboard() {
               key={classroom._id}
               href={`/teacher/classroom/${classroom._id}`}
             >
-              <Card className="h-full transition-colors hover:border-primary">
+              <Card className="hover:border-primary h-full transition-colors">
                 <CardHeader>
                   <CardTitle>{classroom.className}</CardTitle>
                   <CardDescription>
                     Open classroom and manage assignments.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="text-sm text-muted-foreground">
+                <CardContent className="text-muted-foreground text-sm">
                   {classroom.assignments.length} assignment
                   {classroom.assignments.length === 1 ? "" : "s"} • Created{" "}
                   {new Date(classroom._creationTime).toLocaleDateString()}

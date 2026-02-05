@@ -13,7 +13,7 @@ function Header() {
           <Link href="/">Leopard IDE</Link>
         </h1>
         <Authenticated>
-          <nav className="flex items-center gap-3 text-sm text-muted-foreground">
+          <nav className="text-muted-foreground flex items-center gap-3 text-sm">
             <Link href="/app" className="hover:text-foreground">
               Dashboard
             </Link>

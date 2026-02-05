@@ -30,11 +30,15 @@ function formatDateForInput(timestamp: number) {
 
 function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
   const router = useRouter();
-  const createAssignment = useMutation(api.web.teacherAssignments.createAssignment);
+  const createAssignment = useMutation(
+    api.web.teacherAssignments.createAssignment,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [releaseDate, setReleaseDate] = useState(formatDateForInput(Date.now()));
+  const [releaseDate, setReleaseDate] = useState(
+    formatDateForInput(Date.now()),
+  );
   const [dueDate, setDueDate] = useState(
     formatDateForInput(Date.now() + 24 * 60 * 60 * 1000),
   );
@@ -63,7 +67,9 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
       });
 
       toast.success("Assignment created");
-      router.push(`/teacher/classroom/${classroomId}/assignment/${assignmentId}`);
+      router.push(
+        `/teacher/classroom/${classroomId}/assignment/${assignmentId}`,
+      );
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to create assignment",
