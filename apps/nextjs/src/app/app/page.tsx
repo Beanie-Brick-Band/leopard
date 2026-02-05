@@ -12,7 +12,7 @@ import {
 
 import StudentDashboard from "~/components/student-dashboard";
 import TeacherDashboard from "~/components/teacher-dashboard";
-import { fetchAuthQuery, isAuthenticated } from "~/lib/auth-server";
+import { fetchAuthMutation, fetchAuthQuery, isAuthenticated } from "~/lib/auth-server";
 
 async function getDashboardRole() {
   try {
@@ -46,6 +46,7 @@ export default async function Page() {
     );
   }
 
+  await fetchAuthMutation(api.web.user.ensureCurrentUserRole, {});
   const role = await getDashboardRole();
 
   return <main>{role === "teacher" ? <TeacherDashboard /> : <StudentDashboard />}</main>;
