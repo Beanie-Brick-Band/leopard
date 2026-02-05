@@ -5,6 +5,7 @@ import { ConvexHttpClient } from "convex/browser";
 import * as vscode from "vscode";
 
 import { api } from "@package/backend/convex/_generated/api";
+import { assert } from "@package/validators/assert";
 import * as WorkspaceEvents from "@package/validators/workspaceEvents";
 
 // This method is called when your extension is activated
@@ -19,7 +20,12 @@ export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("leopard");
   const convexUrl = config.get<string>("convexUrl") ?? "";
 
-  const batchedClient = new BatchedConvexHttpClient(convexUrl, channel, 1000);
+  const batchedClient = new BatchedConvexHttpClient(
+    convexUrl,
+    channel,
+    1000,
+    64,
+  );
 
   // Log configuration info
   channel.appendLine(`[INIT] Leopard extension activated`);
@@ -169,17 +175,57 @@ class BatchedConvexHttpClient {
     >
   >[1]["changes"];
   private channel: vscode.OutputChannel;
-  private debounceDelay: number;
+  private debounceDelayMs: number;
+  private maxBufferLength: number;
 
   constructor(
     convexUrl: string,
     channel: vscode.OutputChannel,
-    debounceDelay: number,
+    debounceDelayMs: number,
+    maxBufferLength: number,
   ) {
     this.client = new ConvexHttpClient(convexUrl);
     this.channel = channel;
-    this.debounceDelay = debounceDelay;
+    this.debounceDelayMs = debounceDelayMs;
     this.eventBuffer = [];
+    this.maxBufferLength = maxBufferLength;
+  }
+
+  private async sendEvents(
+    events: (typeof this.eventBuffer)[0][],
+    chunkNumber: number,
+    totalChunks: number,
+  ): Promise<boolean> {
+    assert(
+      events.length <= this.maxBufferLength,
+      `Events size ${events.length} exceeds maxBufferLength ${this.maxBufferLength}`,
+    );
+
+    try {
+      this.channel.appendLine(
+        `[${timestamp()}] SENDING: ${events.length} batched event(s) to Convex (chunk ${chunkNumber} of ${totalChunks})...`,
+      );
+
+      await this.client.mutation(api.api.extension.addBatchedChangesMutation, {
+        hostname: os.hostname(),
+        changes: events,
+      });
+
+      this.channel.appendLine(
+        `[${timestamp()}] SUCCESS: ${events.length} batched event(s) uploaded to Convex`,
+      );
+      return true;
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      this.channel.appendLine(
+        `[${timestamp()}] ERROR: Failed to upload batched events - ${errorMsg}`,
+      );
+      console.error(error);
+      vscode.window.showWarningMessage(
+        `Leopard: Failed to upload batched events - ${errorMsg}`,
+      );
+      return false;
+    }
   }
 
   private async submitEvents() {
@@ -192,27 +238,20 @@ class BatchedConvexHttpClient {
     const eventsToSend = [...this.eventBuffer];
     this.eventBuffer = [];
 
-    try {
-      this.channel.appendLine(
-        `[${timestamp()}] SENDING: ${eventsToSend.length} batched event(s) to Convex...`,
-      );
-      await this.client.mutation(api.api.extension.addBatchedChangesMutation, {
-        hostname: os.hostname(),
-        changes: eventsToSend,
-      });
-      this.channel.appendLine(
-        `[${timestamp()}] SUCCESS: ${eventsToSend.length} batched event(s) uploaded to Convex`,
-      );
-    } catch (error) {
-      this.eventBuffer.unshift(...eventsToSend);
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      this.channel.appendLine(
-        `[${timestamp()}] ERROR: Failed to upload batched events - ${errorMsg}`,
-      );
-      console.error(error);
-      vscode.window.showWarningMessage(
-        `Leopard: Failed to upload batched events - ${errorMsg}`,
-      );
+    const totalChunks = Math.ceil(eventsToSend.length / this.maxBufferLength);
+
+    // Send events in chunks of maxBufferLength to avoid overwhelming the server
+    for (let i = 0; i < eventsToSend.length; i += this.maxBufferLength) {
+      const chunk = eventsToSend.slice(i, i + this.maxBufferLength);
+      const chunkNumber = Math.floor(i / this.maxBufferLength) + 1;
+      const success = await this.sendEvents(chunk, chunkNumber, totalChunks);
+
+      if (!success) {
+        // Restore all remaining events since they weren't sent
+        const remainingEvents = eventsToSend.slice(i);
+        this.eventBuffer.unshift(...remainingEvents);
+        return;
+      }
     }
   }
 
@@ -227,7 +266,7 @@ class BatchedConvexHttpClient {
     }
     this.debouncer = setTimeout(() => {
       void this.submitEvents();
-    }, this.debounceDelay);
+    }, this.debounceDelayMs);
   }
 }
 
