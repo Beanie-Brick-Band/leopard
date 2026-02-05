@@ -1,9 +1,26 @@
+import Link from "next/link";
+
+import { Authenticated } from "~/lib/auth";
 import HeaderAuth from "./header-auth";
 
 function Header() {
   return (
     <header className="flex h-12 w-screen items-center justify-between border-b px-4 py-2">
-      <h1>Leopard IDE</h1>
+      <div className="flex items-center gap-6">
+        <h1 className="font-semibold">
+          <Link href="/">Leopard IDE</Link>
+        </h1>
+        <Authenticated>
+          <nav className="flex items-center gap-3 text-sm text-muted-foreground">
+            <Link href="/app" className="hover:text-foreground">
+              Student
+            </Link>
+            <Link href="/teacher" className="hover:text-foreground">
+              Teacher
+            </Link>
+          </nav>
+        </Authenticated>
+      </div>
       <HeaderAuth />
     </header>
   );
