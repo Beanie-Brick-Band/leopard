@@ -16,9 +16,11 @@ import { launchWorkspace } from "~/app/app/actions";
 function AssignmentItem({
   assignmentId,
   isLast = false,
+  isEnrolled,
 }: {
   assignmentId: Id<"assignments">;
   isLast?: boolean;
+  isEnrolled: boolean;
 }) {
   const assignment = useQuery(api.web.assignment.getById, { id: assignmentId });
   const [state, action, pending] = useActionState(
@@ -43,13 +45,15 @@ function AssignmentItem({
             Due: {new Date(assignment.dueDate).toLocaleDateString()}
           </div>
         </div>
-        <Button
-          onClick={() => {
-            startTransition(action);
-          }}
-        >
-          {pending ? <Spinner /> : "Launch Workspace"}
-        </Button>
+        {isEnrolled && (
+          <Button
+            onClick={() => {
+              startTransition(action);
+            }}
+          >
+            {pending ? <Spinner /> : "Launch Workspace"}
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -109,6 +113,7 @@ export default function StudentDashboard() {
                               key={assignmentId}
                               assignmentId={assignmentId}
                               isLast={index === classroom.assignments.length - 1}
+                              isEnrolled={true}
                             />
                           ))}
                         </div>
@@ -156,9 +161,15 @@ export default function StudentDashboard() {
                       <h4 className="text-muted-foreground text-sm font-medium">
                         Assignments:
                       </h4>
-                      <p className="text-muted-foreground text-sm">
-                        Enroll to view assignment details.
-                      </p>
+                      <div className="space-y-2">
+                        {classroom.assignments.map((assignmentId) => (
+                          <AssignmentItem
+                            key={assignmentId}
+                            assignmentId={assignmentId}
+                            isEnrolled={false}
+                          />
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
