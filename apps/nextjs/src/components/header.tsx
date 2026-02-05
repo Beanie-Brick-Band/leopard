@@ -15,10 +15,7 @@ function Header() {
         <Authenticated>
           <nav className="flex items-center gap-3 text-sm text-muted-foreground">
             <Link href="/app" className="hover:text-foreground">
-              Student
-            </Link>
-            <Link href="/teacher" className="hover:text-foreground">
-              Teacher
+              Dashboard
             </Link>
           </nav>
         </Authenticated>
