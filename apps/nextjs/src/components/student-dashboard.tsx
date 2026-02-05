@@ -112,7 +112,9 @@ export default function StudentDashboard() {
                             <AssignmentItem
                               key={assignmentId}
                               assignmentId={assignmentId}
-                              isLast={index === classroom.assignments.length - 1}
+                              isLast={
+                                index === classroom.assignments.length - 1
+                              }
                               isEnrolled={true}
                             />
                           ))}
@@ -128,59 +130,54 @@ export default function StudentDashboard() {
         )}
       </section>
 
-      {classroomsAvailableToEnroll && classroomsAvailableToEnroll.length > 0 && (
-        <section>
-          <h2 className="mb-6 text-2xl font-bold">Available Classrooms</h2>
-          <div className="space-y-6">
-            {classroomsAvailableToEnroll.map((classroom, index) => (
-              <div key={classroom._id}>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold">
-                        {classroom.className}
-                      </h3>
-                      <p className="text-muted-foreground text-sm">
-                        Available for enrollment
-                      </p>
+      {classroomsAvailableToEnroll &&
+        classroomsAvailableToEnroll.length > 0 && (
+          <section>
+            <h2 className="mb-6 text-2xl font-bold">Available Classrooms</h2>
+            <div className="space-y-6">
+              {classroomsAvailableToEnroll.map((classroom, index) => (
+                <div key={classroom._id}>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold">
+                          {classroom.className}
+                        </h3>
+                        <p className="text-muted-foreground text-sm">
+                          Available for enrollment
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="text-muted-foreground text-sm">
+                          {classroom.assignments.length} assignments
+                        </span>
+                        <Button
+                          onClick={() => handleEnroll(classroom._id)}
+                          size="sm"
+                        >
+                          Enroll
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-muted-foreground text-sm">
-                        {classroom.assignments.length} assignments
-                      </span>
-                      <Button
-                        onClick={() => handleEnroll(classroom._id)}
-                        size="sm"
-                      >
-                        Enroll
-                      </Button>
-                    </div>
-                  </div>
-                  {classroom.assignments.length > 0 && (
+                    {/* {classroom.assignments.length > 0 && (
                     <div className="ml-4 space-y-2">
                       <h4 className="text-muted-foreground text-sm font-medium">
                         Assignments:
                       </h4>
-                      <div className="space-y-2">
-                        {classroom.assignments.map((assignmentId) => (
-                          <AssignmentItem
-                            key={assignmentId}
-                            assignmentId={assignmentId}
-                            isEnrolled={false}
-                          />
-                        ))}
-                      </div>
+                      <p className="text-muted-foreground text-sm">
+                        Enroll to view assignment details.
+                      </p>
                     </div>
+                  )} */}
+                  </div>
+                  {index < classroomsAvailableToEnroll.length - 1 && (
+                    <Separator className="mt-6" />
                   )}
                 </div>
-                {index < classroomsAvailableToEnroll.length - 1 && (
-                  <Separator className="mt-6" />
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+              ))}
+            </div>
+          </section>
+        )}
     </div>
   );
 }
