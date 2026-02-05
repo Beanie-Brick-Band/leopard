@@ -1,4 +1,4 @@
-import { MutationCtx, QueryCtx } from "../_generated/server";
+import { mutation, MutationCtx, QueryCtx } from "../_generated/server";
 import { authComponent } from "../auth";
 
 type UserRole = "admin" | "student" | "teacher";
@@ -31,3 +31,26 @@ export async function requireTeacherOrAdmin(ctx: DbCtx, userId: string) {
     throw new Error("Only teachers can access this endpoint");
   }
 }
+
+export const ensureCurrentUserRole = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const authUser = await requireAuth(ctx);
+
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("uid", (q) => q.eq("uid", authUser._id))
+      .first();
+
+    if (existingUser) {
+      return existingUser.role;
+    }
+
+    await ctx.db.insert("users", {
+      uid: authUser._id,
+      role: "student",
+    });
+
+    return "student" as const;
+  },
+});
