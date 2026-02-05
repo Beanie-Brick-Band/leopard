@@ -148,9 +148,9 @@ export default function StudentDashboard() {
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
-                        <span className="text-muted-foreground text-sm">
+                        {/* <span className="text-muted-foreground text-sm">
                           {classroom.assignments.length} assignments
-                        </span>
+                        </span> */}
                         <Button
                           onClick={() => handleEnroll(classroom._id)}
                           size="sm"
