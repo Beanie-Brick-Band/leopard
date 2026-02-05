@@ -51,17 +51,8 @@ const ensureCanAccessAssignment = async (
   const role = await getUserRole(ctx, userId);
 
   if (role === "student") {
-    const relation = await ctx.db
-      .query("classroomStudentsRelations")
-      .withIndex("studentId_classroomId", (q) =>
-        q.eq("studentId", userId).eq("classroomId", classroom._id),
-      )
-      .first();
-
-    if (!relation) {
-      throw new Error("Not authorized to view this assignment");
-    }
-
+    // Temporary policy: allow all students to view assignment details,
+    // including classrooms they haven't enrolled in yet.
     return assignment;
   }
 
