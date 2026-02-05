@@ -22,7 +22,13 @@ export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("leopard");
   const convexUrl = config.get<string>("convexUrl") ?? "";
 
-  batchedClient = new BatchedConvexHttpClient(convexUrl, channel, 1000);
+  batchedClient = new BatchedConvexHttpClient(
+    convexUrl,
+    channel,
+    1000,
+    2000,
+    5,
+  );
 
   // Log configuration info
   channel.appendLine(`[INIT] Leopard extension activated`);
@@ -161,9 +167,9 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {
+export async function deactivate() {
   assert(batchedClient !== null, "Batched client is not initialized");
-  batchedClient.flush();
+  await batchedClient.flush();
 }
 
 class BatchedConvexHttpClient {
@@ -175,20 +181,74 @@ class BatchedConvexHttpClient {
     >
   >[1]["changes"];
   private channel: vscode.OutputChannel;
-  private debounceDelay: number;
+  private debounceDelayMs: number;
+  private retryDelayMs: number;
+  private maxRetries: number;
 
   constructor(
     convexUrl: string,
     channel: vscode.OutputChannel,
-    debounceDelay: number,
+    debounceDelayMs: number,
+    retryDelayMs: number,
+    maxRetries: number,
   ) {
     this.client = new ConvexHttpClient(convexUrl);
     this.channel = channel;
-    this.debounceDelay = debounceDelay;
+    this.debounceDelayMs = debounceDelayMs;
     this.eventBuffer = [];
+    this.retryDelayMs = retryDelayMs;
+    this.maxRetries = maxRetries;
   }
 
-  private async submitEvents() {
+  private async submitEventsOrRetryUntilMaxRetriesReached(
+    events: (typeof this.eventBuffer)[0][],
+  ): Promise<boolean> {
+    let error: unknown;
+
+    for (let retryCount = 0; retryCount < this.maxRetries; retryCount++) {
+      try {
+        if (retryCount > 0) {
+          this.channel.appendLine(
+            `[${Date.now()}] RETRY ${retryCount}/${this.maxRetries}: Retrying upload of ${events.length} batched event(s)...`,
+          );
+
+          // wait before retrying again to avoid overwhelming the connection
+          await sleep(this.retryDelayMs);
+        } else {
+          this.channel.appendLine(
+            `[${Date.now()}] SENDING: ${events.length} batched event(s) to Convex...`,
+          );
+        }
+
+        await this.client.mutation(
+          api.api.extension.addBatchedChangesMutation,
+          {
+            hostname: os.hostname(),
+            changes: events,
+          },
+        );
+
+        this.channel.appendLine(
+          `[${Date.now()}] SUCCESS: ${events.length} batched event(s) uploaded to Convex`,
+        );
+        return true;
+      } catch (e) {
+        error = e;
+      }
+    }
+
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    this.channel.appendLine(
+      `[${Date.now()}] ERROR: Failed to upload batched events after ${this.maxRetries} retries - ${errorMsg}`,
+    );
+    console.error(errorMsg);
+    vscode.window.showWarningMessage(
+      `Leopard: Failed to upload batched events after ${this.maxRetries} retries - ${errorMsg}`,
+    );
+    return false;
+  }
+
+  private async submitEventsOrRecoverToBuffer() {
     if (this.eventBuffer.length === 0) {
       return;
     }
@@ -198,29 +258,12 @@ class BatchedConvexHttpClient {
     const eventsToSend = [...this.eventBuffer];
     this.eventBuffer = [];
 
-    try {
-      this.channel.appendLine(
-        `[${Date.now()}] SENDING: ${eventsToSend.length} batched event(s) to Convex...`,
-      );
+    const success =
+      await this.submitEventsOrRetryUntilMaxRetriesReached(eventsToSend);
 
-      await this.client.mutation(api.api.extension.addBatchedChangesMutation, {
-        hostname: os.hostname(),
-        changes: eventsToSend,
-      });
-
-      this.channel.appendLine(
-        `[${Date.now()}] SUCCESS: ${eventsToSend.length} batched event(s) uploaded to Convex`,
-      );
-    } catch (error) {
+    if (!success) {
+      // Restore events since they weren't sent
       this.eventBuffer.unshift(...eventsToSend);
-
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      this.channel.appendLine(
-        `[${Date.now()}] ERROR: Failed to upload batched events - ${errorMsg}`,
-      );
-      vscode.window.showWarningMessage(
-        `Leopard: Failed to upload batched events - ${errorMsg}`,
-      );
     }
   }
 
@@ -234,15 +277,19 @@ class BatchedConvexHttpClient {
       clearTimeout(this.debouncer);
     }
     this.debouncer = setTimeout(() => {
-      void this.submitEvents();
-    }, this.debounceDelay);
+      void this.submitEventsOrRecoverToBuffer();
+    }, this.debounceDelayMs);
   }
 
-  public flush(): void {
+  public async flush() {
     if (this.debouncer) {
       clearTimeout(this.debouncer);
       this.debouncer = null;
     }
-    void this.submitEvents();
+    await this.submitEventsOrRecoverToBuffer();
   }
+}
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
