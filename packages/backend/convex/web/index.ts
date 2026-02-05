@@ -1,6 +1,3 @@
-import { formatISO } from "date-fns";
-
-import { Id } from "../_generated/dataModel";
 import { internalMutation } from "../_generated/server";
 
 export const createMock = internalMutation(async (ctx) => {
@@ -11,39 +8,57 @@ export const createMock = internalMutation(async (ctx) => {
     throw new Error("Mock data already exists");
   }
 
-  const assignment1Id = await ctx.db.insert("assignments", {
-    dueDate: formatISO(new Date(2030, 6, 30)), // July 30, 2030 - sometime in the future
-    name: "Sample Homework",
-  });
-
-  const assignment2Id = await ctx.db.insert("assignments", {
-    dueDate: formatISO(new Date(2030, 7, 15)), // August 15, 2030 - sometime in the future
-    name: "Sample Project",
-  });
-
-  const assignment3Id = await ctx.db.insert("assignments", {
-    dueDate: formatISO(new Date(2030, 8, 1)), // September 1, 2030 - sometime in the future
-    name: "MNIST CNN Exploration",
-  });
-
-  await ctx.db.insert("classrooms", {
-    assignments: [assignment1Id, assignment2Id],
+  const classroom1Id = await ctx.db.insert("classrooms", {
+    // assignments: [assignment1Id, assignment2Id],
+    assignments: [],
     className: "DSA 101",
     metadata: "{}",
     ownerId: "user_123", // sample user that does not exist
+    assistantIds: [],
   });
 
-  await ctx.db.insert("classrooms", {
-    assignments: [assignment3Id],
+  const classroom2Id = await ctx.db.insert("classrooms", {
+    assignments: [],
     className: "ML 102",
     metadata: "{}",
     ownerId: "user_456", // sample user that does not exist
+    assistantIds: [],
+  });
+
+
+  const assignment1Id = await ctx.db.insert("assignments", {
+    dueDate: 1911614400000, // July 30, 2030 - sometime in the future
+    name: "Sample Homework",
+    releaseDate: 1704067200000, // December 31, 2023 - in the past
+    classroomId: classroom1Id,
+  });
+  
+  const assignment2Id = await ctx.db.insert("assignments", {
+    dueDate: 1912996800000, // August 15, 2030 - sometime in the future
+    name: "Sample Project",
+    classroomId: classroom1Id,
+    releaseDate: 1704067200000, // December 31, 2023 - in the past
+  });
+
+  const assignment3Id = await ctx.db.insert("assignments", {
+    dueDate: 1914465600000, // September 1, 2030 - sometime in the future
+    name: "MNIST CNN Exploration",
+    classroomId: classroom2Id,
+    releaseDate: 1704067200000, // December 31, 2023 - in the past
   });
 
   const workspaceId = await ctx.db.insert("workspaces", {
     coderWorkspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
     isActive: true,
     userId: "user_123", // sample user that does not exist
+  });
+
+  // Update classrooms with assignments
+  await ctx.db.patch(classroom1Id, {
+    assignments: [assignment1Id, assignment2Id],
+  });
+  await ctx.db.patch(classroom2Id, {
+    assignments: [assignment3Id],
   });
 
   await Promise.all(
