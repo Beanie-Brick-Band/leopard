@@ -21,7 +21,8 @@
     "postinstall": "pnpm lint:ws",
     "test": "turbo run test --filter=!./apps/vscode-extension",
     "typecheck": "turbo run typecheck",
-    "ui-add": "turbo run ui-add"
+    "ui-add": "turbo run ui-add",
+    "sync-templates": "pnpm --filter @package/infra-sync sync"
   },
   "devDependencies": {
     "@package/prettier-config": "workspace:*",

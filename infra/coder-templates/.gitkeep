@@ -1,0 +1,9 @@
+# Coder Templates
+
+This directory contains Terraform templates synced from Coder.
+
+To sync templates, run:
+
+```bash
+pnpm sync:templates
+```
