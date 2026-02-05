@@ -11,7 +11,7 @@ export async function getUserRole(ctx: DbCtx, userId: string): Promise<UserRole>
     .first();
 
   if (!user) {
-    throw new Error("User role not found");
+    return "student";
   }
 
   return user.role;
@@ -31,4 +31,3 @@ export async function requireTeacherOrAdmin(ctx: DbCtx, userId: string) {
     throw new Error("Only teachers can access this endpoint");
   }
 }
-
