@@ -31,14 +31,14 @@ describe("insertText", () => {
   it("should insert multi-line text creating new lines", () => {
     const lines = `function test() {
   return true;
-}`.split("\n");
+    }`.split("\n");
     const position: TextDocumentPosition = { line: 1, column: 0 };
     insertText(lines, position, "    console.log('test');\n  ");
 
     expect(lines.join("\n")).toBe(`function test() {
     console.log('test');
     return true;
-}`);
+    }`);
   });
 
   it("should insert text on an empty line", () => {
@@ -79,6 +79,21 @@ end`);
   const y = 2 + 1;
   return x + y;
 }`);
+  });
+
+  it("should insert large chunks of text", () => {
+    const lines = `headerfooter`.split("\n");
+    const position: TextDocumentPosition = { line: 0, column: 6 };
+    const largeText = Array.from(
+      { length: 100 },
+      (_, i) => `line ${i + 1}`,
+    ).join("\n");
+    insertText(lines, position, largeText + "\n");
+
+    expect(lines.length).toBe(101);
+    expect(lines[0]).toBe("headerline 1");
+    expect(lines[1]).toBe("line 2");
+    expect(lines[100]).toBe("footer");
   });
 });
 
@@ -162,5 +177,57 @@ line5`);
     expect(lines.join("\n")).toBe(`function example() {
   const y;
 }`);
+  });
+});
+describe("switching files", () => {
+  it("should handle insertions and deletions across different files independently", () => {
+    const fileA = `line1
+line2
+line3`.split("\n");
+    const fileB = `alpha
+beta
+gamma`.split("\n");
+
+    // Insert into fileA
+    insertText(fileA, { line: 1, column: 5 }, " inserted");
+    expect(fileA.join("\n")).toBe(`line1
+line2 inserted
+line3`);
+
+    // Delete from fileB
+    deleteText(fileB, {
+      start: { line: 0, column: 0 },
+      end: { line: 1, column: 0 },
+    });
+    expect(fileB.join("\n")).toBe(`beta
+gamma`);
+  });
+  it("should handle switching back and forth across files", () => {
+    const fileX = `a
+b
+c`.split("\n");
+    const fileY = `1
+2
+3`.split("\n");
+    const fileZ = `foobar`.split("\n");
+
+    // Insert into fileX
+    insertText(fileX, { line: 2, column: 1 }, " insertedX");
+    expect(fileX.join("\n")).toBe(`a
+b
+c insertedX`);
+
+    // Insert into fileY
+    insertText(fileY, { line: 2, column: 2 }, " insertedY");
+    expect(fileY.join("\n")).toBe(`1
+2
+3 insertedY`);
+
+    // Delete from fileZ
+    deleteText(fileZ, {
+      start: { line: 0, column: 0 },
+      end: { line: 1, column: 3 },
+    });
+    expect(fileZ.join("\n")).toBe(``);
   });
 });
