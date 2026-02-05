@@ -11,6 +11,7 @@
 import type * as api_coder from "../api/coder.js";
 import type * as api_extension from "../api/extension.js";
 import type * as auth from "../auth.js";
+import type * as helpers_roles from "../helpers/roles.js";
 import type * as http from "../http.js";
 import type * as web_assignment from "../web/assignment.js";
 import type * as web_classroom from "../web/classroom.js";
@@ -28,6 +29,7 @@ declare const fullApi: ApiFromModules<{
   "api/coder": typeof api_coder;
   "api/extension": typeof api_extension;
   auth: typeof auth;
+  "helpers/roles": typeof helpers_roles;
   http: typeof http;
   "web/assignment": typeof web_assignment;
   "web/classroom": typeof web_classroom;
