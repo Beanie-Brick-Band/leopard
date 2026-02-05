@@ -14,16 +14,16 @@ import {
 } from "@package/coder-sdk";
 import { createClient } from "@package/coder-sdk/client";
 
+import type { Id } from "../_generated/dataModel";
 import { internal } from "../_generated/api";
 import {
   action,
   internalMutation,
   internalQuery,
-  QueryCtx,
   mutation,
   query,
+  QueryCtx,
 } from "../_generated/server";
-import type { Id } from "../_generated/dataModel";
 import { authComponent } from "../auth";
 import { getUserRole } from "../helpers/roles";
 
@@ -261,6 +261,7 @@ export const launchWorkspace = action({
         body: {
           name: `${args.assignmentId.toString()}`,
           template_id: templatesResp.data?.at(0)?.id,
+          ttl_ms: 3600000,
         },
         path: {
           user: coderUserId,
