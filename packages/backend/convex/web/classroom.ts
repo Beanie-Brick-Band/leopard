@@ -1,8 +1,18 @@
 import { getManyVia } from "convex-helpers/server/relationships";
 import { v } from "convex/values";
 
-import { mutation, query } from "../_generated/server";
+import { MutationCtx, mutation, QueryCtx, query } from "../_generated/server";
 import { authComponent } from "../auth";
+import { getUserRole } from "../helpers/roles";
+
+type DatabaseCtx = QueryCtx | MutationCtx;
+
+const requireStudentRole = async (ctx: DatabaseCtx, userId: string) => {
+  const role = await getUserRole(ctx, userId);
+  if (role !== "student") {
+    throw new Error("Only students can access classroom enrollment endpoints");
+  }
+};
 
 export const getEnrolled = query({
   args: {},
@@ -12,6 +22,8 @@ export const getEnrolled = query({
     if (!user) {
       return [];
     }
+
+    await requireStudentRole(ctx, user._id);
 
     // lookup classrooms via classroomStudentsRelations
     const classrooms = await getManyVia(
@@ -35,6 +47,8 @@ export const getAvailableToEnroll = query({
     if (!user) {
       return [];
     }
+
+    await requireStudentRole(ctx, user._id);
 
     // Get all classrooms
     const allClassrooms = await ctx.db.query("classrooms").collect();
@@ -72,6 +86,8 @@ export const enroll = mutation({
     if (!user) {
       throw new Error("User not authenticated");
     }
+
+    await requireStudentRole(ctx, user._id);
 
     // Check if already enrolled
     const existingRelation = await ctx.db

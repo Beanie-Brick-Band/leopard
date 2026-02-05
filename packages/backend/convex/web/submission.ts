@@ -1,10 +1,20 @@
 import { v } from "convex/values";
 
-import { mutation, query, QueryCtx } from "../_generated/server";
+import { MutationCtx, mutation, query, QueryCtx } from "../_generated/server";
 import { authComponent } from "../auth";
 import { Id } from "../_generated/dataModel";   
+import { getUserRole } from "../helpers/roles";
 
-const checkGraderAccess = async (uid: string,  ctx: QueryCtx, assignmentId: Id<"assignments">) => {
+type DatabaseCtx = QueryCtx | MutationCtx;
+
+const requireStudentRole = async (ctx: DatabaseCtx, userId: string) => {
+    const role = await getUserRole(ctx, userId);
+    if (role !== "student") {
+        throw new Error("Only students can submit and view their own submissions");
+    }
+}
+
+const checkGraderAccess = async (uid: string,  ctx: DatabaseCtx, assignmentId: Id<"assignments">) => {
     const assignment = await ctx.db.get(assignmentId);
     if (!assignment) {
         throw new Error("Assignment not found");
@@ -18,8 +28,8 @@ const checkGraderAccess = async (uid: string,  ctx: QueryCtx, assignmentId: Id<"
     }
 }
 
-const checkAuth = async (ctx: QueryCtx) => {
-    const user = await authComponent.getAuthUser(ctx);
+const checkAuth = async (ctx: DatabaseCtx) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) {
         throw new Error("Not authenticated");
     }
@@ -33,6 +43,7 @@ export const submitAssignment = mutation({
     },
     handler: async (ctx, args) => {
         const user = await checkAuth(ctx);
+        await requireStudentRole(ctx, user._id);
 
         // check assignment exists
         const assignment = await ctx.db.get(args.assignmentId);
@@ -139,6 +150,7 @@ export const getOwnSubmissionsForAssignment = query({
     },
     handler: async (ctx, args) => {
         const user = await checkAuth(ctx);
+        await requireStudentRole(ctx, user._id);
 
         const submission = await ctx.db
         .query("submissions")
@@ -184,5 +196,3 @@ export const getAllSubmissionsForAssignment = query({
         .collect();
         return submissions;
 }});
-
-
