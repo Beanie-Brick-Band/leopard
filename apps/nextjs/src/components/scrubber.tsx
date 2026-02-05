@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { clsx } from "clsx";
 import { useQuery } from "convex/react";
 import { Scrubber } from "react-scrubber";
 import ShikiHighlighter from "react-shiki";
@@ -11,14 +12,46 @@ import { api } from "@package/backend/convex/_generated/api";
 
 import "react-scrubber/lib/scrubber.css";
 
+// Helper function for detecting the language for syntax highlighting
+function getLanguageFromFilePath(filePath: string): string {
+  const ext = filePath.split(".").pop()?.toLowerCase() ?? "";
+  const languageMap: Record<string, string> = {
+    py: "python",
+    js: "javascript",
+    ts: "typescript",
+    tsx: "tsx",
+    jsx: "jsx",
+    java: "java",
+    cpp: "cpp",
+    c: "c",
+    cs: "csharp",
+    go: "go",
+    rs: "rust",
+    rb: "ruby",
+    php: "php",
+    swift: "swift",
+    kt: "kotlin",
+    md: "markdown",
+    json: "json",
+    yaml: "yaml",
+    yml: "yaml",
+    html: "html",
+    css: "css",
+    scss: "scss",
+    sql: "sql",
+    sh: "bash",
+    bash: "bash",
+  };
+  return languageMap[ext] ?? "plaintext";
+}
+
 export const TextReplayScrubberComponent: React.FC = () => {
   // TODO: FiX THIS TO BE PROPER REPLAY INSTEAD OF DEV OVERWRITE WORKSPACE
   const searchParams = useSearchParams();
 
   const workspaceId = (searchParams.get("workspaceId") ??
     "jx757hjx7ze0r9pgqnb7atp6eh80fyxc") as Id<"workspaces">;
-  // A list of line numbers and the character added. The line numbers have the line first, followed by the column.
-  // If the previous column is one greater than the current, that means that a character was deleted
+
   // TODO: implement workspace session retrieval flow
   const userTranscript = useQuery(api.web.replay.getReplay, {
     workspaceId: workspaceId,
@@ -28,7 +61,7 @@ export const TextReplayScrubberComponent: React.FC = () => {
   const STICK_THRESHOLD = 0.5; // while dragging, within this distance the cursor will "stick"
   const STICK_HYSTERESIS = 1.0; // distance to leave a marker once engaged
 
-  const markers = [30.7, 70.4];
+  const markers: number[] = [];
 
   const markerPositions = markers.map((m) => ({
     start: m - 0.3,
@@ -49,7 +82,7 @@ export const TextReplayScrubberComponent: React.FC = () => {
 
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Auto-play effect
+  // Autoplay effect
   useEffect(() => {
     if (!isPlaying) return;
 
@@ -59,7 +92,7 @@ export const TextReplayScrubberComponent: React.FC = () => {
           setIsPlaying(false);
           return s;
         }
-        // Advance by a small increment (adjust speed as needed)
+        // Advance by a small increment
         const newValue = Math.min(s.value + 0.5, 100);
         return { ...s, value: newValue };
       });
@@ -93,7 +126,7 @@ export const TextReplayScrubberComponent: React.FC = () => {
   };
 
   const handleScrubEnd = (value: number) => {
-    // On release, if within SNAP_RELEASE_THRESHOLD of a marker, snap to it.
+    // On release, if within SNAP_RELEASE_THRESHOLD of a marker, snap to that marker
     const found = nearestMarker(value);
     if (found && found.distance <= SNAP_RELEASE_THRESHOLD) {
       const markerValue = found.marker;
@@ -116,7 +149,7 @@ export const TextReplayScrubberComponent: React.FC = () => {
   };
 
   const handleScrubChange = (value: number) => {
-    // While scrubbing, if close enough to a marker, "stick" to it.
+    // While scrubbing, if close enough to a marker, "stick" to that marker
     setState((s) => {
       if (!s.isScrubbing) {
         return { ...s, value, state: "Scrub Change" };
@@ -154,12 +187,66 @@ export const TextReplayScrubberComponent: React.FC = () => {
   const eventsToReplay = Math.round((state.value / 100) * totalEvents);
   const displayedUserTranscript = userTranscript?.slice(0, eventsToReplay);
 
-  // Build the text progressively by replaying events
+  // Extract all unique file paths from the transcript
+  const allFilePaths = React.useMemo(() => {
+    const paths = new Set<string>();
+    userTranscript?.forEach((event) => {
+      event.metadata.contentChanges.forEach((change) => {
+        paths.add(change.filePath);
+      });
+    });
+    return Array.from(paths);
+  }, [userTranscript]);
+
+  // State that tracks the currently selected file
+  const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
+
+  // Set initial file when transcript loads
+  useEffect(() => {
+    if (!selectedFilePath && allFilePaths.length > 0) {
+      // TODO: fix cascading rendering issue ISSUE #193
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedFilePath(allFilePaths[0] ?? null);
+    }
+  }, [allFilePaths, selectedFilePath]);
+
+  // Automatically switch to file being edited at current replay position
+  useEffect(() => {
+    if (!displayedUserTranscript || displayedUserTranscript.length === 0)
+      return;
+
+    const lastEvent =
+      displayedUserTranscript[displayedUserTranscript.length - 1];
+    if (!lastEvent) return;
+
+    const lastChange =
+      lastEvent.metadata.contentChanges[
+        lastEvent.metadata.contentChanges.length - 1
+      ];
+    if (!lastChange) return;
+
+    // Switch to that file if it's different from the current selection
+    // only do so when the user is playing the replay, not when scrubbing
+    if (!isPlaying && !state.isScrubbing) return;
+
+    if (lastChange.filePath !== selectedFilePath) {
+      // TODO: fix cascading rendering issue ISSUE #193
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedFilePath(lastChange.filePath);
+    }
+  }, [displayedUserTranscript, selectedFilePath, isPlaying, state.isScrubbing]);
+
+  // Build the text progressively by replaying events for the selected file only
   const displayedOutputText = React.useMemo(() => {
+    if (!selectedFilePath) return "";
+
     const lines: string[] = [""];
 
     displayedUserTranscript?.forEach((event) => {
       event.metadata.contentChanges.forEach((change) => {
+        // Only apply changes for the currently selected file
+        if (change.filePath !== selectedFilePath) return;
+
         const isInsertion =
           change.range.start.line === change.range.end.line &&
           change.range.start.column === change.range.end.column;
@@ -167,7 +254,7 @@ export const TextReplayScrubberComponent: React.FC = () => {
         if (isInsertion) {
           insertText(lines, change.range.start, change.text);
         } else {
-          // Otherwise, is a replacement. A deletion is a replacement where change.text = ""
+          // A deletion is a replacement where change.text = ""
           deleteText(lines, change.range);
           insertText(lines, change.range.start, change.text);
         }
@@ -175,13 +262,63 @@ export const TextReplayScrubberComponent: React.FC = () => {
     });
 
     return lines.join("\n");
-  }, [displayedUserTranscript]);
+  }, [displayedUserTranscript, selectedFilePath]);
+
+  // Detect the language from the file path
+  const detectedLanguage = React.useMemo(
+    () =>
+      selectedFilePath
+        ? getLanguageFromFilePath(selectedFilePath)
+        : "plaintext",
+    [selectedFilePath],
+  );
+
+  const activeFileButtonRef = React.useRef<HTMLButtonElement>(null);
+
+  // Scroll the active file button into view when selection changes
+  React.useEffect(() => {
+    if (activeFileButtonRef.current) {
+      activeFileButtonRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  }, [selectedFilePath]);
 
   return (
     <div className="h-max w-full space-y-4">
+      {allFilePaths.length > 1 && (
+        <div className="flex gap-0 overflow-x-auto border border-gray-200 bg-gray-100 p-1 dark:border-gray-700 dark:bg-gray-900">
+          {allFilePaths.map((filePath, index) => {
+            const fileName = filePath.split("/").pop() ?? filePath;
+            const isActive = filePath === selectedFilePath;
+            return (
+              <button
+                key={filePath}
+                ref={isActive ? activeFileButtonRef : null}
+                onClick={() => setSelectedFilePath(filePath)}
+                className={clsx(
+                  "group relative shrink-0 px-4 py-2.5 text-sm font-normal transition-all duration-500 ease-in-out",
+                  isActive
+                    ? "bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+                    : "bg-transparent text-gray-600 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-800",
+                  index > 0 && "border-l border-gray-300 dark:border-gray-600",
+                )}
+                title={filePath}
+              >
+                <span className="block whitespace-nowrap transition-all duration-500 ease-in-out">
+                  {fileName}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       <div className="flex h-[75vh] flex-col-reverse overflow-y-auto rounded-md">
         <ShikiHighlighter
-          language="python"
+          language={detectedLanguage}
           className="w-full grow [&>pre]:h-full"
           theme={{
             light: "github-light",
