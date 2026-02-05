@@ -40,11 +40,17 @@ export const createMock = internalMutation(async (ctx) => {
     ownerId: "user_456", // sample user that does not exist
   });
 
+  const workspaceId = await ctx.db.insert("workspaces", {
+    coderWorkspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
+    isActive: true,
+    userId: "user_123", // sample user that does not exist
+  });
+
   await Promise.all(
     events.map((event) =>
       ctx.db.insert("events", {
         ...event,
-        workspaceId: event.workspaceId as Id<"workspaces">,
+        workspaceId,
       }),
     ),
   );
@@ -66,7 +72,6 @@ const events = [
       ],
     },
     timestamp: 1769638584411.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -83,7 +88,6 @@ const events = [
       ],
     },
     timestamp: 1769638583322.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -100,7 +104,6 @@ const events = [
       ],
     },
     timestamp: 1769638584081.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -117,7 +120,6 @@ const events = [
       ],
     },
     timestamp: 1769638583101.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -134,7 +136,6 @@ const events = [
       ],
     },
     timestamp: 1769638578000.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -151,7 +152,6 @@ const events = [
       ],
     },
     timestamp: 1769638590601.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -168,7 +168,6 @@ const events = [
       ],
     },
     timestamp: 1769638590410.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -185,7 +184,6 @@ const events = [
       ],
     },
     timestamp: 1769638624564.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -202,7 +200,6 @@ const events = [
       ],
     },
     timestamp: 1769638590246.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -219,7 +216,6 @@ const events = [
       ],
     },
     timestamp: 1769638584241.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -236,7 +232,6 @@ const events = [
       ],
     },
     timestamp: 1769638577954.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -253,7 +248,6 @@ const events = [
       ],
     },
     timestamp: 1769638590477.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -270,7 +264,6 @@ const events = [
       ],
     },
     timestamp: 1769638578079.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -287,7 +280,6 @@ const events = [
       ],
     },
     timestamp: 1769638588349.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -304,7 +296,6 @@ const events = [
       ],
     },
     timestamp: 1769638620218.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -321,7 +312,6 @@ const events = [
       ],
     },
     timestamp: 1769638583402.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -346,7 +336,6 @@ const events = [
       ],
     },
     timestamp: 1769638600190.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -363,7 +352,6 @@ const events = [
       ],
     },
     timestamp: 1769638619035.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -380,7 +368,6 @@ const events = [
       ],
     },
     timestamp: 1769638622957.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -405,7 +392,6 @@ const events = [
       ],
     },
     timestamp: 1769638598663.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -422,7 +408,6 @@ const events = [
       ],
     },
     timestamp: 1769638577793.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
   {
     eventType: "DID_CHANGE_TEXT_DOCUMENT",
@@ -439,6 +424,5 @@ const events = [
       ],
     },
     timestamp: 1769638583829.0,
-    workspaceId: "jx75g1jdes38h6v3bq54w7z2zn7z51kf",
   },
 ];
