@@ -3,6 +3,15 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
+import {
+  ArrowLeft,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Save,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import type { Doc, Id } from "@package/backend/convex/_generated/dataModel";
@@ -20,6 +29,8 @@ import { Label } from "@package/ui/label";
 import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
+import { Editor } from "~/components/editor";
+import { MarkdownViewer } from "~/components/markdown-viewer";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 
 function formatDateForInput(timestamp: number) {
@@ -71,11 +82,20 @@ function SubmissionCard({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{submission.studentId}</CardTitle>
-        <CardDescription>
-          Submitted {new Date(submission.submittedAt).toLocaleString()}
-        </CardDescription>
+      <CardHeader className="gap-1">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="text-base">{submission.studentId}</CardTitle>
+            <CardDescription>
+              Submitted {new Date(submission.submittedAt).toLocaleString()}
+            </CardDescription>
+          </div>
+          {submission.grade !== undefined && (
+            <div className="bg-primary text-primary-foreground rounded-full px-2.5 py-0.5 text-sm font-semibold">
+              {submission.grade}
+            </div>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
@@ -173,7 +193,7 @@ function AssignmentContent({
 
   if (assignment === undefined) {
     return (
-      <div className="flex min-h-[300px] items-center justify-center">
+      <div className="flex min-h-[400px] items-center justify-center">
         <Spinner />
       </div>
     );
@@ -181,6 +201,7 @@ function AssignmentContent({
 
   const handleSaveAssignment = async () => {
     setIsSavingAssignment(true);
+
     try {
       const parsedReleaseDate = Date.parse(releaseDate);
       const parsedDueDate = Date.parse(dueDate);
@@ -190,6 +211,9 @@ function AssignmentContent({
       }
       if (parsedDueDate <= parsedReleaseDate) {
         throw new Error("Due date must be after release date");
+      }
+      if (!name.trim()) {
+        throw new Error("Assignment name is required");
       }
 
       await updateAssignment({
@@ -246,134 +270,268 @@ function AssignmentContent({
     });
   };
 
+  const dueDateValue = new Date(assignment.dueDate);
+  const totalStudents = submissions?.length ?? 0;
+  const submittedCount = submissions?.length ?? 0;
+  const gradedCount =
+    submissions?.filter((submission) => submission.grade !== undefined)
+      .length ?? 0;
+
   return (
-    <div className="container mx-auto max-w-6xl space-y-6 p-6">
-      <div className="space-y-2">
+    <div className="container mx-auto p-6">
+      <div className="mb-4">
         <Link
           href={`/teacher/classroom/${classroomId}`}
-          className="text-muted-foreground text-sm underline"
+          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm transition-colors"
         >
+          <ArrowLeft className="h-4 w-4" />
           Back to Classroom
         </Link>
-        <h1 className="text-3xl font-bold">{assignment.name}</h1>
-        <p className="text-muted-foreground text-sm">
-          Release {new Date(assignment.releaseDate).toLocaleString()} • Due{" "}
-          {new Date(assignment.dueDate).toLocaleString()}
-        </p>
       </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-start justify-between gap-3">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-6">
           <div>
-            <CardTitle>Assignment Details</CardTitle>
-            <CardDescription>Edit assignment settings</CardDescription>
+            <h1 className="mb-2 text-3xl font-bold">{assignment.name}</h1>
+            <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-sm">
+              <span className="inline-flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                Due: {dueDateValue.toLocaleDateString()}
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                {dueDateValue.toLocaleTimeString()}
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                {submittedCount} / {totalStudents} submitted
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <CheckCircle2 className="h-4 w-4" />
+                {gradedCount} / {submittedCount} graded
+              </span>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsEditing((value) => !value)}
-            >
-              {isEditing ? "Cancel" : "Edit"}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteAssignment}
-              disabled={isDeletingAssignment}
-            >
-              {isDeletingAssignment ? "Deleting..." : "Delete"}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {isEditing ? (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="assignment-name">Name</Label>
-                <Input
-                  id="assignment-name"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="assignment-description">Description</Label>
-                <textarea
-                  id="assignment-description"
-                  rows={8}
-                  value={description}
-                  onChange={(event) => setDescription(event.target.value)}
-                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[160px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                />
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="assignment-release-date">Release Date</Label>
-                  <Input
-                    id="assignment-release-date"
-                    type="datetime-local"
-                    value={releaseDate}
-                    onChange={(event) => setReleaseDate(event.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="assignment-due-date">Due Date</Label>
-                  <Input
-                    id="assignment-due-date"
-                    type="datetime-local"
-                    value={dueDate}
-                    onChange={(event) => setDueDate(event.target.value)}
-                  />
-                </div>
-              </div>
-              <Button
-                onClick={handleSaveAssignment}
-                disabled={isSavingAssignment}
-              >
-                {isSavingAssignment ? "Saving..." : "Save Assignment"}
-              </Button>
-            </>
-          ) : (
-            <>
-              <p className="text-sm whitespace-pre-wrap">
-                {assignment.description ?? "No description"}
-              </p>
-              <p className="text-muted-foreground text-sm">
-                Release {new Date(assignment.releaseDate).toLocaleString()}
-              </p>
-              <p className="text-muted-foreground text-sm">
-                Due {new Date(assignment.dueDate).toLocaleString()}
-              </p>
-            </>
-          )}
-        </CardContent>
-      </Card>
 
-      <Separator />
+          <Separator />
 
-      <section className="space-y-3">
-        <h2 className="text-xl font-semibold">Submissions</h2>
-        {submissions === undefined ? (
-          <div className="flex min-h-[120px] items-center justify-center">
-            <Spinner />
-          </div>
-        ) : submissions.length === 0 ? (
           <Card>
-            <CardContent className="text-muted-foreground py-6 text-sm">
-              No submissions yet.
+            <CardHeader>
+              <CardTitle>Description</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isEditing ? (
+                <Editor
+                  content={description}
+                  onChange={setDescription}
+                  placeholder="Enter assignment description..."
+                />
+              ) : assignment.description ? (
+                <MarkdownViewer content={assignment.description} />
+              ) : (
+                <p className="text-muted-foreground text-sm">No description.</p>
+              )}
             </CardContent>
           </Card>
-        ) : (
-          <div className="space-y-3">
-            {submissions.map((submission) => (
-              <SubmissionCard
-                key={submission._id}
-                submission={submission}
-                onSave={handleSaveSubmission}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold">Submissions</h2>
+            {submissions === undefined ? (
+              <div className="flex min-h-[120px] items-center justify-center">
+                <Spinner />
+              </div>
+            ) : submissions.length === 0 ? (
+              <Card>
+                <CardContent className="text-muted-foreground py-10 text-center text-sm">
+                  No submissions yet from enrolled students.
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {submissions.map((submission) => (
+                  <SubmissionCard
+                    key={submission._id}
+                    submission={submission}
+                    onSave={handleSaveSubmission}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Assignment Settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {isEditing ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="assignment-name">Name</Label>
+                    <Input
+                      id="assignment-name"
+                      value={name}
+                      onChange={(event) => setName(event.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="assignment-release-date">
+                      Release Date
+                    </Label>
+                    <Input
+                      id="assignment-release-date"
+                      type="datetime-local"
+                      value={releaseDate}
+                      onChange={(event) => setReleaseDate(event.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="assignment-due-date">Due Date</Label>
+                    <Input
+                      id="assignment-due-date"
+                      type="datetime-local"
+                      value={dueDate}
+                      onChange={(event) => setDueDate(event.target.value)}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      className="flex-1"
+                      onClick={handleSaveAssignment}
+                      disabled={isSavingAssignment}
+                    >
+                      {isSavingAssignment ? (
+                        "Saving..."
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Save
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditing(false)}
+                      disabled={isSavingAssignment}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-muted-foreground text-xs uppercase">
+                        Name
+                      </p>
+                      <p className="font-medium">{assignment.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs uppercase">
+                        Due Date
+                      </p>
+                      <p className="font-medium">
+                        {new Date(assignment.dueDate).toLocaleString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs uppercase">
+                        Release Date
+                      </p>
+                      <p className="font-medium">
+                        {new Date(assignment.releaseDate).toLocaleString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs uppercase">
+                        Created
+                      </p>
+                      <p className="text-sm">
+                        {new Date(assignment._creationTime).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <Button onClick={() => setIsEditing(true)} className="w-full">
+                    Edit Assignment
+                  </Button>
+                  <Button
+                    onClick={handleDeleteAssignment}
+                    variant="destructive"
+                    className="w-full"
+                    disabled={isDeletingAssignment}
+                  >
+                    {isDeletingAssignment ? (
+                      "Deleting..."
+                    ) : (
+                      <>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Assignment
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Statistics</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground text-sm">
+                  Total Students
+                </span>
+                <span className="font-semibold">{totalStudents}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground text-sm">Submitted</span>
+                <span className="font-semibold">
+                  {submittedCount} (
+                  {totalStudents > 0
+                    ? Math.round((submittedCount / totalStudents) * 100)
+                    : 0}
+                  %)
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground text-sm">Graded</span>
+                <span className="font-semibold">
+                  {gradedCount} (
+                  {submittedCount > 0
+                    ? Math.round((gradedCount / submittedCount) * 100)
+                    : 0}
+                  %)
+                </span>
+              </div>
+              {gradedCount > 0 && submissions ? (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground text-sm">
+                    Avg Grade
+                  </span>
+                  <span className="font-semibold">
+                    {(
+                      submissions
+                        .filter((submission) => submission.grade !== undefined)
+                        .reduce(
+                          (sum, submission) => sum + (submission.grade ?? 0),
+                          0,
+                        ) / gradedCount
+                    ).toFixed(1)}
+                  </span>
+                </div>
+              ) : null}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
