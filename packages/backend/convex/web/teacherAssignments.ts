@@ -2,6 +2,7 @@ import { v } from "convex/values";
 
 import { mutation, query, QueryCtx, MutationCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
+import { authComponent } from "../auth";
 import { getUserRole, requireAuth, requireTeacherOrAdmin } from "./user";
 
 type DbCtx = QueryCtx | MutationCtx;
@@ -213,10 +214,27 @@ export const getSubmissionsByAssignment = query({
 
     await requireInstructorAccess(ctx, classroom._id, user._id);
 
-    return ctx.db
+    const submissions = await ctx.db
       .query("submissions")
       .withIndex("assignmentId_studentId", (q) => q.eq("assignmentId", assignment._id))
       .collect();
+
+    return Promise.all(
+      submissions.map(async (submission) => {
+        const authUser = await authComponent.getAnyUserById(ctx, submission.studentId);
+        const studentName =
+          (authUser?.name && authUser.name.trim()) ||
+          (authUser?.displayUsername && authUser.displayUsername.trim()) ||
+          (authUser?.username && authUser.username.trim()) ||
+          null;
+
+        return {
+          ...submission,
+          studentName,
+          studentEmail: authUser?.email ?? null,
+        };
+      }),
+    );
   },
 });
 
