@@ -1,15 +1,37 @@
-import * as assert from 'assert';
+import * as assert from "assert";
+import type { TestConvex } from "convex-test";
+import * as vscode from "vscode";
 
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
-import * as vscode from 'vscode';
-// import * as myExtension from '../../extension';
+import type schema from "@package/backend/convex/schema";
+import { internal } from "@package/backend/convex/_generated/api";
 
-suite('Extension Test Suite', () => {
-	vscode.window.showInformationMessage('Start all tests.');
+import { createMockClient, resetMockClient } from "../client";
+import { activate } from "../extension";
 
-	test('Sample test', () => {
-		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
-	});
+suite("Extension Test Suite", () => {
+  vscode.window.showInformationMessage("Start all tests.");
+
+  let mockClient: TestConvex<typeof schema> | null = null;
+
+  setup(async () => {
+    // Set up mock client using convex-test
+    mockClient = createMockClient();
+
+    await mockClient.mutation(internal.web.index.createMock, {});
+
+    // Activate the extension (this will trigger the initialization code)
+    const mockContext = {
+      subscriptions: [] as { dispose: () => void }[],
+    } as vscode.ExtensionContext;
+    activate(mockContext);
+  });
+
+  teardown(() => {
+    resetMockClient();
+  });
+
+  test("Sample test", () => {
+    assert.strictEqual(-1, [1, 2, 3].indexOf(5));
+    assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+  });
 });
