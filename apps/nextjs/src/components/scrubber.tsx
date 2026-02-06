@@ -45,17 +45,23 @@ function getLanguageFromFilePath(filePath: string): string {
   return languageMap[ext] ?? "plaintext";
 }
 
-export const TextReplayScrubberComponent: React.FC = () => {
-  // TODO: FiX THIS TO BE PROPER REPLAY INSTEAD OF DEV OVERWRITE WORKSPACE
+interface TextReplayScrubberProps {
+  workspaceId?: Id<"workspaces">;
+}
+
+export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
+  workspaceId,
+}) => {
   const searchParams = useSearchParams();
 
-  const workspaceId = (searchParams.get("workspaceId") ??
-    "jx757hjx7ze0r9pgqnb7atp6eh80fyxc") as Id<"workspaces">;
+  const selectedWorkspaceId = (workspaceId ??
+    searchParams.get("workspaceId")) as Id<"workspaces"> | null;
 
   // TODO: implement workspace session retrieval flow
-  const userTranscript = useQuery(api.web.replay.getReplay, {
-    workspaceId: workspaceId,
-  });
+  const userTranscript = useQuery(
+    api.web.replay.getReplay,
+    selectedWorkspaceId ? { workspaceId: selectedWorkspaceId } : "skip",
+  );
 
   const SNAP_RELEASE_THRESHOLD = 0.5; // when released within this distance, snap to marker
   const STICK_THRESHOLD = 0.5; // while dragging, within this distance the cursor will "stick"
@@ -286,10 +292,16 @@ export const TextReplayScrubberComponent: React.FC = () => {
     }
   }, [selectedFilePath]);
 
+  if (!selectedWorkspaceId) {
+    return (
+      <p className="text-muted-foreground text-sm">No workspace ID provided</p>
+    );
+  }
+
   return (
     <div className="h-max w-full space-y-4">
       {allFilePaths.length > 1 && (
-        <div className="flex gap-0 overflow-x-auto border border-gray-200 bg-gray-100 p-1 dark:border-gray-700 dark:bg-gray-900">
+        <div className="border-border bg-muted/30 flex gap-0 overflow-x-auto border p-1">
           {allFilePaths.map((filePath, index) => {
             const fileName = filePath.split("/").pop() ?? filePath;
             const isActive = filePath === selectedFilePath;
@@ -301,9 +313,9 @@ export const TextReplayScrubberComponent: React.FC = () => {
                 className={clsx(
                   "group relative shrink-0 px-4 py-2.5 text-sm font-normal transition-all duration-500 ease-in-out",
                   isActive
-                    ? "bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
-                    : "bg-transparent text-gray-600 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-800",
-                  index > 0 && "border-l border-gray-300 dark:border-gray-600",
+                    ? "bg-background text-foreground"
+                    : "text-muted-foreground hover:bg-muted bg-transparent",
+                  index > 0 && "border-border border-l",
                 )}
                 title={filePath}
               >
