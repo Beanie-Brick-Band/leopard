@@ -93,6 +93,21 @@ export const getByIds = query({
   },
 });
 
+export const getMyActiveWorkspace = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    return ctx.db
+      .query("workspaces")
+      .withIndex("userId_isActive", (q) => q.eq("userId", user._id).eq("isActive", true))
+      .first();
+  },
+});
+
 export const setUserActiveWorkspace = internalMutation({
   args: {
     userId: v.string(),
