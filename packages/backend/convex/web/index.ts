@@ -1,4 +1,6 @@
-import { internalMutation } from "../_generated/server";
+import { v } from "convex/values";
+
+import { internalMutation, internalQuery } from "../_generated/server";
 
 export const createMock = internalMutation(async (ctx) => {
   if (
@@ -25,14 +27,13 @@ export const createMock = internalMutation(async (ctx) => {
     assistantIds: [],
   });
 
-
   const assignment1Id = await ctx.db.insert("assignments", {
     dueDate: 1911614400000, // July 30, 2030 - sometime in the future
     name: "Sample Homework",
     releaseDate: 1704067200000, // December 31, 2023 - in the past
     classroomId: classroom1Id,
   });
-  
+
   const assignment2Id = await ctx.db.insert("assignments", {
     dueDate: 1912996800000, // August 15, 2030 - sometime in the future
     name: "Sample Project",
@@ -71,6 +72,20 @@ export const createMock = internalMutation(async (ctx) => {
       }),
     ),
   );
+});
+
+export const getWorkspaceByCoderWorkspaceId = internalQuery({
+  args: { coderWorkspaceId: v.string() },
+  handler: async (ctx, args) => {
+    const workspace = await ctx.db
+      .query("workspaces")
+      .withIndex("coderWorkspaceId", (q) =>
+        q.eq("coderWorkspaceId", args.coderWorkspaceId),
+      )
+      .first();
+
+    return workspace?._id ?? null;
+  },
 });
 
 const events = [
