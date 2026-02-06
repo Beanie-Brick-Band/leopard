@@ -130,23 +130,40 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-3 md:grid-cols-2">
-            {assignments.map((assignment) => (
-              <Link
-                key={assignment._id}
-                href={`/teacher/classroom/${classroomId}/assignment/${assignment._id}`}
-              >
-                <Card className="h-full transition-colors hover:border-primary">
-                  <CardHeader>
-                    <CardTitle>{assignment.name}</CardTitle>
-                    <CardDescription>
-                      Due {new Date(assignment.dueDate).toLocaleString()}
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] text-sm">
+                  <thead className="bg-muted/40">
+                    <tr className="border-b">
+                      <th className="px-4 py-3 text-left font-medium">Assignment</th>
+                      <th className="px-4 py-3 text-left font-medium">Due</th>
+                      <th className="px-4 py-3 text-right font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {assignments.map((assignment) => (
+                      <tr key={assignment._id} className="border-b last:border-b-0">
+                        <td className="px-4 py-3 align-top font-medium">{assignment.name}</td>
+                        <td className="px-4 py-3 align-top text-muted-foreground">
+                          {new Date(assignment.dueDate).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-right align-top">
+                          <Button asChild variant="outline">
+                            <Link
+                              href={`/teacher/classroom/${classroomId}/assignment/${assignment._id}`}
+                            >
+                              Open
+                            </Link>
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </section>
 
@@ -159,26 +176,52 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-2">
-            {enrolledStudents.map((enrollment) => (
-              <Card key={enrollment._id}>
-                <CardContent className="flex items-center justify-between gap-2 py-4">
-                  <div>
-                    <p className="font-medium">{enrollment.studentId}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Added {new Date(enrollment._creationTime).toLocaleString()}
-                    </p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleRemoveStudent(enrollment.studentId)}
-                  >
-                    Remove
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] text-sm">
+                  <thead className="bg-muted/40">
+                    <tr className="border-b">
+                      <th className="px-4 py-3 text-left font-medium">Student</th>
+                      <th className="px-4 py-3 text-left font-medium">Email</th>
+                      <th className="px-4 py-3 text-left font-medium">Joined</th>
+                      <th className="px-4 py-3 text-right font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {enrolledStudents.map((enrollment) => (
+                      <tr key={enrollment._id} className="border-b last:border-b-0">
+                        <td className="px-4 py-3 align-top">
+                          <p className="font-medium">
+                            {enrollment.studentName ??
+                              enrollment.studentEmail?.split("@")[0] ??
+                              "Unnamed student"}
+                          </p>
+                          <p className="text-xs font-mono text-muted-foreground">
+                            {enrollment.studentId}
+                          </p>
+                        </td>
+                        <td className="px-4 py-3 align-top text-muted-foreground">
+                          {enrollment.studentEmail ?? "No email available"}
+                        </td>
+                        <td className="px-4 py-3 align-top text-muted-foreground">
+                          {new Date(enrollment._creationTime).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-right align-top">
+                          <Button
+                            variant="outline"
+                            onClick={() => handleRemoveStudent(enrollment.studentId)}
+                          >
+                            Remove
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </section>
     </div>
