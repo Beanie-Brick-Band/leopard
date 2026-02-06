@@ -45,16 +45,23 @@ function getLanguageFromFilePath(filePath: string): string {
   return languageMap[ext] ?? "plaintext";
 }
 
-export const TextReplayScrubberComponent: React.FC = () => {
+interface TextReplayScrubberProps {
+  workspaceId?: Id<"workspaces">;
+}
+
+export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
+  workspaceId,
+}) => {
   // TODO: FiX THIS TO BE PROPER REPLAY INSTEAD OF DEV OVERWRITE WORKSPACE
   const searchParams = useSearchParams();
 
-  const workspaceId = (searchParams.get("workspaceId") ??
+  const selectedWorkspaceId = (workspaceId ??
+    searchParams.get("workspaceId") ??
     "jx757hjx7ze0r9pgqnb7atp6eh80fyxc") as Id<"workspaces">;
 
   // TODO: implement workspace session retrieval flow
   const userTranscript = useQuery(api.web.replay.getReplay, {
-    workspaceId: workspaceId,
+    workspaceId: selectedWorkspaceId,
   });
 
   const SNAP_RELEASE_THRESHOLD = 0.5; // when released within this distance, snap to marker
