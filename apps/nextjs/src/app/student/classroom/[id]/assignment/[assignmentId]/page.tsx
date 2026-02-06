@@ -1,11 +1,18 @@
 "use client";
 
-import { startTransition, use, useActionState, useEffect } from "react";
+import {
+  startTransition,
+  use,
+  useActionState,
+  useEffect,
+  useState,
+} from "react";
 import Link from "next/link";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { ArrowLeft, Calendar, CheckCircle2, Clock } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
 import { api } from "@package/backend/convex/_generated/api";
@@ -31,12 +38,16 @@ function Content({
   assignmentId: Id<"assignments">;
 }) {
   const assignment = useQuery(api.web.assignment.getById, { id: assignmentId });
+  const activeWorkspace = useQuery(api.web.assignment.getMyActiveWorkspace);
   const submissionResult = useQuery(
     api.web.submission.getOwnSubmissionsForAssignment,
     {
       assignmentId,
     },
   );
+  const submitAssignment = useMutation(api.web.submission.submitAssignment);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitConfirmOpen, setIsSubmitConfirmOpen] = useState(false);
 
   const [workspaceUrl, launchAction, isLaunching] = useActionState(
     () => launchWorkspace(assignmentId),
@@ -68,6 +79,44 @@ function Content({
   const gradedAt =
     submission && "gradedAt" in submission ? submission.gradedAt : undefined;
   const submittedAt = submission?.submittedAt;
+  const isPastDue = Date.now() > assignment.dueDate;
+
+  const handleSubmit = async () => {
+    if (!activeWorkspace) {
+      toast.error("Launch your workspace first before submitting.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await submitAssignment({
+        assignmentId,
+        workspaceId: activeWorkspace._id,
+      });
+      toast.success(
+        hasSubmission ? "Assignment re-submitted." : "Assignment submitted.",
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to submit assignment",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openSubmitConfirm = () => {
+    setIsSubmitConfirmOpen(true);
+  };
+
+  const closeSubmitConfirm = () => {
+    setIsSubmitConfirmOpen(false);
+  };
+
+  const confirmSubmit = async () => {
+    setIsSubmitConfirmOpen(false);
+    await handleSubmit();
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -186,19 +235,86 @@ function Content({
                 </span>
               </div>
               <Separator />
-              <Button
-                className="w-full"
-                onClick={() => {
-                  startTransition(launchAction);
-                }}
-                disabled={isLaunching}
-              >
-                {isLaunching ? "Launching..." : "Launch Workspace"}
-              </Button>
+              {!hasSubmission ? (
+                <>
+                  <Button
+                    className="w-full"
+                    onClick={openSubmitConfirm}
+                    disabled={
+                      isSubmitting ||
+                      isPastDue ||
+                      activeWorkspace === undefined ||
+                      activeWorkspace === null
+                    }
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit Assignment"}
+                  </Button>
+                  <Button
+                    className="w-full"
+                    onClick={() => {
+                      startTransition(launchAction);
+                    }}
+                    disabled={isLaunching}
+                  >
+                    {isLaunching ? "Launching..." : "Launch Workspace"}
+                  </Button>
+                  {activeWorkspace === undefined ? (
+                    <p className="text-muted-foreground text-xs">
+                      Checking active workspace...
+                    </p>
+                  ) : activeWorkspace === null ? (
+                    <p className="text-muted-foreground text-xs">
+                      Launch a workspace before submitting.
+                    </p>
+                  ) : isPastDue ? (
+                    <p className="text-muted-foreground text-xs">
+                      This assignment is past due.
+                    </p>
+                  ) : (
+                    <p className="text-muted-foreground text-xs">
+                      Submission uses your currently active workspace.
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p className="text-muted-foreground text-xs">
+                  Assignment submitted and awaiting grading.
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {isSubmitConfirmOpen && !hasSubmission ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Submit Assignment?</CardTitle>
+              <CardDescription>
+                This action is irreversible. You will not be able to submit
+                again or relaunch this workspace after submission.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={closeSubmitConfirm}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmSubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Confirm Submit"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      ) : null}
     </div>
   );
 }
