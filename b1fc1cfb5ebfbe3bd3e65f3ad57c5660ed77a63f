@@ -1,0 +1,23 @@
+apps/nextjs/src/components/editor.tsx
+  0b76bbd46b0db32f 186-187
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "b1fc1cfb5ebfbe3bd3e65f3ad57c5660ed77a63f",
+  "prompts": {
+    "0b76bbd46b0db32f": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3cf5fefa9ffe1UnE42hJ0Wivuc",
+        "model": "vercel/anthropic/claude-sonnet-4.5"
+      },
+      "human_author": "Krish120003 <krish120003@gmail.com>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 1,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
