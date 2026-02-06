@@ -1,9 +1,11 @@
 "use client";
 
+import type { FormEvent } from "react";
 import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
+import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
@@ -20,6 +22,7 @@ import { Input } from "@package/ui/input";
 import { Label } from "@package/ui/label";
 import { Spinner } from "@package/ui/spinner";
 
+import { Editor } from "~/components/editor";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 
 function formatDateForInput(timestamp: number) {
@@ -31,6 +34,7 @@ function formatDateForInput(timestamp: number) {
 function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
   const router = useRouter();
   const createAssignment = useMutation(api.web.teacherAssignments.createAssignment);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -39,7 +43,7 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
     formatDateForInput(Date.now() + 24 * 60 * 60 * 1000),
   );
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
 
@@ -52,6 +56,9 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
       }
       if (parsedDueDate <= parsedReleaseDate) {
         throw new Error("Due date must be after release date");
+      }
+      if (!name.trim()) {
+        throw new Error("Assignment name is required");
       }
 
       const assignmentId = await createAssignment({
@@ -74,20 +81,28 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
   };
 
   return (
-    <div className="container mx-auto max-w-3xl p-6">
+    <div className="container mx-auto max-w-3xl space-y-6 p-6">
+      <Link
+        href={`/teacher/classroom/${classroomId}`}
+        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm transition-colors"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Classroom
+      </Link>
+
       <Card>
         <CardHeader>
           <CardTitle>Create Assignment</CardTitle>
           <CardDescription>
-            Create a new assignment for this classroom.
+            Set up assignment details and instructions for students.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="assignment-name">Name</Label>
               <Input
-                id="name"
+                id="assignment-name"
                 required
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -96,22 +111,19 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <textarea
-                id="description"
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                rows={8}
-                placeholder="Assignment instructions"
-                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[160px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              <Label htmlFor="assignment-description">Description</Label>
+              <Editor
+                content={description}
+                onChange={setDescription}
+                placeholder="Describe the assignment objectives and requirements..."
               />
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="releaseDate">Release Date</Label>
+                <Label htmlFor="release-date">Release Date</Label>
                 <Input
-                  id="releaseDate"
+                  id="release-date"
                   type="datetime-local"
                   required
                   value={releaseDate}
@@ -119,9 +131,9 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="dueDate">Due Date</Label>
+                <Label htmlFor="due-date">Due Date</Label>
                 <Input
-                  id="dueDate"
+                  id="due-date"
                   type="datetime-local"
                   required
                   value={dueDate}
