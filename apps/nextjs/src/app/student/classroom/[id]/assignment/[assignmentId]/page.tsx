@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { ArrowLeft, Calendar, CheckCircle2, Clock } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
 import { api } from "@package/backend/convex/_generated/api";
@@ -113,7 +114,9 @@ function Content({
             <CardContent>
               {assignment.description ? (
                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <ReactMarkdown>{assignment.description}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {assignment.description}
+                  </ReactMarkdown>
                 </div>
               ) : (
                 <p className="text-muted-foreground text-sm">

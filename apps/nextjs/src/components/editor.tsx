@@ -3,6 +3,7 @@
 import type { Editor as TiptapEditor } from "@tiptap/react";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Placeholder from "@tiptap/extension-placeholder";
+import { Markdown } from "@tiptap/markdown";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { common, createLowlight } from "lowlight";
@@ -18,7 +19,6 @@ import {
   Redo,
   Undo,
 } from "lucide-react";
-import { Markdown } from "tiptap-markdown";
 
 import { cn } from "@package/ui";
 import { Button } from "@package/ui/button";
@@ -170,20 +170,17 @@ export function Editor({
       CodeBlockLowlight.configure({
         lowlight,
       }),
-      Markdown.configure({
-        html: true,
-        transformPastedText: true,
-        transformCopiedText: true,
-      }),
+      Markdown,
       Placeholder.configure({
         placeholder: placeholder ?? "Start writing...",
       }),
     ],
     content,
+    contentType: "markdown",
     editable,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      onChange(editor.getMarkdown());
     },
     editorProps: {
       attributes: {
