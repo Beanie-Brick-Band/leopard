@@ -1,9 +1,9 @@
 "use client";
 
+import type { Editor as TiptapEditor } from "@tiptap/react";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
-import type { Editor as TiptapEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { common, createLowlight } from "lowlight";
 import {
@@ -183,7 +183,8 @@ export function Editor({
     editable,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      // @ts-expect-error - markdown storage is added by tiptap-markdown extension
+      onChange(editor.storage.markdown.getMarkdown());
     },
     editorProps: {
       attributes: {
