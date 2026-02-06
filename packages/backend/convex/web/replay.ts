@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
 
 import * as WorkspaceEvents from "@package/validators/workspaceEvents";
 
@@ -39,7 +40,11 @@ export const getReplays = query({
 });
 
 export const getReplay = query({
-  args: { workspaceId: v.id("workspaces") },
+  args: {
+    workspaceId: v.id("workspaces"),
+    endTimestamp: v.number(),
+    paginationOpts: paginationOptsValidator,
+  },
   handler: async (ctx, args) => {
     // TODO get auth to work
     // const auth = authComponent.getAuthUser(ctx);
@@ -50,13 +55,60 @@ export const getReplay = query({
     const events = await ctx.db
       .query("events")
       .withIndex("workspaceId_timestamp", (q) =>
-        q.eq("workspaceId", args.workspaceId),
+        q.eq("workspaceId", args.workspaceId).lte("timestamp", args.endTimestamp),
       )
       .order("asc")
-      .collect();
+      .paginate(args.paginationOpts);
 
-    return events.map((event) =>
-      WorkspaceEvents.DidChangeTextDocument.parse(event),
-    );
+    return {
+      ...events,
+      page: events.page.flatMap((event) => {
+        const parsed = WorkspaceEvents.DidChangeTextDocument.safeParse(event);
+        if (!parsed.success) return [];
+
+        return [
+          {
+            timestamp: parsed.data.timestamp,
+            contentChanges: parsed.data.metadata.contentChanges,
+          },
+        ];
+      }),
+    };
+  },
+});
+
+export const getReplayBounds = query({
+  args: {
+    workspaceId: v.id("workspaces"),
+    asOfTimestamp: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const firstEvent = await ctx.db
+      .query("events")
+      .withIndex("workspaceId_timestamp", (q) =>
+        q.eq("workspaceId", args.workspaceId).lte("timestamp", args.asOfTimestamp),
+      )
+      .order("asc")
+      .first();
+
+    const lastEvent = await ctx.db
+      .query("events")
+      .withIndex("workspaceId_timestamp", (q) =>
+        q.eq("workspaceId", args.workspaceId).lte("timestamp", args.asOfTimestamp),
+      )
+      .order("desc")
+      .first();
+
+    if (!firstEvent || !lastEvent) {
+      return {
+        startTimestamp: null,
+        endTimestamp: null,
+      };
+    }
+
+    return {
+      startTimestamp: firstEvent.timestamp,
+      endTimestamp: lastEvent.timestamp,
+    };
   },
 });

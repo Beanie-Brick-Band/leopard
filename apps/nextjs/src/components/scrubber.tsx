@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { clsx } from "clsx";
-import { useQuery } from "convex/react";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import { Scrubber } from "react-scrubber";
 import ShikiHighlighter from "react-shiki";
 
@@ -11,6 +11,20 @@ import type { Id } from "@package/backend/convex/_generated/dataModel";
 import { api } from "@package/backend/convex/_generated/api";
 
 import "react-scrubber/lib/scrubber.css";
+
+interface ReplayContentChange {
+  range: Range;
+  text: string;
+  filePath: string;
+}
+
+interface ReplayEvent {
+  timestamp: number;
+  contentChanges: ReplayContentChange[];
+}
+
+const INITIAL_PAGE_SIZE = 10;
+const PAGE_LOAD_SIZE = 10;
 
 // Helper function for detecting the language for syntax highlighting
 function getLanguageFromFilePath(filePath: string): string {
@@ -52,10 +66,22 @@ export const TextReplayScrubberComponent: React.FC = () => {
   const workspaceId = (searchParams.get("workspaceId") ??
     "jx757hjx7ze0r9pgqnb7atp6eh80fyxc") as Id<"workspaces">;
 
-  // TODO: implement workspace session retrieval flow
-  const userTranscript = useQuery(api.web.replay.getReplay, {
-    workspaceId: workspaceId,
+  const [snapshotAsOfTimestamp] = React.useState(() => Date.now());
+  const replayBounds = useQuery(api.web.replay.getReplayBounds, {
+    workspaceId,
+    asOfTimestamp: snapshotAsOfTimestamp,
   });
+  const snapshotEndTimestamp = replayBounds?.endTimestamp ?? 0;
+
+  const {
+    results: userTranscript,
+    status: paginationStatus,
+    loadMore,
+  } = usePaginatedQuery(
+    api.web.replay.getReplay,
+    { workspaceId, endTimestamp: snapshotEndTimestamp },
+    { initialNumItems: INITIAL_PAGE_SIZE },
+  );
 
   const SNAP_RELEASE_THRESHOLD = 0.5; // when released within this distance, snap to marker
   const STICK_THRESHOLD = 0.5; // while dragging, within this distance the cursor will "stick"
@@ -182,16 +208,40 @@ export const TextReplayScrubberComponent: React.FC = () => {
     });
   };
 
-  // Calculate how many events to replay based on scrubber position
-  const totalEvents = userTranscript?.length ?? 0;
-  const eventsToReplay = Math.round((state.value / 100) * totalEvents);
-  const displayedUserTranscript = userTranscript?.slice(0, eventsToReplay);
+  // Replay position is mapped to a fixed snapshot time range.
+  const targetTimestamp = React.useMemo(() => {
+    const startTimestamp = replayBounds?.startTimestamp;
+    const endTimestamp = replayBounds?.endTimestamp;
+
+    if (startTimestamp == null || endTimestamp == null) return null;
+
+    const replayDuration = Math.max(0, endTimestamp - startTimestamp);
+    return startTimestamp + Math.round((state.value / 100) * replayDuration);
+  }, [replayBounds?.endTimestamp, replayBounds?.startTimestamp, state.value]);
+
+  const displayedUserTranscript = React.useMemo(() => {
+    if (targetTimestamp == null) return [] as ReplayEvent[];
+    return userTranscript.filter((event) => event.timestamp <= targetTimestamp);
+  }, [targetTimestamp, userTranscript]);
+
+  const loadedEndTimestamp =
+    userTranscript.length > 0
+      ? (userTranscript[userTranscript.length - 1]?.timestamp ?? null)
+      : null;
+
+  useEffect(() => {
+    if (targetTimestamp == null) return;
+    if (paginationStatus !== "CanLoadMore") return;
+    if (loadedEndTimestamp == null || loadedEndTimestamp < targetTimestamp) {
+      loadMore(PAGE_LOAD_SIZE);
+    }
+  }, [loadedEndTimestamp, loadMore, paginationStatus, targetTimestamp]);
 
   // Extract all unique file paths from the transcript
   const allFilePaths = React.useMemo(() => {
     const paths = new Set<string>();
-    userTranscript?.forEach((event) => {
-      event.metadata.contentChanges.forEach((change) => {
+    userTranscript.forEach((event) => {
+      event.contentChanges.forEach((change) => {
         paths.add(change.filePath);
       });
     });
@@ -212,17 +262,14 @@ export const TextReplayScrubberComponent: React.FC = () => {
 
   // Automatically switch to file being edited at current replay position
   useEffect(() => {
-    if (!displayedUserTranscript || displayedUserTranscript.length === 0)
-      return;
+    if (displayedUserTranscript.length === 0) return;
 
     const lastEvent =
       displayedUserTranscript[displayedUserTranscript.length - 1];
     if (!lastEvent) return;
 
     const lastChange =
-      lastEvent.metadata.contentChanges[
-        lastEvent.metadata.contentChanges.length - 1
-      ];
+      lastEvent.contentChanges[lastEvent.contentChanges.length - 1];
     if (!lastChange) return;
 
     // Switch to that file if it's different from the current selection
@@ -242,8 +289,8 @@ export const TextReplayScrubberComponent: React.FC = () => {
 
     const lines: string[] = [""];
 
-    displayedUserTranscript?.forEach((event) => {
-      event.metadata.contentChanges.forEach((change) => {
+    displayedUserTranscript.forEach((event) => {
+      event.contentChanges.forEach((change) => {
         // Only apply changes for the currently selected file
         if (change.filePath !== selectedFilePath) return;
 
