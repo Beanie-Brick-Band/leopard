@@ -5,7 +5,7 @@ import * as vscode from "vscode";
 import type schema from "@package/backend/convex/schema";
 import { internal } from "@package/backend/convex/_generated/api";
 
-import { createMockClient, resetMockClient } from "../client";
+import { createMockClient, resetMockClient, setMockHostname } from "../client";
 import { activate } from "../extension";
 
 suite("Extension Test Suite", () => {
@@ -18,6 +18,9 @@ suite("Extension Test Suite", () => {
     mockClient = createMockClient();
 
     await mockClient.mutation(internal.web.index.createMock, {});
+    setMockHostname(
+      "coder-273044a0-03a7-49ef-b1a4-e1bbc3c49d9b-7b78cdf4d9-mx66l",
+    );
 
     // Activate the extension (this will trigger the initialization code)
     const mockContext = {
