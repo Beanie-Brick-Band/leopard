@@ -33,6 +33,7 @@
     "lucide-react": "^0.552.0",
     "next": "16.0.10",
     "react": "catalog:react19",
+    "react-markdown": "^10.1.0",
     "react-scrubber": "^2.1.0",
     "react-shiki": "^0.9.0",
     "sonner": "^2.0.7",
