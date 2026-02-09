@@ -133,22 +133,15 @@ export const updateAssignment = mutation({
     } = {};
 
     if (args.name !== undefined) patch.name = args.name;
-    if (args.dueDate !== undefined) {
-      if (args.dueDate > assignment.releaseDate){
-        patch.dueDate = args.dueDate;
-      }
-      else{
-        throw new Error("Due date must be after release date");
-      }
+    const newReleaseDate = args.releaseDate ?? assignment.releaseDate;
+    const newDueDate = args.dueDate ?? assignment.dueDate;
+
+    if (newDueDate <= newReleaseDate) {
+      throw new Error("Due date must be after release date");
     }
-    if (args.releaseDate !== undefined) {
-      if (args.releaseDate < assignment.dueDate){
-        patch.releaseDate = args.releaseDate;
-      }
-      else{
-        throw new Error("Release date must be before due date");
-      }
-    }
+
+    if (args.dueDate !== undefined) patch.dueDate = args.dueDate;
+    if (args.releaseDate !== undefined) patch.releaseDate = args.releaseDate;
 
     if (args.description !== undefined) patch.description = args.description;
     if (args.workspaceConfig !== undefined) patch.workspaceConfig = args.workspaceConfig;
