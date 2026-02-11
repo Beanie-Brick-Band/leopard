@@ -1,4 +1,4 @@
-import { MutationCtx, QueryCtx } from "../_generated/server";
+import { mutation, MutationCtx, QueryCtx } from "../_generated/server";
 import { authComponent } from "../auth";
 
 type UserRole = "admin" | "student" | "teacher";
@@ -11,7 +11,7 @@ export async function getUserRole(ctx: DbCtx, userId: string): Promise<UserRole>
     .first();
 
   if (!user) {
-    throw new Error("User role not found");
+    return "student";
   }
 
   return user.role;
@@ -32,3 +32,25 @@ export async function requireTeacherOrAdmin(ctx: DbCtx, userId: string) {
   }
 }
 
+export const ensureCurrentUserRole = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const authUser = await requireAuth(ctx);
+
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("uid", (q) => q.eq("uid", authUser._id))
+      .first();
+
+    if (existingUser) {
+      return existingUser.role;
+    }
+
+    await ctx.db.insert("users", {
+      uid: authUser._id,
+      role: "student",
+    });
+
+    return "student" as const;
+  },
+});

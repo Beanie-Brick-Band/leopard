@@ -14,7 +14,7 @@ export const getUserRole = async (
     .first();
 
   if (!user) {
-    throw new Error("User role not found");
+    return "student";
   }
 
   return user.role;
