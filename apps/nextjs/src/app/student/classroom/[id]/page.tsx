@@ -47,7 +47,6 @@ function AssignmentCard({
   assignment: {
     _id: Id<"assignments">;
     name: string;
-    description?: string;
     dueDate: number;
   };
   classroomId: Id<"classrooms">;
@@ -89,15 +88,6 @@ function AssignmentCard({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {assignment.description ? (
-          <div
-            className="prose prose-sm dark:prose-invert line-clamp-3 max-w-none"
-            dangerouslySetInnerHTML={{ __html: assignment.description }}
-          />
-        ) : (
-          <p className="text-muted-foreground text-sm">No description yet.</p>
-        )}
-
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"

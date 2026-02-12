@@ -4,6 +4,8 @@ import { startTransition, use, useActionState, useEffect } from "react";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import { ArrowLeft, Calendar, CheckCircle2, Clock } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
 import { api } from "@package/backend/convex/_generated/api";
@@ -111,10 +113,11 @@ function Content({
             </CardHeader>
             <CardContent>
               {assignment.description ? (
-                <div
-                  className="prose prose-sm dark:prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: assignment.description }}
-                />
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {assignment.description}
+                  </ReactMarkdown>
+                </div>
               ) : (
                 <p className="text-muted-foreground text-sm">
                   No description yet.
