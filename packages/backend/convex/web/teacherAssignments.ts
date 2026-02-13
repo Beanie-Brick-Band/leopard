@@ -6,6 +6,12 @@ import { getUserRole, requireAuth } from "./user";
 import { requireInstructorAccess } from "./teacher";
 
 type DbCtx = QueryCtx | MutationCtx;
+type SubmissionStat = {
+  assignmentId: Id<"assignments">;
+  assignmentName: string;
+  submissions: number;
+  submissionRate: number;
+};
 
 async function getClassroomForAssignment(ctx: DbCtx, assignmentId: Id<"assignments">) {
   const assignment = await ctx.db.get(assignmentId);
@@ -345,5 +351,98 @@ export const deleteFlag = mutation({
     });
 
     return submission._id;
+  },
+});
+
+//class data for an individual assignment submission stats
+export const getAssignmentSubmissionStats = query({
+  args: {
+    assignmentId: v.id("assignments"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    const assignment = await ctx.db.get(args.assignmentId);
+    if (!assignment) {
+      throw new Error("Assignment not found");
+    }
+
+    await requireInstructorAccess(ctx, assignment.classroomId, user._id);
+
+    const totalStudents = await ctx.db
+      .query("classroomStudentsRelations")
+      .withIndex("classroomId_studentId", (q) => q.eq("classroomId", assignment.classroomId))
+      .collect();
+
+    const submissions = await ctx.db
+      .query("submissions")
+      .withIndex("assignmentId_studentId", (q) => q.eq("assignmentId", assignment._id))
+      .collect();
+
+    const submissionRate = totalStudents.length > 0 ? submissions.length / totalStudents.length : 0
+
+      return {totalStudents: totalStudents.length,
+        totalSubmissions: submissions.length, 
+        submissionRate: submissionRate}
+  },
+});
+
+//aggregate submission stats for all assignments that are already due
+export const getClassroomSubmissionStats = query({
+  args: {
+    classroomId: v.id("classrooms"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    const classroom = await ctx.db.get(args.classroomId);
+    if (!classroom) {
+      throw new Error("Classroom not found");
+    }
+
+    await requireInstructorAccess(ctx, args.classroomId, user._id);
+
+    const totalStudents = await ctx.db
+      .query("classroomStudentsRelations")
+      .withIndex("classroomId_studentId", (q) => q.eq("classroomId", args.classroomId))
+      .collect();
+
+
+    if (classroom.assignments.length == 0){
+      return {};
+    }
+    
+    const now = Date.now();
+
+    const assignmentsPastDue = await ctx.db
+      .query("assignments")
+      .withIndex("classroomId", (q) => q.eq("classroomId", args.classroomId))
+      .filter((q) => q.lte(q.field("dueDate"), now))
+      .collect();
+
+    if (assignmentsPastDue.length == 0){
+      return {};
+    }
+
+    const submissionStats : Record<Id<"assignments">, SubmissionStat> = {}
+
+    // do this for each assignment past due
+    for (const assignment of assignmentsPastDue) {
+      const submissions = await ctx.db
+        .query("submissions")
+        .withIndex("assignmentId_studentId", (q) =>
+          q.eq("assignmentId", assignment._id)
+        )
+        .collect();
+
+        submissionStats[assignment._id] = {
+          assignmentId: assignment._id, 
+          assignmentName: assignment.name,
+          submissions: submissions.length,
+          submissionRate: totalStudents.length > 0 ? submissions.length / totalStudents.length : 0
+        }
+    }
+
+    return submissionStats
   },
 });
