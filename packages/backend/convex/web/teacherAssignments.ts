@@ -1,13 +1,17 @@
 import { v } from "convex/values";
 
-import { mutation, query, QueryCtx, MutationCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
-import { getUserRole, requireAuth } from "./user";
+import { mutation, MutationCtx, query, QueryCtx } from "../_generated/server";
+import { authComponent } from "../auth";
 import { requireInstructorAccess } from "./teacher";
+import { getUserRole, requireAuth, requireTeacherOrAdmin } from "./user";
 
 type DbCtx = QueryCtx | MutationCtx;
 
-async function getClassroomForAssignment(ctx: DbCtx, assignmentId: Id<"assignments">) {
+async function getClassroomForAssignment(
+  ctx: DbCtx,
+  assignmentId: Id<"assignments">,
+) {
   const assignment = await ctx.db.get(assignmentId);
   if (!assignment) {
     throw new Error("Assignment not found");
@@ -90,7 +94,11 @@ export const createAssignment = mutation({
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
-    const classroom = await requireInstructorAccess(ctx, args.classroomId, user._id);
+    const classroom = await requireInstructorAccess(
+      ctx,
+      args.classroomId,
+      user._id,
+    );
 
     const assignmentId = await ctx.db.insert("assignments", {
       classroomId: args.classroomId,
@@ -120,7 +128,10 @@ export const updateAssignment = mutation({
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
-    const { assignment, classroom } = await getClassroomForAssignment(ctx, args.assignmentId);
+    const { assignment, classroom } = await getClassroomForAssignment(
+      ctx,
+      args.assignmentId,
+    );
 
     await requireInstructorAccess(ctx, classroom._id, user._id);
 
@@ -144,7 +155,8 @@ export const updateAssignment = mutation({
     if (args.releaseDate !== undefined) patch.releaseDate = args.releaseDate;
 
     if (args.description !== undefined) patch.description = args.description;
-    if (args.workspaceConfig !== undefined) patch.workspaceConfig = args.workspaceConfig;
+    if (args.workspaceConfig !== undefined)
+      patch.workspaceConfig = args.workspaceConfig;
 
     if (Object.keys(patch).length === 0) {
       return assignment._id;
@@ -161,13 +173,18 @@ export const deleteAssignment = mutation({
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
-    const { assignment, classroom } = await getClassroomForAssignment(ctx, args.assignmentId);
+    const { assignment, classroom } = await getClassroomForAssignment(
+      ctx,
+      args.assignmentId,
+    );
 
     await requireInstructorAccess(ctx, classroom._id, user._id);
 
     const submissions = await ctx.db
       .query("submissions")
-      .withIndex("assignmentId_studentId", (q) => q.eq("assignmentId", assignment._id))
+      .withIndex("assignmentId_studentId", (q) =>
+        q.eq("assignmentId", assignment._id),
+      )
       .collect();
 
     for (const submission of submissions) {
@@ -195,14 +212,75 @@ export const getSubmissionsByAssignment = query({
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
-    const { assignment, classroom } = await getClassroomForAssignment(ctx, args.assignmentId);
+    const { assignment, classroom } = await getClassroomForAssignment(
+      ctx,
+      args.assignmentId,
+    );
 
     await requireInstructorAccess(ctx, classroom._id, user._id);
 
-    return ctx.db
+    const submissions = await ctx.db
       .query("submissions")
-      .withIndex("assignmentId_studentId", (q) => q.eq("assignmentId", assignment._id))
+      .withIndex("assignmentId_studentId", (q) =>
+        q.eq("assignmentId", assignment._id),
+      )
       .collect();
+
+    return Promise.all(
+      submissions.map(async (submission) => {
+        const authUser = await authComponent.getAnyUserById(
+          ctx,
+          submission.studentId,
+        );
+        const studentName =
+          (authUser?.name && authUser.name.trim()) ||
+          (authUser?.displayUsername && authUser.displayUsername.trim()) ||
+          (authUser?.username && authUser.username.trim()) ||
+          null;
+
+        return {
+          ...submission,
+          studentName,
+          studentEmail: authUser?.email ?? null,
+        };
+      }),
+    );
+  },
+});
+
+export const getSubmissionById = query({
+  args: {
+    submissionId: v.id("submissions"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    const submission = await ctx.db.get(args.submissionId);
+    if (!submission) {
+      throw new Error("Submission not found");
+    }
+
+    const { classroom } = await getClassroomForAssignment(
+      ctx,
+      submission.assignmentId,
+    );
+    await requireInstructorAccess(ctx, classroom._id, user._id);
+
+    const authUser = await authComponent.getAnyUserById(
+      ctx,
+      submission.studentId,
+    );
+    const studentName =
+      (authUser?.name && authUser.name.trim()) ||
+      (authUser?.displayUsername && authUser.displayUsername.trim()) ||
+      (authUser?.username && authUser.username.trim()) ||
+      null;
+
+    return {
+      ...submission,
+      studentName,
+      studentEmail: authUser?.email ?? null,
+    };
   },
 });
 
@@ -219,7 +297,10 @@ export const gradeSubmission = mutation({
       throw new Error("Submission not found");
     }
 
-    const { classroom } = await getClassroomForAssignment(ctx, submission.assignmentId);
+    const { classroom } = await getClassroomForAssignment(
+      ctx,
+      submission.assignmentId,
+    );
     await requireInstructorAccess(ctx, classroom._id, user._id);
 
     await ctx.db.patch(submission._id, {
@@ -245,7 +326,10 @@ export const provideSubmissionFeedback = mutation({
       throw new Error("Submission not found");
     }
 
-    const { classroom } = await getClassroomForAssignment(ctx, submission.assignmentId);
+    const { classroom } = await getClassroomForAssignment(
+      ctx,
+      submission.assignmentId,
+    );
     await requireInstructorAccess(ctx, classroom._id, user._id);
 
     await ctx.db.patch(submission._id, {
@@ -270,7 +354,10 @@ export const createFlag = mutation({
       throw new Error("Submission not found");
     }
 
-    const { classroom } = await getClassroomForAssignment(ctx, submission.assignmentId);
+    const { classroom } = await getClassroomForAssignment(
+      ctx,
+      submission.assignmentId,
+    );
     await requireInstructorAccess(ctx, classroom._id, user._id);
 
     const flagId = await ctx.db.insert("flags", {
@@ -299,7 +386,10 @@ export const getFlagsBySubmission = query({
       throw new Error("Submission not found");
     }
 
-    const { classroom } = await getClassroomForAssignment(ctx, submission.assignmentId);
+    const { classroom } = await getClassroomForAssignment(
+      ctx,
+      submission.assignmentId,
+    );
     await requireInstructorAccess(ctx, classroom._id, user._id);
 
     const flags = (
@@ -323,19 +413,26 @@ export const deleteFlag = mutation({
       throw new Error("Submission not found");
     }
 
-    const { classroom } = await getClassroomForAssignment(ctx, submission.assignmentId);
+    const { classroom } = await getClassroomForAssignment(
+      ctx,
+      submission.assignmentId,
+    );
     await requireInstructorAccess(ctx, classroom._id, user._id);
 
     const flag = await ctx.db.get(args.flagId);
 
-    if (!flag){
+    if (!flag) {
       throw new Error("No flag found");
     }
 
-    const submissionContainsFlag = submission.flags.some(fid => fid === flag._id)
+    const submissionContainsFlag = submission.flags.some(
+      (fid) => fid === flag._id,
+    );
 
-    if (!submissionContainsFlag){
-      throw new Error("Failed to delete flag: flag does not belong to submission");
+    if (!submissionContainsFlag) {
+      throw new Error(
+        "Failed to delete flag: flag does not belong to submission",
+      );
     }
 
     await ctx.db.delete(flag._id);
