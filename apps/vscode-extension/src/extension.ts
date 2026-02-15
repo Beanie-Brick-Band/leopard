@@ -22,13 +22,11 @@ export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("leopard");
   const convexUrl = config.get<string>("convexUrl") ?? "";
 
-  batchedClient = new BatchedConvexHttpClient(
-    convexUrl,
-    channel,
-    1000,
-    2000,
-    5,
-  );
+  batchedClient = new BatchedConvexHttpClient(convexUrl, channel, {
+    debounceDelayMs: 1000,
+    retryDelayMs: 2000,
+    maxRetries: 5,
+  });
 
   // Log configuration info
   channel.appendLine(`[INIT] Leopard extension activated`);
@@ -172,6 +170,11 @@ export async function deactivate() {
   await batchedClient.flush();
 }
 
+interface BatchedConvexHttpClientConfig {
+  debounceDelayMs: number;
+  retryDelayMs: number;
+  maxRetries: number;
+}
 class BatchedConvexHttpClient {
   private client: ConvexHttpClient;
   private debouncer: NodeJS.Timeout | null = null;
@@ -181,23 +184,17 @@ class BatchedConvexHttpClient {
     >
   >[1]["changes"];
   private channel: vscode.OutputChannel;
-  private debounceDelayMs: number;
-  private retryDelayMs: number;
-  private maxRetries: number;
+  private config: BatchedConvexHttpClientConfig;
 
   constructor(
     convexUrl: string,
     channel: vscode.OutputChannel,
-    debounceDelayMs: number,
-    retryDelayMs: number,
-    maxRetries: number,
+    config: BatchedConvexHttpClientConfig,
   ) {
     this.client = new ConvexHttpClient(convexUrl);
     this.channel = channel;
-    this.debounceDelayMs = debounceDelayMs;
     this.eventBuffer = [];
-    this.retryDelayMs = retryDelayMs;
-    this.maxRetries = maxRetries;
+    this.config = config;
   }
 
   private async submitEventsOrRetryUntilMaxRetriesReached(
@@ -205,15 +202,19 @@ class BatchedConvexHttpClient {
   ): Promise<boolean> {
     let error: unknown;
 
-    for (let retryCount = 0; retryCount < this.maxRetries; retryCount++) {
+    for (
+      let retryCount = 0;
+      retryCount < this.config.maxRetries;
+      retryCount++
+    ) {
       try {
         if (retryCount > 0) {
           this.channel.appendLine(
-            `[${Date.now()}] RETRY ${retryCount}/${this.maxRetries}: Retrying upload of ${events.length} batched event(s)...`,
+            `[${Date.now()}] RETRY ${retryCount}/${this.config.maxRetries}: Retrying upload of ${events.length} batched event(s)...`,
           );
 
           // wait before retrying again to avoid overwhelming the connection
-          await sleep(this.retryDelayMs);
+          await sleep(this.config.retryDelayMs);
         } else {
           this.channel.appendLine(
             `[${Date.now()}] SENDING: ${events.length} batched event(s) to Convex...`,
@@ -239,11 +240,11 @@ class BatchedConvexHttpClient {
 
     const errorMsg = error instanceof Error ? error.message : String(error);
     this.channel.appendLine(
-      `[${Date.now()}] ERROR: Failed to upload batched events after ${this.maxRetries} retries - ${errorMsg}`,
+      `[${Date.now()}] ERROR: Failed to upload batched events after ${this.config.maxRetries} retries - ${errorMsg}`,
     );
     console.error(errorMsg);
     vscode.window.showWarningMessage(
-      `Leopard: Failed to upload batched events after ${this.maxRetries} retries - ${errorMsg}`,
+      `Leopard: Failed to upload batched events after ${this.config.maxRetries} retries - ${errorMsg}`,
     );
     return false;
   }
@@ -278,7 +279,7 @@ class BatchedConvexHttpClient {
     }
     this.debouncer = setTimeout(() => {
       void this.submitEventsOrRecoverToBuffer();
-    }, this.debounceDelayMs);
+    }, this.config.debounceDelayMs);
   }
 
   public async flush() {
