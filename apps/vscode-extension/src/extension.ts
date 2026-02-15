@@ -8,8 +8,6 @@ import { api } from "@package/backend/convex/_generated/api";
 import { assert } from "@package/validators/assert";
 import * as WorkspaceEvents from "@package/validators/workspaceEvents";
 
-let batchedClient: BatchedConvexHttpClient | null = null;
-
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(
@@ -22,11 +20,9 @@ export function activate(
   console.log('Congratulations, your extension "leopard" is now active!');
   const channel = vscode.window.createOutputChannel("Leopard Event Logger");
 
-  // Get configuration from VSCode settings
   const config = vscode.workspace.getConfiguration("leopard");
   const convexUrl = config.get<string>("convexUrl") ?? "";
-
-  batchedClient = new BatchedConvexHttpClient(
+  BatchedConvexHttpClient.init(
     client ?? new ConvexHttpClient(convexUrl),
     hostname ?? os.hostname(),
     channel,
@@ -98,8 +94,7 @@ export function activate(
         return;
       }
 
-      assert(batchedClient !== null, "Batched client is not initialized");
-      batchedClient.addEvent({
+      BatchedConvexHttpClient.getInstance().addEvent({
         timestamp: Date.now(),
         eventType: WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT,
         metadata: {
@@ -170,11 +165,11 @@ export function activate(
 
 // This method is called when your extension is deactivated
 export async function deactivate() {
-  assert(batchedClient !== null, "Batched client is not initialized");
-  await batchedClient.flush();
+  await BatchedConvexHttpClient.flushAndResetInstance();
 }
 
 class BatchedConvexHttpClient {
+  private static instance: BatchedConvexHttpClient | null = null;
   private client: ConvexHttpClient;
   private debouncer: NodeJS.Timeout | null = null;
   private eventBuffer: Parameters<
@@ -186,7 +181,7 @@ class BatchedConvexHttpClient {
   private debounceDelay: number;
   private hostname: string;
 
-  constructor(
+  private constructor(
     client: ConvexHttpClient,
     hostname: string,
     channel: vscode.OutputChannel,
@@ -197,6 +192,32 @@ class BatchedConvexHttpClient {
     this.debounceDelay = debounceDelay;
     this.eventBuffer = [];
     this.hostname = hostname;
+  }
+
+  public static init(
+    client: ConvexHttpClient,
+    hostname: string,
+    channel: vscode.OutputChannel,
+    debounceDelay: number,
+  ) {
+    assert(
+      BatchedConvexHttpClient.instance === null,
+      "BatchedConvexHttpClient already initialized.",
+    );
+    BatchedConvexHttpClient.instance = new BatchedConvexHttpClient(
+      client,
+      hostname,
+      channel,
+      debounceDelay,
+    );
+  }
+
+  public static getInstance(): BatchedConvexHttpClient {
+    assert(
+      BatchedConvexHttpClient.instance !== null,
+      "BatchedConvexHttpClient not initialized. Call init() first.",
+    );
+    return BatchedConvexHttpClient.instance;
   }
 
   private async submitEvents() {
@@ -255,5 +276,10 @@ class BatchedConvexHttpClient {
       this.debouncer = null;
     }
     await this.submitEvents();
+  }
+
+  public static async flushAndResetInstance() {
+    await BatchedConvexHttpClient.getInstance().flush();
+    BatchedConvexHttpClient.instance = null;
   }
 }
