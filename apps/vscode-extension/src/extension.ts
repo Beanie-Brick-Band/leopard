@@ -5,7 +5,10 @@ import { ConvexHttpClient } from "convex/browser";
 import * as vscode from "vscode";
 
 import { api } from "@package/backend/convex/_generated/api";
+import { assert } from "@package/validators/assert";
 import * as WorkspaceEvents from "@package/validators/workspaceEvents";
+
+let batchedClient: BatchedConvexHttpClient | null = null;
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -19,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("leopard");
   const convexUrl = config.get<string>("convexUrl") ?? "";
 
-  const client = new ConvexHttpClient(convexUrl);
+  batchedClient = new BatchedConvexHttpClient(convexUrl, channel, 1000);
 
   // Log configuration info
   channel.appendLine(`[INIT] Leopard extension activated`);
@@ -27,21 +30,17 @@ export function activate(context: vscode.ExtensionContext) {
   channel.appendLine(`[INIT] Hostname: ${os.hostname()}`);
   channel.show();
 
-  function timestamp() {
-    return Date.now();
-  }
-
   // TODO: workspace ingestion flow implementation for this event is low priority but could potentially be useful
   // context.subscriptions.push(
   //   vscode.workspace.onDidOpenTextDocument((e) => {
-  //     channel.appendLine(`[${timestamp()}] ${e.uri.fsPath} - opened`);
+  //     channel.appendLine(`[${Date.now()}] ${e.uri.fsPath} - opened`);
   //   }),
   // );
 
   // TODO: workspace ingestion flow implementation for this event is low priority but could potentially be useful
   // context.subscriptions.push(
   //   vscode.workspace.onDidCloseTextDocument((e) => {
-  //     channel.appendLine(`[${timestamp()}] ${e.uri.fsPath} - closed`);
+  //     channel.appendLine(`[${Date.now()}] ${e.uri.fsPath} - closed`);
   //   }),
   // );
 
@@ -49,7 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(
   //   vscode.workspace.onDidCreateFiles((e) => {
   //     channel.appendLine(
-  //       `[${timestamp()}] ${e.files.map((file) => file.fsPath).join(", ")} - created`,
+  //       `[${Date.now()}] ${e.files.map((file) => file.fsPath).join(", ")} - created`,
   //     );
   //   }),
   // );
@@ -58,7 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(
   //   vscode.workspace.onDidDeleteFiles((e) => {
   //     channel.appendLine(
-  //       `[${timestamp()}] ${e.files.map((file) => file.fsPath).join(", ")} - deleted`,
+  //       `[${Date.now()}] ${e.files.map((file) => file.fsPath).join(", ")} - deleted`,
   //     );
   //   }),
   // );
@@ -67,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(
   //   vscode.workspace.onDidRenameFiles((e) => {
   //     channel.appendLine(
-  //       `[${timestamp()}] ${e.files.map((file) => file.oldUri.fsPath).join(", ")} - ${e.files.map((file) => file.newUri.fsPath).join(", ")} - renamed`,
+  //       `[${Date.now()}] ${e.files.map((file) => file.oldUri.fsPath).join(", ")} - ${e.files.map((file) => file.newUri.fsPath).join(", ")} - renamed`,
   //     );
   //   }),
   // );
@@ -75,12 +74,13 @@ export function activate(context: vscode.ExtensionContext) {
   // TODO: workspace ingestion flow implementation for this event is low priority but could potentially be useful
   // context.subscriptions.push(
   //   vscode.workspace.onDidSaveTextDocument((e) => {
-  //     channel.appendLine(`[${timestamp()}] ${e.uri.fsPath} - saved`);
+  //     channel.appendLine(`[${Date.now()}] ${e.uri.fsPath} - saved`);
   //   }),
   // );
 
+  // TODO implement reliable recovery in case of disconnections/failed mutations
   context.subscriptions.push(
-    vscode.workspace.onDidChangeTextDocument(async (e) => {
+    vscode.workspace.onDidChangeTextDocument((e) => {
       if (e.contentChanges.length === 0) {
         return;
       }
@@ -90,54 +90,27 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const changeCount = e.contentChanges.length;
-      channel.appendLine(
-        `[${timestamp()}] LOCAL: ${e.document.uri.fsPath} - ${changeCount} change(s)`,
-      );
-
-      // TODO implement reliable recovery in case of disconnections/failed mutations
-      try {
-        channel.appendLine(
-          `[${timestamp()}] SENDING: ${changeCount} change(s) to Convex...`,
-        );
-        await client.mutation(api.api.extension.addBatchedChangesMutation, {
-          hostname: os.hostname(),
-          changes: [
-            {
-              timestamp: timestamp(),
-              eventType: WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT,
-              metadata: {
-                contentChanges: e.contentChanges.map((change) => ({
-                  range: {
-                    start: {
-                      line: change.range.start.line,
-                      column: change.range.start.character,
-                    },
-                    end: {
-                      line: change.range.end.line,
-                      column: change.range.end.character,
-                    },
-                  },
-                  text: change.text,
-                  filePath: e.document.uri.fsPath,
-                })),
+      assert(batchedClient !== null, "Batched client is not initialized");
+      batchedClient.addEvent({
+        timestamp: Date.now(),
+        eventType: WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT,
+        metadata: {
+          contentChanges: e.contentChanges.map((change) => ({
+            range: {
+              start: {
+                line: change.range.start.line,
+                column: change.range.start.character,
+              },
+              end: {
+                line: change.range.end.line,
+                column: change.range.end.character,
               },
             },
-          ],
-        });
-        channel.appendLine(
-          `[${timestamp()}] SUCCESS: Event uploaded to Convex`,
-        );
-      } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : String(error);
-        channel.appendLine(
-          `[${timestamp()}] ERROR: Failed to upload - ${errorMsg}`,
-        );
-        console.error(error);
-        vscode.window.showWarningMessage(
-          `Leopard: Failed to upload event - ${errorMsg}`,
-        );
-      }
+            text: change.text,
+            filePath: e.document.uri.fsPath,
+          })),
+        },
+      });
     }),
   );
 
@@ -145,7 +118,7 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(
   //   vscode.workspace.onDidAcceptCopy((e) => {
   //     channel.appendLine(
-  //       `[${timestamp()}] ${e.contents.map((content) => content.plainText).join("; ")} - copy accepted`,
+  //       `[${Date.now()}] ${e.contents.map((content) => content.plainText).join("; ")} - copy accepted`,
   //     );
   //   }),
   // );
@@ -154,7 +127,7 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(
   //   vscode.window.onDidChangeTextEditorSelection((e) => {
   //     channel.appendLine(
-  //       `[${timestamp()}] ${e.textEditor.document.uri.fsPath} - ${e.selections.map((selection) => `${selection.start.line}:${selection.start.character} - ${selection.end.line}:${selection.end.character}`).join(", ")} - selection changed`,
+  //       `[${Date.now()}] ${e.textEditor.document.uri.fsPath} - ${e.selections.map((selection) => `${selection.start.line}:${selection.start.character} - ${selection.end.line}:${selection.end.character}`).join(", ")} - selection changed`,
   //     );
   //   }),
   // );
@@ -163,7 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(
   //   vscode.window.onDidChangeTerminalState((e) => {
   //     channel.appendLine(
-  //       `[${timestamp()}] ${e.name} ${e.state.shell} - terminal state changed`,
+  //       `[${Date.now()}] ${e.name} ${e.state.shell} - terminal state changed`,
   //     );
   //   }),
   // );
@@ -172,7 +145,7 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(
   //   vscode.window.onDidChangeTerminalShellIntegration((e) => {
   //     channel.appendLine(
-  //       `[${timestamp()}] ${e.terminal.name} ${e.terminal.state.shell} - terminal shell integration changed`,
+  //       `[${Date.now()}] ${e.terminal.name} ${e.terminal.state.shell} - terminal shell integration changed`,
   //     );
   //   }),
   // );
@@ -181,12 +154,95 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(
   //   vscode.window.onDidEndTerminalShellExecution((e) => {
   //     channel.appendLine(
-  //       `[${timestamp()}] ${e.terminal.name} ${e.exitCode} ${e.execution.commandLine.value} - command executed`,
+  //       `[${Date.now()}] ${e.terminal.name} ${e.exitCode} ${e.execution.commandLine.value} - command executed`,
   //     );
   //   }),
   // );
 }
 
 // This method is called when your extension is deactivated
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export function deactivate() {}
+export function deactivate() {
+  assert(batchedClient !== null, "Batched client is not initialized");
+  batchedClient.flush();
+}
+
+class BatchedConvexHttpClient {
+  private client: ConvexHttpClient;
+  private debouncer: NodeJS.Timeout | null = null;
+  private eventBuffer: Parameters<
+    typeof this.client.mutation<
+      typeof api.api.extension.addBatchedChangesMutation
+    >
+  >[1]["changes"];
+  private channel: vscode.OutputChannel;
+  private debounceDelay: number;
+
+  constructor(
+    convexUrl: string,
+    channel: vscode.OutputChannel,
+    debounceDelay: number,
+  ) {
+    this.client = new ConvexHttpClient(convexUrl);
+    this.channel = channel;
+    this.debounceDelay = debounceDelay;
+    this.eventBuffer = [];
+  }
+
+  private async submitEvents() {
+    if (this.eventBuffer.length === 0) {
+      return;
+    }
+
+    // Create a copy to avoid race conditions: the eventBuffer could be modified while
+    // sending events (e.g., new events arriving during the async mutation).
+    const eventsToSend = [...this.eventBuffer];
+    this.eventBuffer = [];
+
+    try {
+      this.channel.appendLine(
+        `[${Date.now()}] SENDING: ${eventsToSend.length} batched event(s) to Convex...`,
+      );
+
+      await this.client.mutation(api.api.extension.addBatchedChangesMutation, {
+        hostname: os.hostname(),
+        changes: eventsToSend,
+      });
+
+      this.channel.appendLine(
+        `[${Date.now()}] SUCCESS: ${eventsToSend.length} batched event(s) uploaded to Convex`,
+      );
+    } catch (error) {
+      this.eventBuffer.unshift(...eventsToSend);
+
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      this.channel.appendLine(
+        `[${Date.now()}] ERROR: Failed to upload batched events - ${errorMsg}`,
+      );
+      vscode.window.showWarningMessage(
+        `Leopard: Failed to upload batched events - ${errorMsg}`,
+      );
+    }
+  }
+
+  public addEvent(event: (typeof this.eventBuffer)[0]): void {
+    this.channel.appendLine(
+      `[${event.timestamp}] Logged an event: ${event.eventType}`,
+    );
+
+    this.eventBuffer.push(event);
+    if (this.debouncer) {
+      clearTimeout(this.debouncer);
+    }
+    this.debouncer = setTimeout(() => {
+      void this.submitEvents();
+    }, this.debounceDelay);
+  }
+
+  public flush(): void {
+    if (this.debouncer) {
+      clearTimeout(this.debouncer);
+      this.debouncer = null;
+    }
+    void this.submitEvents();
+  }
+}
