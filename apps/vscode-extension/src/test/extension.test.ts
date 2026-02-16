@@ -35,7 +35,11 @@ suite("Extension Test Suite", () => {
     const mockContext = {
       subscriptions: [] as { dispose: () => void }[],
     } as vscode.ExtensionContext;
-    activate(mockContext, mockClient as unknown as ConvexHttpClient);
+    activate(
+      mockContext,
+      mockClient as unknown as ConvexHttpClient,
+      "coder-273044a0-03a7-49ef-b1a4-e1bbc3c49d9b-7b78cdf4d9-mx66l",
+    );
   });
 
   teardown(async () => {
