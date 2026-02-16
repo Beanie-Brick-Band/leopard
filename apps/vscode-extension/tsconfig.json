@@ -3,7 +3,7 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "noEmit": true,
+    "noEmit": false,
     "lib": ["ES2022", "DOM"],
     "target": "ES2022",
     "sourceMap": true,
@@ -13,13 +13,7 @@
   },
   "include": ["src/**/*"],
 
-  "exclude": [
-    "node_modules"
-    // "../../packages/backend/convex/api",
-    // "../../packages/backend/convex/auth.ts",
-    // "../../packages/backend/convex/http.ts",
-    // "../../packages/backend/src"
-  ],
+  "exclude": ["node_modules", ".vscode-test"],
   "ts-node": {
     "esm": true
   }
