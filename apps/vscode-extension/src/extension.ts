@@ -168,7 +168,7 @@ export async function deactivate() {
   await BatchedConvexHttpClient.flushAndResetInstance();
 }
 
-class BatchedConvexHttpClient {
+export class BatchedConvexHttpClient {
   private static instance: BatchedConvexHttpClient | null = null;
   private client: ConvexHttpClient;
   private debouncer: NodeJS.Timeout | null = null;
