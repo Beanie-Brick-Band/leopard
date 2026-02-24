@@ -15,6 +15,7 @@ let batchedClient: BatchedConvexHttpClient | null = null;
 export function activate(
   context: vscode.ExtensionContext,
   client?: ConvexHttpClient,
+  hostname?: string,
 ) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
@@ -27,14 +28,14 @@ export function activate(
 
   batchedClient = new BatchedConvexHttpClient(
     client ?? new ConvexHttpClient(convexUrl),
+    hostname ?? os.hostname(),
     channel,
     1000,
   );
 
-  // Log configuration info
   channel.appendLine(`[INIT] Leopard extension activated`);
   channel.appendLine(`[INIT] Convex URL: ${convexUrl}`);
-  channel.appendLine(`[INIT] Hostname: ${os.hostname()}`);
+  channel.appendLine(`[INIT] Hostname: ${hostname ?? os.hostname()}`);
   channel.show();
 
   // TODO: workspace ingestion flow implementation for this event is low priority but could potentially be useful
@@ -183,8 +184,11 @@ class BatchedConvexHttpClient {
   >[1]["changes"];
   private channel: vscode.OutputChannel;
   private debounceDelay: number;
+  private hostname: string;
+
   constructor(
     client: ConvexHttpClient,
+    hostname: string,
     channel: vscode.OutputChannel,
     debounceDelay: number,
   ) {
@@ -192,6 +196,7 @@ class BatchedConvexHttpClient {
     this.channel = channel;
     this.debounceDelay = debounceDelay;
     this.eventBuffer = [];
+    this.hostname = hostname;
   }
 
   private async submitEvents() {
@@ -210,7 +215,7 @@ class BatchedConvexHttpClient {
       );
 
       await this.client.mutation(api.api.extension.addBatchedChangesMutation, {
-        hostname: os.hostname(),
+        hostname: this.hostname,
         changes: eventsToSend,
       });
 
