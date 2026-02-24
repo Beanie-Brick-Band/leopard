@@ -12,7 +12,10 @@ let batchedClient: BatchedConvexHttpClient | null = null;
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export function activate(
+  context: vscode.ExtensionContext,
+  client?: ConvexHttpClient,
+) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
   console.log('Congratulations, your extension "leopard" is now active!');
@@ -22,7 +25,11 @@ export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("leopard");
   const convexUrl = config.get<string>("convexUrl") ?? "";
 
-  batchedClient = new BatchedConvexHttpClient(convexUrl, channel, 1000);
+  batchedClient = new BatchedConvexHttpClient(
+    client ?? new ConvexHttpClient(convexUrl),
+    channel,
+    1000,
+  );
 
   // Log configuration info
   channel.appendLine(`[INIT] Leopard extension activated`);
@@ -161,9 +168,9 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {
+export async function deactivate() {
   assert(batchedClient !== null, "Batched client is not initialized");
-  batchedClient.flush();
+  await batchedClient.flush();
 }
 
 class BatchedConvexHttpClient {
@@ -176,13 +183,12 @@ class BatchedConvexHttpClient {
   >[1]["changes"];
   private channel: vscode.OutputChannel;
   private debounceDelay: number;
-
   constructor(
-    convexUrl: string,
+    client: ConvexHttpClient,
     channel: vscode.OutputChannel,
     debounceDelay: number,
   ) {
-    this.client = new ConvexHttpClient(convexUrl);
+    this.client = client;
     this.channel = channel;
     this.debounceDelay = debounceDelay;
     this.eventBuffer = [];
@@ -238,11 +244,11 @@ class BatchedConvexHttpClient {
     }, this.debounceDelay);
   }
 
-  public flush(): void {
+  public async flush() {
     if (this.debouncer) {
       clearTimeout(this.debouncer);
       this.debouncer = null;
     }
-    void this.submitEvents();
+    await this.submitEvents();
   }
 }
