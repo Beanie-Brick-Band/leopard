@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
 import { mutation, query, QueryCtx, MutationCtx } from "../_generated/server";
+import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import { authComponent } from "../auth";
 import { getUserRole, requireAuth, requireTeacherOrAdmin } from "./user";
@@ -209,6 +210,14 @@ export const deleteClassroom = mutation({
 
       const assignment = await ctx.db.get(assignmentId);
       if (assignment) {
+        // Schedule MinIO cleanup if starter code exists
+        if (assignment.starterCodeStorageKey) {
+          await ctx.scheduler.runAfter(
+            0,
+            internal.web.teacherAssignmentActions.internalDeleteStarterCodeObject,
+            { storageKey: assignment.starterCodeStorageKey },
+          );
+        }
         await ctx.db.delete(assignment._id);
       }
     }
