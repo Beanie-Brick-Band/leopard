@@ -1,9 +1,18 @@
 import { v } from "convex/values";
 
-import { mutation, query, QueryCtx, MutationCtx } from "../_generated/server";
+import {
+  internalMutation,
+  internalQuery,
+  mutation,
+  query,
+  QueryCtx,
+  MutationCtx,
+} from "../_generated/server";
+import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import { getUserRole, requireAuth } from "./user";
 import { requireInstructorAccess } from "./teacher";
+import { getObjectKey } from "../helpers/storageKeys";
 
 type DbCtx = QueryCtx | MutationCtx;
 
@@ -20,6 +29,35 @@ async function getClassroomForAssignment(ctx: DbCtx, assignmentId: Id<"assignmen
 
   return { assignment, classroom };
 }
+
+// Internal query: verify instructor access and return assignment data
+// Used by actions via ctx.runQuery(...)
+export const internalGetAssignmentForInstructor = internalQuery({
+  args: {
+    assignmentId: v.id("assignments"),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { assignment, classroom } = await getClassroomForAssignment(
+      ctx,
+      args.assignmentId,
+    );
+    await requireInstructorAccess(ctx, classroom._id, args.userId);
+    return assignment;
+  },
+});
+
+// Internal mutation: clear the starter code storage key
+export const internalClearStarterCodeKey = internalMutation({
+  args: {
+    assignmentId: v.id("assignments"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.assignmentId, {
+      starterCodeStorageKey: undefined,
+    });
+  },
+});
 
 async function requireAccessToClassroomAssignments(
   ctx: DbCtx,
@@ -184,6 +222,15 @@ export const deleteAssignment = mutation({
       assignments: classroom.assignments.filter((id) => id !== assignment._id),
     });
 
+    // Schedule MinIO cleanup if starter code exists
+    if (assignment.starterCodeStorageKey) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.web.teacherAssignmentActions.internalDeleteStarterCodeObject,
+        { storageKey: assignment.starterCodeStorageKey },
+      );
+    }
+
     await ctx.db.delete(assignment._id);
     return assignment._id;
   },
@@ -347,3 +394,36 @@ export const deleteFlag = mutation({
     return submission._id;
   },
 });
+
+// --- Starter Code Endpoints ---
+
+export const saveStarterCodeKey = mutation({
+  args: {
+    assignmentId: v.id("assignments"),
+    storageKey: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const { assignment, classroom } = await getClassroomForAssignment(
+      ctx,
+      args.assignmentId,
+    );
+    await requireInstructorAccess(ctx, classroom._id, user._id);
+
+    // Validate the storage key matches the expected format
+    const expectedKey = getObjectKey(
+      classroom._id,
+      assignment._id,
+    );
+    if (args.storageKey !== expectedKey) {
+      throw new Error("Invalid storage key");
+    }
+
+    await ctx.db.patch(args.assignmentId, {
+      starterCodeStorageKey: args.storageKey,
+    });
+
+    return args.assignmentId;
+  },
+});
+

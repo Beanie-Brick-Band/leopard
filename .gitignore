@@ -60,3 +60,8 @@ infra/*.tfstate
 infra/*.tfstate.*
 
 *.vsix
+
+# agent skills
+.agents/
+.claude/
+skills-lock.json

@@ -8,6 +8,7 @@ export default defineSchema({
     dueDate: v.number(),
     name: v.string(),
     releaseDate: v.number(),
+    starterCodeStorageKey: v.optional(v.string()),
     workspaceConfig: v.optional(v.record(v.string(), v.any())),
   }),
   classrooms: defineTable({
