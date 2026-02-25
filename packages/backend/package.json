@@ -6,7 +6,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "convex dev",
-    "setup": "convex dev --until-success"
+    "setup": "convex dev --until-success",
+    "test": "dotenv -e ../../.env -e ../../.env.local -- vitest run",
+    "test:watch": "dotenv -e ../../.env -e ../../.env.local -- vitest"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +29,8 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "dotenv-cli": "^10.0.0",
+    "typescript": "catalog:",
+    "vitest": "^4.0.17"
   }
 }
