@@ -167,11 +167,14 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
                 accept=".zip"
                 onChange={(event) => {
                   const file = event.target.files?.[0] ?? null;
+
                   if (file && file.size > 50 * 1024 * 1024) {
                     toast.error("File must be under 50MB");
                     event.target.value = "";
+                    setStarterCodeFile(null);
                     return;
                   }
+
                   setStarterCodeFile(file);
                 }}
               />
