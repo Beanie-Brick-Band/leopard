@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import {
   ArrowLeft,
   Calendar,
@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import type { Id } from "@package/backend/convex/_generated/dataModel";
+import type { Doc, Id } from "@package/backend/convex/_generated/dataModel";
 import { api } from "@package/backend/convex/_generated/api";
 import { Button } from "@package/ui/button";
 import {
@@ -37,6 +37,253 @@ function formatDateForInput(timestamp: number) {
   const date = new Date(timestamp);
   const offset = date.getTimezoneOffset() * 60_000;
   return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+}
+
+function SubmissionCard({
+  submission,
+  onSave,
+}: {
+  submission: Doc<"submissions">;
+  onSave: (
+    submissionId: Id<"submissions">,
+    grade: number | null,
+    feedback: string,
+  ) => Promise<void>;
+}) {
+  const [isSaving, setIsSaving] = useState(false);
+  const [grade, setGrade] = useState(submission.grade?.toString() ?? "");
+  const [feedback, setFeedback] = useState(submission.submissionFeedback ?? "");
+
+  const handleSave = async () => {
+    const nextGrade =
+      grade.trim() === ""
+        ? null
+        : Number.isNaN(Number(grade))
+          ? Number.NaN
+          : Number(grade);
+
+    if (Number.isNaN(nextGrade)) {
+      toast.error("Grade must be a valid number");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await onSave(submission._id, nextGrade, feedback);
+      toast.success("Submission updated");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update submission",
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader className="gap-1">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="text-base">{submission.studentId}</CardTitle>
+            <CardDescription>
+              Submitted {new Date(submission.submittedAt).toLocaleString()}
+            </CardDescription>
+          </div>
+          {submission.grade !== undefined && (
+            <div className="bg-primary text-primary-foreground rounded-full px-2.5 py-0.5 text-sm font-semibold">
+              {submission.grade}
+            </div>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor={`grade-${submission._id}`}>Grade</Label>
+            <Input
+              id={`grade-${submission._id}`}
+              value={grade}
+              onChange={(event) => setGrade(event.target.value)}
+              placeholder="e.g. 95"
+              type="number"
+              step="0.01"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={`graded-at-${submission._id}`}>Graded At</Label>
+            <Input
+              id={`graded-at-${submission._id}`}
+              readOnly
+              value={
+                submission.gradedAt
+                  ? new Date(submission.gradedAt).toLocaleString()
+                  : "Not graded"
+              }
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor={`feedback-${submission._id}`}>Feedback</Label>
+          <textarea
+            id={`feedback-${submission._id}`}
+            rows={4}
+            value={feedback}
+            onChange={(event) => setFeedback(event.target.value)}
+            placeholder="Feedback for the student"
+            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          />
+        </div>
+
+        <Button onClick={handleSave} disabled={isSaving}>
+          {isSaving ? "Saving..." : "Save Grade & Feedback"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function StarterCodeCard({
+  assignmentId,
+}: {
+  assignmentId: Id<"assignments">;
+}) {
+  const assignment = useQuery(api.web.assignment.getById, { id: assignmentId });
+  const getUploadUrl = useAction(
+    api.web.teacherAssignmentActions.getStarterCodeUploadUrl,
+  );
+  const saveKey = useMutation(
+    api.web.teacherAssignments.saveStarterCodeKey,
+  );
+  const removeCode = useAction(
+    api.web.teacherAssignmentActions.removeStarterCode,
+  );
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const hasStarterCode = !!assignment?.starterCodeStorageKey;
+
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error("File must be under 50MB");
+      event.target.value = "";
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const { uploadUrl, storageKey } = await getUploadUrl({
+        assignmentId,
+      });
+
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener("progress", (e) => {
+          if (e.lengthComputable) {
+            setUploadProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        });
+        xhr.addEventListener("load", () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve();
+          else reject(new Error(`Upload failed: ${xhr.status}`));
+        });
+        xhr.addEventListener("error", () => reject(new Error("Upload failed")));
+        xhr.open("PUT", uploadUrl);
+        xhr.setRequestHeader("Content-Type", "application/zip");
+        xhr.send(file);
+      });
+
+      await saveKey({ assignmentId, storageKey });
+      toast.success("Starter code uploaded");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Upload failed",
+      );
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+      event.target.value = "";
+    }
+  };
+
+  const handleRemove = async () => {
+    if (!confirm("Remove starter code from this assignment?")) return;
+    setIsRemoving(true);
+    try {
+      await removeCode({ assignmentId });
+      toast.success("Starter code removed");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to remove",
+      );
+    } finally {
+      setIsRemoving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Starter Code</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {hasStarterCode ? (
+          <>
+            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+              <CheckCircle2 className="h-4 w-4" />
+              <span>Starter code uploaded</span>
+            </div>
+            <Button
+              variant="destructive"
+              size="sm"
+              className="w-full"
+              onClick={handleRemove}
+              disabled={isRemoving}
+            >
+              {isRemoving ? "Removing..." : "Remove Starter Code"}
+            </Button>
+          </>
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            No starter code uploaded.
+          </p>
+        )}
+        <div className="space-y-2">
+          <Label htmlFor="starter-code-upload">
+            {hasStarterCode ? "Replace" : "Upload"} Starter Code
+          </Label>
+          <Input
+            id="starter-code-upload"
+            type="file"
+            accept=".zip"
+            onChange={handleUpload}
+            disabled={isUploading}
+          />
+          {isUploading && (
+            <div className="space-y-1">
+              <div className="bg-muted h-2 w-full rounded-full">
+                <div
+                  className="bg-primary h-2 rounded-full transition-all"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+              <p className="text-muted-foreground text-xs">
+                Uploading... {uploadProgress}%
+              </p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 function AssignmentContent({
@@ -458,6 +705,8 @@ function AssignmentContent({
               ) : null}
             </CardContent>
           </Card>
+
+          <StarterCodeCard assignmentId={assignmentId} />
         </div>
       </div>
     </div>
