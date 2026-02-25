@@ -4,6 +4,6 @@
     "types": ["node"],
     "allowJs": true
   },
-  "include": ["./convex/**/*", "./src/**/*", "api"],
+  "include": ["./convex/**/*", "./src/**/*", "./tests/**/*", "api"],
   "exclude": ["node_modules"]
 }
