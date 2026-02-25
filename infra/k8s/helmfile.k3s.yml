@@ -11,6 +11,9 @@ repositories:
   - name: coder-v2
     url: https://helm.coder.com/v2
 
+  - name: minio
+    url: https://charts.min.io/
+
 releases:
   # --- Cert Manager ---
   - name: cert-manager
@@ -43,3 +46,12 @@ releases:
       - coder/postgresql
     values:
       - ./values.k3s.yml
+
+  # --- MinIO (S3-compatible object storage) ---
+  - name: minio
+    namespace: minio
+    createNamespace: true
+    chart: minio/minio
+    version: 5.4.0
+    values:
+      - ./minio-values.yml
