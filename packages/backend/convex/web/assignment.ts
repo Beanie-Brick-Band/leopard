@@ -1,23 +1,7 @@
 import { v } from "convex/values";
 
-import {
-  activateUserAccount,
-  createNewSessionKey,
-  createNewUser,
-  createUserWorkspace,
-  createWorkspaceBuild,
-  getOrganizations,
-  getTemplatesByOrganization,
-  getUserByName,
-  getWorkspaceMetadataByUserAndWorkspaceName,
-  listWorkspaces,
-} from "@package/coder-sdk";
-import { createClient } from "@package/coder-sdk/client";
-
 import type { Id } from "../_generated/dataModel";
-import { internal } from "../_generated/api";
 import {
-  action,
   internalMutation,
   internalQuery,
   query,
