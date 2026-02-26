@@ -9,10 +9,17 @@ import { deleteText, insertText } from "./scrubber";
 type ReplayEvent = output<typeof WorkspaceEventSchema>;
 
 function createReplayEvent(
-  event: Omit<ReplayEvent, "timestamp" | "workspaceId"> &
-    Partial<Pick<ReplayEvent, "timestamp" | "workspaceId">>,
+  event: Omit<
+    ReplayEvent,
+    "_id" | "_creationTime" | "timestamp" | "workspaceId"
+  > &
+    Partial<
+      Pick<ReplayEvent, "_id" | "_creationTime" | "timestamp" | "workspaceId">
+    >,
 ): ReplayEvent {
   return WorkspaceEventSchema.parse({
+    _id: "test-id",
+    _creationTime: 0,
     timestamp: 0,
     workspaceId: "test-workspace",
     ...event,
