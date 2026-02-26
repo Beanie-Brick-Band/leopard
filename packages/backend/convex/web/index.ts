@@ -56,6 +56,13 @@ export const createMock = internalMutation(async (ctx) => {
     userId: "user_123", // sample user that does not exist
   });
 
+  // Empty workspace
+  await ctx.db.insert("workspaces", {
+    coderWorkspaceId: "00000000-0000-0000-0000-000000000000",
+    isActive: true,
+    userId: "user_123",
+  });
+
   // Update classrooms with assignments
   await ctx.db.patch(classroom1Id, {
     assignments: [assignment1Id, assignment2Id],
