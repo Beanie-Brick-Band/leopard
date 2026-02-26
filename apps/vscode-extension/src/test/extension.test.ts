@@ -23,10 +23,8 @@ import { activate, BatchedConvexHttpClient } from "../extension";
 suite("Extension Test Suite", () => {
   vscode.window.showInformationMessage("Start all tests.");
 
-  let mockClient: TestConvex<typeof schema>;
-  let workspaceId: Id<"workspaces">;
-  let workspaceUri: vscode.Uri;
   let fileManager: FileManager;
+  let replayFetcher: ReplayFetcher;
 
   suiteSetup(() => {
     /*
@@ -56,7 +54,7 @@ suite("Extension Test Suite", () => {
       "convex/web/replay.ts": () => Promise.resolve(webReplayModule),
       "convex/api/extension.ts": () => Promise.resolve(apiExtensionModule),
     };
-    mockClient = convexTest(schema, modules);
+    const mockClient = convexTest(schema, modules);
 
     await mockClient.mutation(internal.web.index.createMock, {});
 
@@ -66,13 +64,14 @@ suite("Extension Test Suite", () => {
       { coderWorkspaceId },
     );
     assert.ok(unverifiedWorkspaceId, "Workspace should exist");
-    workspaceId = unverifiedWorkspaceId;
+    const workspaceId = unverifiedWorkspaceId;
 
     const newWorkspaceUri = vscode.workspace.workspaceFolders?.[0]?.uri;
     assert.ok(newWorkspaceUri, "Workspace folder should exist");
-    workspaceUri = newWorkspaceUri;
+    const workspaceUri = newWorkspaceUri;
 
     fileManager = new FileManager(workspaceUri);
+    replayFetcher = new ReplayFetcher(mockClient, workspaceId, workspaceUri);
     BatchedConvexHttpClient.init(
       mockClient as unknown as ConvexHttpClient,
       `coder-${coderWorkspaceId}-7b78cdf4d9-mx66l`,
@@ -97,15 +96,13 @@ suite("Extension Test Suite", () => {
     // we need this to bypass the debounce and flush the buffer
     await BatchedConvexHttpClient.getInstance().flush();
 
-    const replay = await mockClient.query(api.web.replay.getReplay, {
-      workspaceId,
-    });
-    const lastEvent = replay[replay.length - 1];
-    assert.ok(replay.length > 0, "Replay should contain at least one event");
+    const replay = await replayFetcher.fetch();
+    assert.ok(replay.length === 1, "An event should have been added");
+
     assert.deepStrictEqual(
-      lastEvent,
+      replay[0],
       {
-        ...lastEvent,
+        ...replay[0],
         eventType: WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT,
         metadata: {
           contentChanges: [
@@ -139,7 +136,7 @@ suite("Extension Test Suite", () => {
     assert.ok(success1, "First edit should be applied");
 
     // simulate typing delay
-    await sleep(200);
+    await sleep(100);
 
     const success2 = await fileManager.createAndEdit(
       "test-dummy2.ts",
@@ -151,25 +148,17 @@ suite("Extension Test Suite", () => {
     // Flush to bypass debounce and submit batched events
     await BatchedConvexHttpClient.getInstance().flush();
 
-    // Verify both events were received
-    const replay = await mockClient.query(api.web.replay.getReplay, {
-      workspaceId,
-    });
+    const replay = await replayFetcher.fetch();
+    assert.ok(replay.length === 2, "2 events should have been added");
 
-    const recentEvents = replay.slice(-2);
-    assert.ok(
-      recentEvents.length >= 2,
-      "Should have at least 2 sequential events",
-    );
-
-    const firstEditEvent = recentEvents.find((event) =>
+    const firstEditEvent = replay.find((event) =>
       event.metadata.contentChanges.some(
         (change: { text: string }) => change.text === "First edit\n",
       ),
     );
     assert.ok(firstEditEvent, "Should find event containing 'First edit'");
 
-    const secondEditEvent = recentEvents.find((event) =>
+    const secondEditEvent = replay.find((event) =>
       event.metadata.contentChanges.some(
         (change: { text: string }) => change.text === "Second edit\n",
       ),
@@ -237,5 +226,25 @@ class FileManager {
 
   getFileURI(fileName: string) {
     return vscode.Uri.joinPath(this.workspaceUri, fileName);
+  }
+}
+
+class ReplayFetcher {
+  constructor(
+    private readonly client: TestConvex<typeof schema>,
+    private readonly workspaceId: Id<"workspaces">,
+    private readonly workspaceUri: vscode.Uri,
+  ) {}
+
+  async fetch() {
+    const replay = await this.client.query(api.web.replay.getReplay, {
+      workspaceId: this.workspaceId,
+    });
+    const filtered = replay.filter((event) =>
+      event.metadata.contentChanges.some((change) =>
+        change.filePath.startsWith(this.workspaceUri.fsPath),
+      ),
+    );
+    return filtered;
   }
 }
