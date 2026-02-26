@@ -13,14 +13,38 @@ import * as webIndexModule from "@package/backend/convex/web/index";
 import * as webReplayModule from "@package/backend/convex/web/replay";
 import * as WorkspaceEvents from "@package/validators/workspaceEvents";
 
-import { activate, BatchedConvexHttpClient, deactivate } from "../extension";
+import { activate, BatchedConvexHttpClient } from "../extension";
 
+/*
+  These tests were designed to be sequential. Only one VSCode instance is
+  running at a time, so we should avoid mutating state that can carry over from
+  other tests where possible.
+*/
 suite("Extension Test Suite", () => {
   vscode.window.showInformationMessage("Start all tests.");
 
   let mockClient: TestConvex<typeof schema>;
   let workspaceId: Id<"workspaces">;
   let workspaceUri: vscode.Uri;
+
+  suiteSetup(() => {
+    /*
+      VSCode automatically activates the extension on test suite startup, but the
+      listeners of the extension aren't being triggered. So we manually activate
+      another instance that does get triggered. This is a workaround to the bug,
+      which for testing should be sufficient.
+
+      Also activate should run only once per VSCode instance. Several activate calls
+      can create several extension instances that can carry over to other tests.
+      
+      Also no need to run deactivate since VSCode does automatic cleanup
+    */
+    const mockContext = {
+      subscriptions: [] as { dispose: () => void }[],
+    } as vscode.ExtensionContext;
+
+    activate(mockContext);
+  });
 
   setup(async () => {
     // Provide modules in the format expected by convex-test
@@ -54,18 +78,15 @@ suite("Extension Test Suite", () => {
     const success = await vscode.workspace.applyEdit(wsEdit);
     assert.ok(success, "test-dummy.ts file should be created");
 
-    const mockContext = {
-      subscriptions: [] as { dispose: () => void }[],
-    } as vscode.ExtensionContext;
-    activate(
-      mockContext,
+    BatchedConvexHttpClient.init(
       mockClient as unknown as ConvexHttpClient,
       `coder-${coderWorkspaceId}-7b78cdf4d9-mx66l`,
+      1000,
     );
   });
 
   teardown(async () => {
-    await deactivate();
+    await BatchedConvexHttpClient.flushAndResetInstance();
 
     const wsEdit = new vscode.WorkspaceEdit();
     wsEdit.deleteFile(vscode.Uri.joinPath(workspaceUri, "test-dummy.ts"));

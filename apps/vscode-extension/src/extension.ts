@@ -10,11 +10,7 @@ import * as WorkspaceEvents from "@package/validators/workspaceEvents";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export function activate(
-  context: vscode.ExtensionContext,
-  client?: ConvexHttpClient,
-  hostname?: string,
-) {
+export function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
   console.log('Congratulations, your extension "leopard" is now active!');
@@ -23,15 +19,15 @@ export function activate(
   const config = vscode.workspace.getConfiguration("leopard");
   const convexUrl = config.get<string>("convexUrl") ?? "";
   BatchedConvexHttpClient.init(
-    client ?? new ConvexHttpClient(convexUrl),
-    hostname ?? os.hostname(),
-    channel,
+    new ConvexHttpClient(convexUrl),
+    os.hostname(),
     1000,
+    channel,
   );
 
   channel.appendLine(`[INIT] Leopard extension activated`);
   channel.appendLine(`[INIT] Convex URL: ${convexUrl}`);
-  channel.appendLine(`[INIT] Hostname: ${hostname ?? os.hostname()}`);
+  channel.appendLine(`[INIT] Hostname: ${os.hostname()}`);
   channel.show();
 
   // TODO: workspace ingestion flow implementation for this event is low priority but could potentially be useful
@@ -177,15 +173,15 @@ export class BatchedConvexHttpClient {
       typeof api.api.extension.addBatchedChangesMutation
     >
   >[1]["changes"];
-  private channel: vscode.OutputChannel;
+  private channel?: vscode.OutputChannel;
   private debounceDelay: number;
   private hostname: string;
 
   private constructor(
     client: ConvexHttpClient,
     hostname: string,
-    channel: vscode.OutputChannel,
     debounceDelay: number,
+    channel?: vscode.OutputChannel,
   ) {
     this.client = client;
     this.channel = channel;
@@ -197,18 +193,14 @@ export class BatchedConvexHttpClient {
   public static init(
     client: ConvexHttpClient,
     hostname: string,
-    channel: vscode.OutputChannel,
     debounceDelay: number,
+    channel?: vscode.OutputChannel,
   ) {
-    assert(
-      BatchedConvexHttpClient.instance === null,
-      "BatchedConvexHttpClient already initialized.",
-    );
     BatchedConvexHttpClient.instance = new BatchedConvexHttpClient(
       client,
       hostname,
-      channel,
       debounceDelay,
+      channel,
     );
   }
 
@@ -231,7 +223,7 @@ export class BatchedConvexHttpClient {
     this.eventBuffer = [];
 
     try {
-      this.channel.appendLine(
+      this.channel?.appendLine(
         `[${Date.now()}] SENDING: ${eventsToSend.length} batched event(s) to Convex...`,
       );
 
@@ -240,14 +232,14 @@ export class BatchedConvexHttpClient {
         changes: eventsToSend,
       });
 
-      this.channel.appendLine(
+      this.channel?.appendLine(
         `[${Date.now()}] SUCCESS: ${eventsToSend.length} batched event(s) uploaded to Convex`,
       );
     } catch (error) {
       this.eventBuffer.unshift(...eventsToSend);
 
       const errorMsg = error instanceof Error ? error.message : String(error);
-      this.channel.appendLine(
+      this.channel?.appendLine(
         `[${Date.now()}] ERROR: Failed to upload batched events - ${errorMsg}`,
       );
       vscode.window.showWarningMessage(
@@ -257,7 +249,7 @@ export class BatchedConvexHttpClient {
   }
 
   public addEvent(event: (typeof this.eventBuffer)[0]): void {
-    this.channel.appendLine(
+    this.channel?.appendLine(
       `[${event.timestamp}] Logged an event: ${event.eventType}`,
     );
 
