@@ -31,7 +31,7 @@ suite("Extension Test Suite", () => {
     /*
       VSCode automatically activates the extension on test suite startup, but the
       listeners of the extension aren't being triggered. So we manually activate
-      another instance that does get triggered. This is a workaround to the bug,
+      another instance that does get triggered. This is a workaround to the bug
       which for testing should be sufficient.
 
       Also activate should run only once per VSCode instance. Several activate calls
@@ -75,8 +75,17 @@ suite("Extension Test Suite", () => {
     wsEdit.createFile(vscode.Uri.joinPath(workspaceUri, "test-dummy.ts"), {
       ignoreIfExists: true,
     });
+    wsEdit.createFile(vscode.Uri.joinPath(workspaceUri, "test-dummy2.ts"), {
+      ignoreIfExists: true,
+    });
+    wsEdit.createFile(vscode.Uri.joinPath(workspaceUri, "test-dummy3.ts"), {
+      ignoreIfExists: true,
+    });
     const success = await vscode.workspace.applyEdit(wsEdit);
-    assert.ok(success, "test-dummy.ts file should be created");
+    assert.ok(
+      success,
+      "test-dummy.ts, test-dummy2.ts, and test-dummy3.ts files should be created",
+    );
 
     BatchedConvexHttpClient.init(
       mockClient as unknown as ConvexHttpClient,
@@ -90,11 +99,16 @@ suite("Extension Test Suite", () => {
 
     const wsEdit = new vscode.WorkspaceEdit();
     wsEdit.deleteFile(vscode.Uri.joinPath(workspaceUri, "test-dummy.ts"));
+    wsEdit.deleteFile(vscode.Uri.joinPath(workspaceUri, "test-dummy2.ts"));
+    wsEdit.deleteFile(vscode.Uri.joinPath(workspaceUri, "test-dummy3.ts"));
     const success = await vscode.workspace.applyEdit(wsEdit);
-    assert.ok(success, "test-dummy.ts file should be deleted");
+    assert.ok(
+      success,
+      "test-dummy.ts, test-dummy2.ts, and test-dummy3.ts files should be deleted",
+    );
   });
 
-  test("onDidChangeTextDocument event is sent to Convex", async () => {
+  test("onDidChangeTextDocument event is sent to the Database", async () => {
     const wsEdit = new vscode.WorkspaceEdit();
     const fileUri = vscode.Uri.joinPath(workspaceUri, "test-dummy.ts");
     wsEdit.insert(fileUri, new vscode.Position(0, 0), "Hello, world!");
@@ -113,9 +127,8 @@ suite("Extension Test Suite", () => {
     assert.deepStrictEqual(
       lastEvent,
       {
+        ...lastEvent,
         eventType: WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT,
-        timestamp: lastEvent?.timestamp, // the timestamp value can vary too much for testing
-        workspaceId: lastEvent?.workspaceId, // workspaceId is included in the parsed event
         metadata: {
           contentChanges: [
             {
@@ -138,4 +151,61 @@ suite("Extension Test Suite", () => {
       "Event object should match expected structure",
     );
   });
+
+  test("Sequential workspace events must be batch submitted", async () => {
+    const wsEdit1 = new vscode.WorkspaceEdit();
+    const fileUri = vscode.Uri.joinPath(workspaceUri, "test-dummy3.ts");
+    wsEdit1.insert(fileUri, new vscode.Position(0, 0), "First edit\n");
+    const success1 = await vscode.workspace.applyEdit(wsEdit1);
+    assert.ok(success1, "First edit should be applied");
+
+    // simulate typing delay
+    await sleep(200);
+
+    const wsEdit2 = new vscode.WorkspaceEdit();
+    const fileUri2 = vscode.Uri.joinPath(workspaceUri, "test-dummy2.ts");
+    wsEdit2.insert(fileUri2, new vscode.Position(1, 0), "Second edit\n");
+    const success2 = await vscode.workspace.applyEdit(wsEdit2);
+    assert.ok(success2, "Second edit should be applied");
+
+    // Flush to bypass debounce and submit batched events
+    await BatchedConvexHttpClient.getInstance().flush();
+
+    // Verify both events were received
+    const replay = await mockClient.query(api.web.replay.getReplay, {
+      workspaceId,
+    });
+
+    const recentEvents = replay.slice(-2);
+    assert.ok(
+      recentEvents.length >= 2,
+      "Should have at least 2 sequential events",
+    );
+
+    const firstEditEvent = recentEvents.find((event) =>
+      event.metadata.contentChanges.some(
+        (change: { text: string }) => change.text === "First edit\n",
+      ),
+    );
+    assert.ok(firstEditEvent, "Should find event containing 'First edit'");
+
+    const secondEditEvent = recentEvents.find((event) =>
+      event.metadata.contentChanges.some(
+        (change: { text: string }) => change.text === "Second edit\n",
+      ),
+    );
+    assert.ok(secondEditEvent, "Should find event containing 'Second edit'");
+
+    const timeDiff = Math.abs(
+      firstEditEvent._creationTime - secondEditEvent._creationTime,
+    );
+    assert.ok(
+      timeDiff <= 10,
+      `events that are batched together should have a _creationTime difference of less than 10ms (actual diff: ${timeDiff}ms)`,
+    );
+  });
 });
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

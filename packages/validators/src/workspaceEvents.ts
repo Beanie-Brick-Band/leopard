@@ -15,6 +15,8 @@ export const NAME = NAMES.reduce(
 );
 
 const Event = z.object({
+  _id: z.string(),
+  _creationTime: z.number(),
   timestamp: z.number(),
   workspaceId: z.string(),
 });
