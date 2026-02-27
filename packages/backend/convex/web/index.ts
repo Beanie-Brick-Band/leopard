@@ -457,4 +457,16 @@ const events = [
     },
     timestamp: 1769638583829.0,
   },
+  {
+    eventType: "DID_RENAME_FILES",
+    metadata: {
+      renamedFiles: [
+        {
+          newFilePath: "/Users/fvcci/Code/Github/price-matched/test-renamed.py",
+          oldFilePath: "/Users/fvcci/Code/Github/price-matched/test.py",
+        },
+      ],
+    },
+    timestamp: 1769638614000,
+  },
 ];

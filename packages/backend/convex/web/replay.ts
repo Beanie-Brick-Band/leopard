@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import z from "zod";
 
 import * as WorkspaceEvents from "@package/validators/workspaceEvents";
 
@@ -55,8 +56,6 @@ export const getReplay = query({
       .order("asc")
       .collect();
 
-    return events.map((event) =>
-      WorkspaceEvents.DidChangeTextDocument.parse(event),
-    );
+    return z.array(WorkspaceEvents.WorkspaceEvent).parse(events);
   },
 });
