@@ -12,6 +12,8 @@ import { api } from "@package/backend/convex/_generated/api";
 
 import "react-scrubber/lib/scrubber.css";
 
+import * as WorkspaceEvents from "@package/validators/workspaceEvents";
+
 // Helper function for detecting the language for syntax highlighting
 function getLanguageFromFilePath(filePath: string): string {
   const ext = filePath.split(".").pop()?.toLowerCase() ?? "";
@@ -191,9 +193,12 @@ export const TextReplayScrubberComponent: React.FC = () => {
   const allFilePaths = React.useMemo(() => {
     const paths = new Set<string>();
     userTranscript?.forEach((event) => {
-      event.metadata.contentChanges.forEach((change) => {
-        paths.add(change.filePath);
-      });
+      // TODO: implement logic for DID_RENAME_FILES events. ISSUE #233
+      if (event.eventType === WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT) {
+        event.metadata.contentChanges.forEach((change) => {
+          paths.add(change.filePath);
+        });
+      }
     });
     return Array.from(paths);
   }, [userTranscript]);
@@ -219,20 +224,22 @@ export const TextReplayScrubberComponent: React.FC = () => {
       displayedUserTranscript[displayedUserTranscript.length - 1];
     if (!lastEvent) return;
 
-    const lastChange =
-      lastEvent.metadata.contentChanges[
-        lastEvent.metadata.contentChanges.length - 1
-      ];
-    if (!lastChange) return;
+    if (lastEvent.eventType === WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT) {
+      const lastChange =
+        lastEvent.metadata.contentChanges[
+          lastEvent.metadata.contentChanges.length - 1
+        ];
+      if (!lastChange) return;
 
-    // Switch to that file if it's different from the current selection
-    // only do so when the user is playing the replay, not when scrubbing
-    if (!isPlaying && !state.isScrubbing) return;
+      // Switch to that file if it's different from the current selection
+      // only do so when the user is playing the replay, not when scrubbing
+      if (!isPlaying && !state.isScrubbing) return;
 
-    if (lastChange.filePath !== selectedFilePath) {
-      // TODO: fix cascading rendering issue ISSUE #193
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedFilePath(lastChange.filePath);
+      if (lastChange.filePath !== selectedFilePath) {
+        // TODO: fix cascading rendering issue ISSUE #193
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSelectedFilePath(lastChange.filePath);
+      }
     }
   }, [displayedUserTranscript, selectedFilePath, isPlaying, state.isScrubbing]);
 
@@ -243,22 +250,24 @@ export const TextReplayScrubberComponent: React.FC = () => {
     const lines: string[] = [""];
 
     displayedUserTranscript?.forEach((event) => {
-      event.metadata.contentChanges.forEach((change) => {
-        // Only apply changes for the currently selected file
-        if (change.filePath !== selectedFilePath) return;
+      if (event.eventType === WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT) {
+        event.metadata.contentChanges.forEach((change) => {
+          // Only apply changes for the currently selected file
+          if (change.filePath !== selectedFilePath) return;
 
-        const isInsertion =
-          change.range.start.line === change.range.end.line &&
-          change.range.start.column === change.range.end.column;
+          const isInsertion =
+            change.range.start.line === change.range.end.line &&
+            change.range.start.column === change.range.end.column;
 
-        if (isInsertion) {
-          insertText(lines, change.range.start, change.text);
-        } else {
-          // A deletion is a replacement where change.text = ""
-          deleteText(lines, change.range);
-          insertText(lines, change.range.start, change.text);
-        }
-      });
+          if (isInsertion) {
+            insertText(lines, change.range.start, change.text);
+          } else {
+            // A deletion is a replacement where change.text = ""
+            deleteText(lines, change.range);
+            insertText(lines, change.range.start, change.text);
+          }
+        });
+      }
     });
 
     return lines.join("\n");
