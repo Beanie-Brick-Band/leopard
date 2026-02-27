@@ -26,6 +26,7 @@ suite("Extension Test Suite", () => {
   let mockClient: TestConvex<typeof schema>;
   let workspaceId: Id<"workspaces">;
   let workspaceUri: vscode.Uri;
+  let fileManager: FileManager;
 
   suiteSetup(() => {
     /*
@@ -71,22 +72,7 @@ suite("Extension Test Suite", () => {
     assert.ok(newWorkspaceUri, "Workspace folder should exist");
     workspaceUri = newWorkspaceUri;
 
-    const wsEdit = new vscode.WorkspaceEdit();
-    wsEdit.createFile(vscode.Uri.joinPath(workspaceUri, "test-dummy.ts"), {
-      ignoreIfExists: true,
-    });
-    wsEdit.createFile(vscode.Uri.joinPath(workspaceUri, "test-dummy2.ts"), {
-      ignoreIfExists: true,
-    });
-    wsEdit.createFile(vscode.Uri.joinPath(workspaceUri, "test-dummy3.ts"), {
-      ignoreIfExists: true,
-    });
-    const success = await vscode.workspace.applyEdit(wsEdit);
-    assert.ok(
-      success,
-      "test-dummy.ts, test-dummy2.ts, and test-dummy3.ts files should be created",
-    );
-
+    fileManager = new FileManager(workspaceUri);
     BatchedConvexHttpClient.init(
       mockClient as unknown as ConvexHttpClient,
       `coder-${coderWorkspaceId}-7b78cdf4d9-mx66l`,
@@ -95,25 +81,17 @@ suite("Extension Test Suite", () => {
   });
 
   teardown(async () => {
+    await fileManager.deleteAllFiles();
     await BatchedConvexHttpClient.flushAndResetInstance();
-
-    const wsEdit = new vscode.WorkspaceEdit();
-    wsEdit.deleteFile(vscode.Uri.joinPath(workspaceUri, "test-dummy.ts"));
-    wsEdit.deleteFile(vscode.Uri.joinPath(workspaceUri, "test-dummy2.ts"));
-    wsEdit.deleteFile(vscode.Uri.joinPath(workspaceUri, "test-dummy3.ts"));
-    const success = await vscode.workspace.applyEdit(wsEdit);
-    assert.ok(
-      success,
-      "test-dummy.ts, test-dummy2.ts, and test-dummy3.ts files should be deleted",
-    );
   });
 
   test("onDidChangeTextDocument event is sent to the Database", async () => {
-    const wsEdit = new vscode.WorkspaceEdit();
-    const fileUri = vscode.Uri.joinPath(workspaceUri, "test-dummy.ts");
-    wsEdit.insert(fileUri, new vscode.Position(0, 0), "Hello, world!");
-    const success = await vscode.workspace.applyEdit(wsEdit);
-    assert.ok(success, "Hello, world! should be inserted into test-dummy.ts");
+    const success = await fileManager.createAndEdit(
+      "test-dummy.ts",
+      new vscode.Position(0, 0),
+      "Hello, world!",
+    );
+    assert.ok(success, `test-dummy.ts should be created and edited`);
 
     // events are not immediately sent to the mockClient because of the debounce delay, so
     // we need this to bypass the debounce and flush the buffer
@@ -143,7 +121,7 @@ suite("Extension Test Suite", () => {
                 },
               },
               text: "Hello, world!",
-              filePath: fileUri.fsPath,
+              filePath: fileManager.getFileURI("test-dummy.ts").fsPath,
             },
           ],
         },
@@ -153,19 +131,21 @@ suite("Extension Test Suite", () => {
   });
 
   test("Sequential workspace events must be batch submitted", async () => {
-    const wsEdit1 = new vscode.WorkspaceEdit();
-    const fileUri = vscode.Uri.joinPath(workspaceUri, "test-dummy3.ts");
-    wsEdit1.insert(fileUri, new vscode.Position(0, 0), "First edit\n");
-    const success1 = await vscode.workspace.applyEdit(wsEdit1);
+    const success1 = await fileManager.createAndEdit(
+      "test-dummy3.ts",
+      new vscode.Position(0, 0),
+      "First edit\n",
+    );
     assert.ok(success1, "First edit should be applied");
 
     // simulate typing delay
     await sleep(200);
 
-    const wsEdit2 = new vscode.WorkspaceEdit();
-    const fileUri2 = vscode.Uri.joinPath(workspaceUri, "test-dummy2.ts");
-    wsEdit2.insert(fileUri2, new vscode.Position(1, 0), "Second edit\n");
-    const success2 = await vscode.workspace.applyEdit(wsEdit2);
+    const success2 = await fileManager.createAndEdit(
+      "test-dummy2.ts",
+      new vscode.Position(1, 0),
+      "Second edit\n",
+    );
     assert.ok(success2, "Second edit should be applied");
 
     // Flush to bypass debounce and submit batched events
@@ -208,4 +188,54 @@ suite("Extension Test Suite", () => {
 
 async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+class FileManager {
+  private readonly workspaceUri: vscode.Uri;
+  private readonly files: Set<string>;
+
+  constructor(workspaceUri: vscode.Uri) {
+    this.workspaceUri = workspaceUri;
+    this.files = new Set();
+  }
+
+  async createAndEdit(
+    fileName: string,
+    position: vscode.Position,
+    edit: string,
+  ) {
+    const fileUri = vscode.Uri.joinPath(this.workspaceUri, fileName);
+    const wsEdit = new vscode.WorkspaceEdit();
+    wsEdit.createFile(fileUri, { ignoreIfExists: true });
+    wsEdit.insert(fileUri, position, edit);
+    const success = await vscode.workspace.applyEdit(wsEdit);
+    if (success) {
+      this.files.add(fileName);
+      return true;
+    }
+
+    return false;
+  }
+
+  async deleteAllFiles() {
+    if (this.files.size === 0) {
+      return true;
+    }
+    const wsEdit = new vscode.WorkspaceEdit();
+    for (const fileName of this.files) {
+      wsEdit.deleteFile(vscode.Uri.joinPath(this.workspaceUri, fileName), {
+        ignoreIfNotExists: true,
+      });
+    }
+    const success = await vscode.workspace.applyEdit(wsEdit);
+    if (success) {
+      this.files.clear();
+      return true;
+    }
+    return false;
+  }
+
+  getFileURI(fileName: string) {
+    return vscode.Uri.joinPath(this.workspaceUri, fileName);
+  }
 }
