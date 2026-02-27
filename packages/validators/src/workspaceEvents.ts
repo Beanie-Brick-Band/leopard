@@ -4,23 +4,18 @@
 
 import { z } from "zod";
 
-export const NAMES = ["DID_CHANGE_TEXT_DOCUMENT"] as const;
-
-export const NAME = NAMES.reduce(
-  (acc, name) => {
-    acc[name] = name;
-    return acc;
-  },
-  {} as Record<(typeof NAMES)[number], (typeof NAMES)[number]>,
-);
+export const NAME = {
+  DID_CHANGE_TEXT_DOCUMENT: "DID_CHANGE_TEXT_DOCUMENT",
+  DID_RENAME_FILES: "DID_RENAME_FILES",
+} as const;
 
 const Event = z.object({
   timestamp: z.number(),
   workspaceId: z.string(),
 });
 
-export const DidChangeTextDocument = Event.extend({
-  eventType: z.literal("DID_CHANGE_TEXT_DOCUMENT"),
+const DidChangeTextDocument = Event.extend({
+  eventType: z.literal(NAME.DID_CHANGE_TEXT_DOCUMENT),
   metadata: z.object({
     contentChanges: z.array(
       z.object({
@@ -41,4 +36,19 @@ export const DidChangeTextDocument = Event.extend({
   }),
 });
 
-export type DidChangeTextDocument = z.infer<typeof DidChangeTextDocument>;
+const DidRenameFiles = Event.extend({
+  eventType: z.literal(NAME.DID_RENAME_FILES),
+  metadata: z.object({
+    renamedFiles: z.array(
+      z.object({
+        oldFilePath: z.string(),
+        newFilePath: z.string(),
+      }),
+    ),
+  }),
+});
+
+export const WorkspaceEvent = z.discriminatedUnion("eventType", [
+  DidChangeTextDocument,
+  DidRenameFiles,
+]);
