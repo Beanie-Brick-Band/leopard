@@ -9,7 +9,7 @@ export default defineSchema({
     name: v.string(),
     releaseDate: v.number(),
     workspaceConfig: v.optional(v.record(v.string(), v.any())),
-  }),
+  }).index("classroomId", ["classroomId"]),
   classrooms: defineTable({
     assignments: v.array(v.id("assignments")),
     className: v.string(),
