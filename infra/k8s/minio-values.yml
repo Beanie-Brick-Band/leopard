@@ -1,0 +1,50 @@
+mode: standalone
+replicas: 1
+
+existingSecret: minio-credentials
+
+persistence:
+  enabled: true
+  size: 5Gi
+
+buckets:
+  - name: starter-codes
+    policy: none
+    purge: false
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+  limits:
+    memory: 512Mi
+    cpu: 500m
+
+environment:
+  MINIO_CORS_ALLOW_ORIGIN: "https://nolapse.tech,https://*.nolapse.tech,http://localhost:3000"
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  hosts:
+    - minio.nolapse.tech
+  tls:
+    - secretName: minio-tls
+      hosts:
+        - minio.nolapse.tech
+
+consoleIngress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  hosts:
+    - minio-console.nolapse.tech
+  tls:
+    - secretName: minio-console-tls
+      hosts:
+        - minio-console.nolapse.tech

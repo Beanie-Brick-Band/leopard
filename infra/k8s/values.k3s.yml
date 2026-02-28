@@ -9,6 +9,10 @@ coder:
       value: "*.coder.nolapse.tech"
     - name: CODER_OAUTH2_GITHUB_ALLOW_SIGNUPS
       value: "true"
+    - name: CODER_MAX_TOKEN_LIFETIME
+      value: "8760h"
+    - name: CODER_MAX_ADMIN_TOKEN_LIFETIME
+      value: "8760h"
     - name: CODER_PG_CONNECTION_URL
       valueFrom:
         secretKeyRef:

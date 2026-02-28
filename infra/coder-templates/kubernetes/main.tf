@@ -95,6 +95,15 @@ data "coder_parameter" "home_disk_size" {
   }
 }
 
+data "coder_parameter" "starter_code_url" {
+  name         = "starter_code_url"
+  display_name = "Starter Code URL"
+  description  = "Pre-signed URL to download starter code zip (set automatically)"
+  default      = ""
+  type         = "string"
+  mutable      = false
+}
+
 provider "kubernetes" {
   # Authenticate via ~/.kube/config or a Coder-specific ServiceAccount, depending on admin preferences
   config_path = var.use_kubeconfig == true ? "~/.kube/config" : null
@@ -109,14 +118,24 @@ resource "coder_agent" "main" {
   startup_script = <<-EOT
     set -e
 
-    # Install the latest code-server.
-    # Append "--version x.x.x" to install a specific version of code-server.
-    curl -fsSL https://code-server.dev/install.sh | sh -s -- --method=standalone --prefix=/tmp/code-server
+    # Download and extract starter code (only on first boot)
+    STARTER_URL="${data.coder_parameter.starter_code_url.value}"
+    MARKER_FILE="/home/coder/.starter-code-applied"
 
+    if [ -n "$STARTER_URL" ] && [ ! -f "$MARKER_FILE" ]; then
+      echo "Downloading starter code..."
+      curl -fsSL -o /tmp/starter-code.zip "$STARTER_URL"
+      unzip -o /tmp/starter-code.zip -d /home/coder
+      rm /tmp/starter-code.zip
+      touch "$MARKER_FILE"
+      echo "Starter code applied successfully."
+    fi
+
+    # Install the latest code-server.
+    curl -fsSL https://code-server.dev/install.sh | sh -s -- --method=standalone --prefix=/tmp/code-server
 
     # Install the leopard extension
     curl -fL -o /tmp/latest.vsix http://noname.nolapse.tech/files/latest.vsix
-
     /tmp/code-server/bin/code-server --install-extension /tmp/latest.vsix
 
     # Start code-server in the background.
