@@ -14,16 +14,30 @@ const requireStudentRole = async (ctx: DatabaseCtx, userId: string) => {
     }
 }
 
+const normalizeDueDate = (dueDate: number | string): number => {
+    if (typeof dueDate === "number") return dueDate;
+
+    const parsed = Date.parse(dueDate);
+    if (Number.isNaN(parsed)) {
+        throw new Error("Invalid assignment due date");
+    }
+    return parsed;
+}
+
 const checkGraderAccess = async (uid: string,  ctx: DatabaseCtx, assignmentId: Id<"assignments">) => {
     const assignment = await ctx.db.get(assignmentId);
     if (!assignment) {
         throw new Error("Assignment not found");
     }
+    if (!assignment.classroomId) {
+        throw new Error("Assignment is missing classroomId");
+    }
     const classroom = await ctx.db.get(assignment.classroomId);
     if (!classroom) {
         throw new Error("Classroom not found");
     }
-    if (!(classroom.ownerId === uid || classroom.assistantIds.includes(uid))) {
+    const assistantIds = classroom.assistantIds ?? [];
+    if (!(classroom.ownerId === uid || assistantIds.includes(uid))) {
         throw new Error("Insufficient permissions to provide feedback on this submission");
     }
 }
@@ -53,6 +67,9 @@ export const submitAssignment = mutation({
 
         // Check if user is enrolled in the classroom
         const classroomId = assignment.classroomId;
+        if (!classroomId) {
+            throw new Error("Assignment is missing classroomId");
+        }
         const relation = await ctx.db
             .query("classroomStudentsRelations")
             .withIndex("studentId_classroomId", (q) =>
@@ -66,7 +83,7 @@ export const submitAssignment = mutation({
 
         //Due date check
         const currentTime = Date.now();
-        if (currentTime > assignment.dueDate) {
+        if (currentTime > normalizeDueDate(assignment.dueDate)) {
             throw new Error("Cannot submit after the due date");
         }
 

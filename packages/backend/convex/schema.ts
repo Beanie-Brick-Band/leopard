@@ -3,11 +3,11 @@ import { v } from "convex/values";
 
 export default defineSchema({
   assignments: defineTable({
-    classroomId: v.id("classrooms"),
+    classroomId: v.optional(v.id("classrooms")),
     description: v.optional(v.string()),
-    dueDate: v.number(),
+    dueDate: v.union(v.number(), v.string()),
     name: v.string(),
-    releaseDate: v.number(),
+    releaseDate: v.optional(v.union(v.number(), v.string())),
     workspaceConfig: v.optional(v.record(v.string(), v.any())),
   }).index("classroomId", ["classroomId"]),
   classrooms: defineTable({
@@ -15,7 +15,7 @@ export default defineSchema({
     className: v.string(),
     metadata: v.string(),
     ownerId: v.string(), // map this to betterAuth user id
-    assistantIds: v.array(v.string()), // map this to betterAuth user ids
+    assistantIds: v.optional(v.array(v.string())), // map this to betterAuth user ids
   }),
   classroomStudentsRelations: defineTable({
     classroomId: v.id("classrooms"),
