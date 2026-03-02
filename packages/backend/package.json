@@ -8,7 +8,10 @@
     "dev": "convex dev",
     "setup": "convex dev --until-success",
     "test": "dotenv -e ../../.env -e ../../.env.local -- vitest run",
-    "test:watch": "dotenv -e ../../.env -e ../../.env.local -- vitest"
+    "test:convex": "dotenv -e ../../.env -e ../../.env.local -- vitest run --config vitest.convex.config.ts",
+    "test:once": "dotenv -e ../../.env -e ../../.env.local -- vitest run",
+    "test:debug": "dotenv -e ../../.env -e ../../.env.local -- vitest --inspect-brk --no-file-parallelism",
+    "test:coverage": "dotenv -e ../../.env -e ../../.env.local -- vitest run --coverage --coverage.reporter=text"
   },
   "keywords": [],
   "author": "",
@@ -28,7 +31,9 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@edge-runtime/vm": "^5.0.0",
     "@types/node": "catalog:",
+    "convex-test": "^0.0.41",
     "dotenv-cli": "^10.0.0",
     "typescript": "catalog:",
     "vitest": "^4.0.17"

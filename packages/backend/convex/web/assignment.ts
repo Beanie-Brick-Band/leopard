@@ -33,6 +33,10 @@ const ensureCanAccessAssignment = async (
 
   const role = await getUserRole(ctx, userId);
 
+  if (role === "admin") {
+    return assignment;
+  }
+
   if (role === "student") {
     const relation = await ctx.db
       .query("classroomStudentsRelations")
@@ -86,7 +90,9 @@ export const getMyActiveWorkspace = query({
 
     return ctx.db
       .query("workspaces")
-      .withIndex("userId_isActive", (q) => q.eq("userId", user._id).eq("isActive", true))
+      .withIndex("userId_isActive", (q) =>
+        q.eq("userId", user._id).eq("isActive", true),
+      )
       .first();
   },
 });

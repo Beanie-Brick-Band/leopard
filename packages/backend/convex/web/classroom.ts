@@ -1,7 +1,7 @@
 import { getManyVia } from "convex-helpers/server/relationships";
 import { v } from "convex/values";
 
-import { MutationCtx, mutation, QueryCtx, query } from "../_generated/server";
+import { mutation, MutationCtx, query, QueryCtx } from "../_generated/server";
 import { authComponent } from "../auth";
 import { getUserRole } from "../helpers/roles";
 
@@ -9,7 +9,7 @@ type DatabaseCtx = QueryCtx | MutationCtx;
 
 const requireStudentRole = async (ctx: DatabaseCtx, userId: string) => {
   const role = await getUserRole(ctx, userId);
-  if (role !== "student") {
+  if (role !== "student" && role !== "admin") {
     throw new Error("Only students can access classroom enrollment endpoints");
   }
 };
