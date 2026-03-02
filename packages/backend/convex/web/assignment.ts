@@ -20,7 +20,6 @@ import {
   action,
   internalMutation,
   internalQuery,
-  mutation,
   query,
   QueryCtx,
 } from "../_generated/server";
