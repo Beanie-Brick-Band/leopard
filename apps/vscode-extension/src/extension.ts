@@ -67,13 +67,20 @@ export function activate(
   // );
 
   // TODO: workspace ingestion flow implementation for this event is low priority but could potentially be useful
-  // context.subscriptions.push(
-  //   vscode.workspace.onDidRenameFiles((e) => {
-  //     channel.appendLine(
-  //       `[${Date.now()}] ${e.files.map((file) => file.oldUri.fsPath).join(", ")} - ${e.files.map((file) => file.newUri.fsPath).join(", ")} - renamed`,
-  //     );
-  //   }),
-  // );
+  context.subscriptions.push(
+    vscode.workspace.onDidRenameFiles((e) => {
+      BatchedConvexHttpClient.getInstance().addEvent({
+        timestamp: Date.now(),
+        eventType: WorkspaceEvents.NAME.DID_RENAME_FILES,
+        metadata: {
+          renamedFiles: e.files.map((file) => ({
+            oldFilePath: file.oldUri.fsPath,
+            newFilePath: file.newUri.fsPath,
+          })),
+        },
+      });
+    }),
+  );
 
   // TODO: workspace ingestion flow implementation for this event is low priority but could potentially be useful
   // context.subscriptions.push(
