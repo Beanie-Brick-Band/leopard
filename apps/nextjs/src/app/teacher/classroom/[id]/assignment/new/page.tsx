@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { use, useState } from "react";
+import { use, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAction, useMutation } from "convex/react";
@@ -22,7 +22,9 @@ import { Input } from "@package/ui/input";
 import { Label } from "@package/ui/label";
 import { Spinner } from "@package/ui/spinner";
 
+import type { StarterCodeUploaderHandle } from "~/components/starter-code-uploader";
 import { Editor } from "~/components/editor";
+import { StarterCodeUploader } from "~/components/starter-code-uploader";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 
 function formatDateForInput(timestamp: number) {
@@ -36,6 +38,12 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
   const createAssignment = useMutation(
     api.web.teacherAssignments.createAssignment,
   );
+  const getUploadUrl = useAction(
+    api.web.teacherAssignmentActions.generateStarterCodeUploadUrl,
+  );
+
+  const uploaderRef = useRef<StarterCodeUploaderHandle>(null);
+  const storageKeyRef = useRef<string | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
@@ -46,15 +54,6 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
   const [dueDate, setDueDate] = useState(
     formatDateForInput(Date.now() + 24 * 60 * 60 * 1000),
   );
-  const [starterCodeFile, setStarterCodeFile] = useState<File | null>(null);
-
-  const getUploadUrl = useAction(
-    api.web.teacherAssignmentActions.getStarterCodeUploadUrl,
-  );
-  const saveStarterCodeKey = useMutation(
-    api.web.teacherAssignments.saveStarterCodeKey,
-  );
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
@@ -73,40 +72,26 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
         throw new Error("Assignment name is required");
       }
 
+      // Upload starter code first (if any), before creating the assignment
+      if (uploaderRef.current?.hasFiles()) {
+        storageKeyRef.current = null;
+        await uploaderRef.current.upload();
+      }
+
       const assignmentId = await createAssignment({
         classroomId,
         name: name.trim(),
         description: description.trim() || undefined,
         releaseDate: parsedReleaseDate,
         dueDate: parsedDueDate,
+        starterCodeStorageKey: storageKeyRef.current ?? undefined,
       });
 
-      if (starterCodeFile) {
-        try {
-          const { uploadUrl, storageKey } = await getUploadUrl({
-            assignmentId,
-          });
-
-          const uploadResp = await fetch(uploadUrl, {
-            method: "PUT",
-            body: starterCodeFile,
-            headers: { "Content-Type": "application/zip" },
-          });
-
-          if (!uploadResp.ok) {
-            throw new Error("Upload failed");
-          }
-
-          await saveStarterCodeKey({ assignmentId, storageKey });
-          toast.success("Assignment created with starter code");
-        } catch {
-          toast.warning(
-            "Assignment created, but starter code upload failed. You can upload it from the assignment page.",
-          );
-        }
-      } else {
-        toast.success("Assignment created");
-      }
+      toast.success(
+        storageKeyRef.current
+          ? "Assignment created with starter code"
+          : "Assignment created",
+      );
 
       router.push(
         `/teacher/classroom/${classroomId}/assignment/${assignmentId}`,
@@ -160,24 +145,15 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="starter-code">Starter Code (optional)</Label>
-              <Input
-                id="starter-code"
-                type="file"
-                accept=".zip"
-                onChange={(event) => {
-                  const file = event.target.files?.[0] ?? null;
-                  if (file && file.size > 50 * 1024 * 1024) {
-                    toast.error("File must be under 50MB");
-                    event.target.value = "";
-                    return;
-                  }
-                  setStarterCodeFile(file);
+              <Label>Starter Code (optional)</Label>
+              <StarterCodeUploader
+                ref={uploaderRef}
+                autoProceed={false}
+                getUploadUrl={() => getUploadUrl({ classroomId })}
+                onUploadSuccess={(storageKey) => {
+                  storageKeyRef.current = storageKey;
                 }}
               />
-              <p className="text-muted-foreground text-xs">
-                Upload a .zip file with starter code for students (max 50MB).
-              </p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
