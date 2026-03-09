@@ -19,6 +19,28 @@ export const internalDeleteStarterCodeObject = internalAction({
   },
 });
 
+export const generateStarterCodeUploadUrl = action({
+  args: {
+    classroomId: v.id("classrooms"),
+  },
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) {
+      throw new Error("Not authenticated");
+    }
+
+    await ctx.runQuery(
+      internal.web.teacherAssignments.internalVerifyInstructorAccess,
+      { classroomId: args.classroomId, userId: user._id },
+    );
+
+    const key = `${args.classroomId}/${crypto.randomUUID()}/starter-code.zip`;
+    const uploadUrl = await generateUploadUrl(key);
+
+    return { uploadUrl, storageKey: key };
+  },
+});
+
 export const getStarterCodeUploadUrl = action({
   args: {
     assignmentId: v.id("assignments"),

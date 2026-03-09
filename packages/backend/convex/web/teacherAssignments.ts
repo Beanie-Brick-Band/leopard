@@ -40,6 +40,16 @@ async function getClassroomForAssignment(
   return { assignment, classroom };
 }
 
+export const internalVerifyInstructorAccess = internalQuery({
+  args: {
+    classroomId: v.id("classrooms"),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await requireInstructorAccess(ctx, args.classroomId, args.userId);
+  },
+});
+
 // Internal query: verify instructor access and return assignment data
 // Used by actions via ctx.runQuery(...)
 export const internalGetAssignmentForInstructor = internalQuery({
@@ -135,6 +145,7 @@ export const createAssignment = mutation({
     releaseDate: v.number(),
     description: v.optional(v.string()),
     workspaceConfig: v.optional(v.record(v.string(), v.any())),
+    starterCodeStorageKey: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
@@ -151,6 +162,7 @@ export const createAssignment = mutation({
       releaseDate: args.releaseDate,
       description: args.description,
       workspaceConfig: args.workspaceConfig,
+      starterCodeStorageKey: args.starterCodeStorageKey,
     });
 
     await ctx.db.patch(classroom._id, {
