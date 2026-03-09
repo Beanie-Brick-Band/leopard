@@ -240,6 +240,64 @@ export const launchWorkspace = action({
       throw new Error("Failed to create session key in Coder");
     }
 
+    // Poll until the workspace is ready (build running + agent connected & ready)
+    const POLL_INTERVAL_MS = 2000;
+    const TIMEOUT_MS = 120_000;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < TIMEOUT_MS) {
+      const poll = await getWorkspaceMetadataByUserAndWorkspaceName({
+        client: coderClient,
+        path: {
+          user: coderUserId,
+          workspacename: `${args.assignmentId.toString()}`,
+        },
+      });
+
+      if (poll.error || !poll.data) {
+        throw new Error("Failed to poll workspace status");
+      }
+
+      const buildStatus = poll.data.latest_build?.status;
+
+      // Fail fast on terminal error states
+      if (buildStatus === "failed" || buildStatus === "canceled") {
+        throw new Error(`Workspace build entered terminal state: ${buildStatus}`);
+      }
+
+      if (buildStatus === "running") {
+        // Check if any agent is connected and ready
+        const agents =
+          poll.data.latest_build?.resources?.flatMap((r) => r.agents ?? []) ??
+          [];
+
+        const hasReadyAgent = agents.some(
+          (a) => a.status === "connected" && a.lifecycle_state === "ready",
+        );
+
+        // Fail fast if an agent hit an error
+        const hasAgentError = agents.some(
+          (a) =>
+            a.lifecycle_state === "start_error" ||
+            a.lifecycle_state === "start_timeout",
+        );
+
+        if (hasReadyAgent) {
+          break;
+        }
+
+        if (hasAgentError) {
+          throw new Error("Workspace agent failed to start");
+        }
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+    }
+
+    if (Date.now() - startTime >= TIMEOUT_MS) {
+      throw new Error("Workspace did not become ready within 2 minutes");
+    }
+
     await ctx.runMutation(internal.web.assignment.setUserActiveWorkspace, {
       userId: coderUserId,
       coderWorkspaceId: workspaceMetadata.data.id!,
