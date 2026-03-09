@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import type { Doc, Id } from "@package/backend/convex/_generated/dataModel";
+import type { Id } from "@package/backend/convex/_generated/dataModel";
 import { api } from "@package/backend/convex/_generated/api";
 import { Button } from "@package/ui/button";
 import {
@@ -39,111 +39,6 @@ function formatDateForInput(timestamp: number) {
   return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 }
 
-function SubmissionCard({
-  submission,
-  onSave,
-}: {
-  submission: Doc<"submissions">;
-  onSave: (
-    submissionId: Id<"submissions">,
-    grade: number | null,
-    feedback: string,
-  ) => Promise<void>;
-}) {
-  const [isSaving, setIsSaving] = useState(false);
-  const [grade, setGrade] = useState(submission.grade?.toString() ?? "");
-  const [feedback, setFeedback] = useState(submission.submissionFeedback ?? "");
-
-  const handleSave = async () => {
-    const nextGrade =
-      grade.trim() === ""
-        ? null
-        : Number.isNaN(Number(grade))
-          ? Number.NaN
-          : Number(grade);
-
-    if (Number.isNaN(nextGrade)) {
-      toast.error("Grade must be a valid number");
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      await onSave(submission._id, nextGrade, feedback);
-      toast.success("Submission updated");
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to update submission",
-      );
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  return (
-    <Card>
-      <CardHeader className="gap-1">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <CardTitle className="text-base">{submission.studentId}</CardTitle>
-            <CardDescription>
-              Submitted {new Date(submission.submittedAt).toLocaleString()}
-            </CardDescription>
-          </div>
-          {submission.grade !== undefined && (
-            <div className="bg-primary text-primary-foreground rounded-full px-2.5 py-0.5 text-sm font-semibold">
-              {submission.grade}
-            </div>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor={`grade-${submission._id}`}>Grade</Label>
-            <Input
-              id={`grade-${submission._id}`}
-              value={grade}
-              onChange={(event) => setGrade(event.target.value)}
-              placeholder="e.g. 95"
-              type="number"
-              step="0.01"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor={`graded-at-${submission._id}`}>Graded At</Label>
-            <Input
-              id={`graded-at-${submission._id}`}
-              readOnly
-              value={
-                submission.gradedAt
-                  ? new Date(submission.gradedAt).toLocaleString()
-                  : "Not graded"
-              }
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor={`feedback-${submission._id}`}>Feedback</Label>
-          <textarea
-            id={`feedback-${submission._id}`}
-            rows={4}
-            value={feedback}
-            onChange={(event) => setFeedback(event.target.value)}
-            placeholder="Feedback for the student"
-            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-          />
-        </div>
-
-        <Button onClick={handleSave} disabled={isSaving}>
-          {isSaving ? "Saving..." : "Save Grade & Feedback"}
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
 function AssignmentContent({
   classroomId,
   assignmentId,
@@ -158,18 +53,11 @@ function AssignmentContent({
       assignmentId,
     },
   );
-
   const updateAssignment = useMutation(
     api.web.teacherAssignments.updateAssignment,
   );
   const deleteAssignment = useMutation(
     api.web.teacherAssignments.deleteAssignment,
-  );
-  const gradeSubmission = useMutation(
-    api.web.teacherAssignments.gradeSubmission,
-  );
-  const provideSubmissionFeedback = useMutation(
-    api.web.teacherAssignments.provideSubmissionFeedback,
   );
 
   const [isEditing, setIsEditing] = useState(false);
@@ -252,30 +140,14 @@ function AssignmentContent({
     }
   };
 
-  const handleSaveSubmission = async (
-    submissionId: Id<"submissions">,
-    grade: number | null,
-    feedback: string,
-  ) => {
-    if (grade !== null) {
-      await gradeSubmission({
-        submissionId,
-        grade,
-      });
-    }
-
-    await provideSubmissionFeedback({
-      submissionId,
-      feedback,
-    });
-  };
-
   const dueDateValue = new Date(assignment.dueDate);
   const totalStudents = submissions?.length ?? 0;
   const submittedCount = submissions?.length ?? 0;
   const gradedCount =
     submissions?.filter((submission) => submission.grade !== undefined)
       .length ?? 0;
+  const sortedSubmissions =
+    submissions?.slice().sort((a, b) => b.submittedAt - a.submittedAt) ?? [];
 
   return (
     <div className="container mx-auto p-6">
@@ -347,15 +219,71 @@ function AssignmentContent({
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-3">
-                {submissions.map((submission) => (
-                  <SubmissionCard
-                    key={submission._id}
-                    submission={submission}
-                    onSave={handleSaveSubmission}
-                  />
-                ))}
-              </div>
+              <Card>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[720px] text-sm">
+                      <thead className="bg-muted/40">
+                        <tr className="border-b">
+                          <th className="px-4 py-3 text-left font-medium">
+                            Student
+                          </th>
+                          <th className="px-4 py-3 text-left font-medium">
+                            Submitted
+                          </th>
+                          <th className="px-4 py-3 text-left font-medium">
+                            Grade
+                          </th>
+                          <th className="px-4 py-3 text-right font-medium">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortedSubmissions.map((submission) => (
+                          <tr
+                            key={submission._id}
+                            className="border-b last:border-b-0"
+                          >
+                            <td className="px-4 py-3 align-top">
+                              <p className="font-medium">
+                                {submission.studentName ??
+                                  submission.studentEmail?.split("@")[0] ??
+                                  submission.studentId}
+                              </p>
+                            </td>
+                            <td className="text-muted-foreground px-4 py-3 align-top">
+                              {new Date(
+                                submission.submittedAt,
+                              ).toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 align-top">
+                              {submission.grade !== undefined ? (
+                                <span className="font-medium">
+                                  {submission.grade}
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">
+                                  Not graded
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-right align-top">
+                              <Button asChild variant="outline">
+                                <Link
+                                  href={`/teacher/classroom/${classroomId}/assignment/${assignmentId}/review/${submission._id}`}
+                                >
+                                  Review
+                                </Link>
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </section>
         </div>
