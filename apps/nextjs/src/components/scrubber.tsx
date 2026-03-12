@@ -195,31 +195,44 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
   const eventsToReplay = Math.round((state.value / 100) * totalEvents);
   const displayedUserTranscript = userTranscript?.slice(0, eventsToReplay);
 
-  // Extract all unique file paths from the transcript
-  const allFilePaths = React.useMemo(() => {
+  // Extract file paths visible at the current replay position
+  const currentFilePaths = React.useMemo(() => {
     const paths = new Set<string>();
-    userTranscript?.forEach((event) => {
-      // TODO: implement logic for DID_RENAME_FILES events. ISSUE #233
+    displayedUserTranscript?.forEach((event) => {
       if (event.eventType === WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT) {
         event.metadata.contentChanges.forEach((change) => {
           paths.add(change.filePath);
         });
       }
+
+      if (event.eventType === WorkspaceEvents.NAME.DID_RENAME_FILES) {
+        event.metadata.renamedFiles.forEach((rename) => {
+          paths.delete(rename.oldFilePath);
+          paths.add(rename.newFilePath);
+        });
+      }
     });
     return Array.from(paths);
-  }, [userTranscript]);
+  }, [displayedUserTranscript]);
 
   // State that tracks the currently selected file
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
 
-  // Set initial file when transcript loads
+  // Set initial file when transcript loads and keep selection valid across rename/time changes
   useEffect(() => {
-    if (!selectedFilePath && allFilePaths.length > 0) {
-      // TODO: fix cascading rendering issue ISSUE #193
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedFilePath(allFilePaths[0] ?? null);
+    if (currentFilePaths.length === 0) {
+      if (selectedFilePath !== null) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSelectedFilePath(null);
+      }
+      return;
     }
-  }, [allFilePaths, selectedFilePath]);
+
+    if (!selectedFilePath || !currentFilePaths.includes(selectedFilePath)) {
+      // TODO: fix cascading rendering issue ISSUE #193
+      setSelectedFilePath(currentFilePaths[0] ?? null);
+    }
+  }, [currentFilePaths, selectedFilePath]);
 
   // Automatically switch to file being edited at current replay position
   useEffect(() => {
@@ -246,6 +259,17 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedFilePath(lastChange.filePath);
       }
+      return;
+    }
+
+    if (!isPlaying && !state.isScrubbing) return;
+
+    const renamedSelectedFile = lastEvent.metadata.renamedFiles.find(
+      (rename) => rename.oldFilePath === selectedFilePath,
+    );
+
+    if (renamedSelectedFile) {
+      setSelectedFilePath(renamedSelectedFile.newFilePath);
     }
   }, [displayedUserTranscript, selectedFilePath, isPlaying, state.isScrubbing]);
 
@@ -253,13 +277,17 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
   const displayedOutputText = React.useMemo(() => {
     if (!selectedFilePath) return "";
 
-    const lines: string[] = [""];
+    const fileContents = new Map<string, string[]>();
+
+    // Initialize currently visible files with empty content
+    currentFilePaths.forEach((path) => {
+      fileContents.set(path, [""]);
+    });
 
     displayedUserTranscript?.forEach((event) => {
       if (event.eventType === WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT) {
         event.metadata.contentChanges.forEach((change) => {
-          // Only apply changes for the currently selected file
-          if (change.filePath !== selectedFilePath) return;
+          const lines = fileContents.get(change.filePath) ?? [""];
 
           const isInsertion =
             change.range.start.line === change.range.end.line &&
@@ -272,12 +300,27 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
             deleteText(lines, change.range);
             insertText(lines, change.range.start, change.text);
           }
+
+          fileContents.set(change.filePath, lines);
+        });
+        // Currently redundant but for clarity upon futher events being added
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      } else if (event.eventType === WorkspaceEvents.NAME.DID_RENAME_FILES) {
+        event.metadata.renamedFiles.forEach((rename) => {
+          const oldLines = fileContents.get(rename.oldFilePath) ?? [""];
+          const newLines = [...oldLines]; // copy content to new file
+          fileContents.set(rename.newFilePath, newLines);
+          fileContents.set(rename.oldFilePath, [""]); // reset old file to empty
+
+          // remove the oldFilePath from being accessed
+          fileContents.delete(rename.oldFilePath);
         });
       }
     });
 
+    const lines = fileContents.get(selectedFilePath) ?? [""];
     return lines.join("\n");
-  }, [displayedUserTranscript, selectedFilePath]);
+  }, [displayedUserTranscript, selectedFilePath, currentFilePaths]);
 
   // Detect the language from the file path
   const detectedLanguage = React.useMemo(
@@ -309,9 +352,9 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
 
   return (
     <div className="h-max w-full space-y-4">
-      {allFilePaths.length > 1 && (
-        <div className="border-border bg-muted/30 flex gap-0 overflow-x-auto border p-1">
-          {allFilePaths.map((filePath, index) => {
+      {currentFilePaths.length > 0 && (
+        <div className="flex gap-0 overflow-x-auto border border-gray-200 bg-gray-100 p-1 dark:border-gray-700 dark:bg-gray-900">
+          {currentFilePaths.map((filePath, index) => {
             const fileName = filePath.split("/").pop() ?? filePath;
             const isActive = filePath === selectedFilePath;
             return (
