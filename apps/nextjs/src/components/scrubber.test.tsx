@@ -1,7 +1,81 @@
+import type { output } from "zod";
 import { describe, expect, it } from "vitest";
+
+import { WorkspaceEvent as WorkspaceEventSchema } from "@package/validators/workspaceEvents";
 
 import type { Range, TextDocumentPosition } from "./scrubber";
 import { deleteText, insertText } from "./scrubber";
+
+type ReplayEvent = output<typeof WorkspaceEventSchema>;
+
+function createReplayEvent(
+  event: Omit<ReplayEvent, "timestamp" | "workspaceId"> &
+    Partial<Pick<ReplayEvent, "timestamp" | "workspaceId">>,
+): ReplayEvent {
+  return WorkspaceEventSchema.parse({
+    timestamp: 0,
+    workspaceId: "test-workspace",
+    ...event,
+  });
+}
+
+function getVisibleFilePathsFromTimeline(transcript: ReplayEvent[]): string[] {
+  const paths = new Set<string>();
+
+  transcript.forEach((event) => {
+    if (event.eventType === "DID_CHANGE_TEXT_DOCUMENT") {
+      event.metadata.contentChanges.forEach((change) => {
+        paths.add(change.filePath);
+      });
+      return;
+    }
+
+    event.metadata.renamedFiles.forEach((rename) => {
+      paths.delete(rename.oldFilePath);
+      paths.add(rename.newFilePath);
+    });
+  });
+
+  return Array.from(paths);
+}
+
+function replayFileContents(transcript: ReplayEvent[]): Map<string, string> {
+  const fileContents = new Map<string, string[]>();
+
+  transcript.forEach((event) => {
+    if (event.eventType === "DID_CHANGE_TEXT_DOCUMENT") {
+      event.metadata.contentChanges.forEach((change) => {
+        const lines = fileContents.get(change.filePath) ?? [""];
+        const isInsertion =
+          change.range.start.line === change.range.end.line &&
+          change.range.start.column === change.range.end.column;
+
+        if (isInsertion) {
+          insertText(lines, change.range.start, change.text);
+        } else {
+          deleteText(lines, change.range);
+          insertText(lines, change.range.start, change.text);
+        }
+
+        fileContents.set(change.filePath, lines);
+      });
+      return;
+    }
+
+    event.metadata.renamedFiles.forEach((rename) => {
+      const oldLines = fileContents.get(rename.oldFilePath) ?? [""];
+      fileContents.set(rename.newFilePath, [...oldLines]);
+      fileContents.delete(rename.oldFilePath);
+    });
+  });
+
+  return new Map(
+    Array.from(fileContents.entries()).map(([filePath, lines]) => [
+      filePath,
+      lines.join("\n"),
+    ]),
+  );
+}
 
 describe("insertText", () => {
   it("should insert text at the beginning of a line", () => {
@@ -229,5 +303,121 @@ c insertedX`);
       end: { line: 1, column: 3 },
     });
     expect(fileZ.join("\n")).toBe(``);
+  });
+});
+
+describe("rename timeline functionality", () => {
+  it("shows first created file in the timeline at the first event", () => {
+    const timeline: ReplayEvent[] = [
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "src/file1.ts",
+              range: {
+                start: { line: 0, column: 0 },
+                end: { line: 0, column: 0 },
+              },
+              text: "const a = 1;",
+            },
+          ],
+        },
+      }),
+    ];
+
+    expect(getVisibleFilePathsFromTimeline(timeline)).toEqual(["src/file1.ts"]);
+  });
+
+  it("keeps old file name before rename and new file name after rename", () => {
+    const events: ReplayEvent[] = [
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "src/file1.ts",
+              range: {
+                start: { line: 0, column: 0 },
+                end: { line: 0, column: 0 },
+              },
+              text: "hello",
+            },
+          ],
+        },
+      }),
+      createReplayEvent({
+        eventType: "DID_RENAME_FILES",
+        metadata: {
+          renamedFiles: [
+            {
+              oldFilePath: "src/file1.ts",
+              newFilePath: "src/file2.ts",
+            },
+          ],
+        },
+      }),
+    ];
+
+    expect(getVisibleFilePathsFromTimeline(events.slice(0, 1))).toEqual([
+      "src/file1.ts",
+    ]);
+    expect(getVisibleFilePathsFromTimeline(events)).toEqual(["src/file2.ts"]);
+  });
+
+  it("does not keep old content when old file name is reused after rename", () => {
+    const events: ReplayEvent[] = [
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "src/file1.ts",
+              range: {
+                start: { line: 0, column: 0 },
+                end: { line: 0, column: 0 },
+              },
+              text: "const oldValue = 123;",
+            },
+          ],
+        },
+      }),
+      createReplayEvent({
+        eventType: "DID_RENAME_FILES",
+        metadata: {
+          renamedFiles: [
+            {
+              oldFilePath: "src/file1.ts",
+              newFilePath: "src/file2.ts",
+            },
+          ],
+        },
+      }),
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "src/file1.ts",
+              range: {
+                start: { line: 0, column: 0 },
+                end: { line: 0, column: 0 },
+              },
+              text: "const newValue = 999;",
+            },
+          ],
+        },
+      }),
+    ];
+
+    const visibleFiles = getVisibleFilePathsFromTimeline(events);
+    expect(visibleFiles).toEqual(
+      expect.arrayContaining(["src/file1.ts", "src/file2.ts"]),
+    );
+
+    const fileContents = replayFileContents(events);
+    expect(fileContents.get("src/file2.ts")).toBe("const oldValue = 123;");
+    expect(fileContents.get("src/file1.ts")).toBe("const newValue = 999;");
+    expect(fileContents.get("src/file1.ts")).not.toContain("oldValue");
   });
 });
