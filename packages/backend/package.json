@@ -6,7 +6,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "convex dev",
-    "setup": "convex dev --until-success"
+    "setup": "convex dev --until-success",
+    "test": "vitest",
+    "test:once": "vitest run",
+    "test:debug": "vitest --inspect-brk --no-file-parallelism",
+    "test:coverage": "vitest run --coverage --coverage.reporter=text"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +28,10 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@edge-runtime/vm": "^5.0.0",
     "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "convex-test": "^0.0.41",
+    "typescript": "catalog:",
+    "vitest": "^4.0.17"
   }
 }
