@@ -10,6 +10,8 @@ export const NAME = {
 } as const;
 
 const Event = z.object({
+  _id: z.string(),
+  _creationTime: z.number(),
   timestamp: z.number(),
   workspaceId: z.string(),
 });
