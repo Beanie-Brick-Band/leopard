@@ -21,9 +21,7 @@ export function StarterCodeCard({
   const getUploadUrl = useAction(
     api.web.teacherAssignmentActions.getStarterCodeUploadUrl,
   );
-  const saveKey = useMutation(
-    api.web.teacherAssignments.saveStarterCodeKey,
-  );
+  const saveKey = useMutation(api.web.teacherAssignments.saveStarterCodeKey);
   const removeCode = useAction(
     api.web.teacherAssignmentActions.removeStarterCode,
   );
@@ -39,9 +37,7 @@ export function StarterCodeCard({
       await removeCode({ assignmentId });
       toast.success("Starter code removed");
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to remove",
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to remove");
     } finally {
       setIsRemoving(false);
     }

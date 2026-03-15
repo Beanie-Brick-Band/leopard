@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
 
+import { StarterCodeCard } from "./starter-code-card";
+
 // --- Hoisted mocks (available inside vi.mock factories) ---
 
 const {
@@ -19,11 +21,13 @@ const {
   mockRemoveCode: vi.fn(),
   mockUseQuery: vi.fn(),
   mockToast: { success: vi.fn(), error: vi.fn() },
-  capturedUploadSuccess: { fn: null as ((storageKey: string) => Promise<void>) | null },
+  capturedUploadSuccess: {
+    fn: null as ((storageKey: string) => Promise<void>) | null,
+  },
 }));
 
 vi.mock("convex/react", () => ({
-  useQuery: (...args: unknown[]) => mockUseQuery(...args),
+  useQuery: (...args: unknown[]) => mockUseQuery(...args) as unknown,
   useAction: (ref: string) => {
     if (ref === "getStarterCodeUploadUrl") return mockGetUploadUrl;
     if (ref === "removeStarterCode") return mockRemoveCode;
@@ -61,8 +65,6 @@ vi.mock("~/components/starter-code-uploader", () => ({
     return <div data-testid="starter-code-uploader">Uploader Mock</div>;
   },
 }));
-
-import { StarterCodeCard } from "./starter-code-card";
 
 // --- Helpers ---
 
@@ -134,6 +136,7 @@ describe("StarterCodeCard", () => {
       render(<StarterCodeCard assignmentId={ASSIGNMENT_ID} />);
 
       // Trigger the onUploadSuccess callback the card passes to the uploader
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       await capturedUploadSuccess.fn!("test/key.zip");
 
       expect(mockSaveKey).toHaveBeenCalledWith({
@@ -153,7 +156,10 @@ describe("StarterCodeCard", () => {
 
     it("calls removeCode after confirmation", async () => {
       const user = userEvent.setup();
-      vi.stubGlobal("confirm", vi.fn(() => true));
+      vi.stubGlobal(
+        "confirm",
+        vi.fn(() => true),
+      );
       mockRemoveCode.mockResolvedValue(undefined);
 
       render(<StarterCodeCard assignmentId={ASSIGNMENT_ID} />);
@@ -175,7 +181,10 @@ describe("StarterCodeCard", () => {
 
     it("does nothing when confirmation is cancelled", async () => {
       const user = userEvent.setup();
-      vi.stubGlobal("confirm", vi.fn(() => false));
+      vi.stubGlobal(
+        "confirm",
+        vi.fn(() => false),
+      );
 
       render(<StarterCodeCard assignmentId={ASSIGNMENT_ID} />);
 
@@ -190,7 +199,10 @@ describe("StarterCodeCard", () => {
 
     it("shows error toast when remove fails", async () => {
       const user = userEvent.setup();
-      vi.stubGlobal("confirm", vi.fn(() => true));
+      vi.stubGlobal(
+        "confirm",
+        vi.fn(() => true),
+      );
       mockRemoveCode.mockRejectedValue(new Error("Delete failed"));
 
       render(<StarterCodeCard assignmentId={ASSIGNMENT_ID} />);
@@ -208,7 +220,10 @@ describe("StarterCodeCard", () => {
 
     it("shows 'Removing...' while remove is in progress", async () => {
       const user = userEvent.setup();
-      vi.stubGlobal("confirm", vi.fn(() => true));
+      vi.stubGlobal(
+        "confirm",
+        vi.fn(() => true),
+      );
 
       let resolveRemove!: () => void;
       mockRemoveCode.mockReturnValue(
