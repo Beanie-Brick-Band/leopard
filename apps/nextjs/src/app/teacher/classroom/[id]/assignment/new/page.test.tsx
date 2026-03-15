@@ -1,9 +1,11 @@
-import { Suspense, act } from "react";
+import { act, Suspense } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
+
+import NewAssignmentPage from "./page";
 
 // --- Hoisted mocks ---
 
@@ -111,14 +113,14 @@ vi.mock("~/components/starter-code-uploader", () => ({
   },
 }));
 
-import NewAssignmentPage from "./page";
-
 // --- Helpers ---
 
 const CLASSROOM_ID = "classroom123" as Id<"classrooms">;
 const ASSIGNMENT_ID = "assignment456" as Id<"assignments">;
 
 async function renderPage() {
+  // async needed for act() to flush suspended promises from use()
+  // eslint-disable-next-line @typescript-eslint/require-await
   await act(async () => {
     render(
       <Suspense fallback={<div>Loading...</div>}>
