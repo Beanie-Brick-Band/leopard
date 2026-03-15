@@ -17,7 +17,7 @@ export async function launchWorkspace(assignmentId: Id<"assignments">) {
   }
 
   const result = await fetchAction(
-    api.web.assignment.launchWorkspace,
+    api.web.assignmentActions.launchWorkspace,
     {
       assignmentId: assignmentId,
     },

@@ -1,10 +1,19 @@
 import { v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
-import { mutation, MutationCtx, query, QueryCtx } from "../_generated/server";
+import { internal } from "../_generated/api";
+import {
+  internalMutation,
+  internalQuery,
+  mutation,
+  MutationCtx,
+  query,
+  QueryCtx,
+} from "../_generated/server";
 import { authComponent } from "../auth";
+import { getObjectKey } from "../helpers/storageKeys";
 import { requireInstructorAccess } from "./teacher";
-import { getUserRole, requireAuth, requireTeacherOrAdmin } from "./user";
+import { getUserRole, requireAuth } from "./user";
 
 type DbCtx = QueryCtx | MutationCtx;
 type SubmissionStat = {
@@ -30,6 +39,45 @@ async function getClassroomForAssignment(
 
   return { assignment, classroom };
 }
+
+export const internalVerifyInstructorAccess = internalQuery({
+  args: {
+    classroomId: v.id("classrooms"),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await requireInstructorAccess(ctx, args.classroomId, args.userId);
+  },
+});
+
+// Internal query: verify instructor access and return assignment data
+// Used by actions via ctx.runQuery(...)
+export const internalGetAssignmentForInstructor = internalQuery({
+  args: {
+    assignmentId: v.id("assignments"),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { assignment, classroom } = await getClassroomForAssignment(
+      ctx,
+      args.assignmentId,
+    );
+    await requireInstructorAccess(ctx, classroom._id, args.userId);
+    return assignment;
+  },
+});
+
+// Internal mutation: clear the starter code storage key
+export const internalClearStarterCodeKey = internalMutation({
+  args: {
+    assignmentId: v.id("assignments"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.assignmentId, {
+      starterCodeStorageKey: undefined,
+    });
+  },
+});
 
 async function requireAccessToClassroomAssignments(
   ctx: DbCtx,
@@ -97,6 +145,7 @@ export const createAssignment = mutation({
     releaseDate: v.number(),
     description: v.optional(v.string()),
     workspaceConfig: v.optional(v.record(v.string(), v.any())),
+    starterCodeStorageKey: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
@@ -113,6 +162,7 @@ export const createAssignment = mutation({
       releaseDate: args.releaseDate,
       description: args.description,
       workspaceConfig: args.workspaceConfig,
+      starterCodeStorageKey: args.starterCodeStorageKey,
     });
 
     await ctx.db.patch(classroom._id, {
@@ -206,6 +256,15 @@ export const deleteAssignment = mutation({
     await ctx.db.patch(classroom._id, {
       assignments: classroom.assignments.filter((id) => id !== assignment._id),
     });
+
+    // Schedule MinIO cleanup if starter code exists
+    if (assignment.starterCodeStorageKey) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.web.teacherAssignmentActions.internalDeleteStarterCodeObject,
+        { storageKey: assignment.starterCodeStorageKey },
+      );
+    }
 
     await ctx.db.delete(assignment._id);
     return assignment._id;
@@ -448,6 +507,35 @@ export const deleteFlag = mutation({
     });
 
     return submission._id;
+  },
+});
+
+// --- Starter Code Endpoints ---
+
+export const saveStarterCodeKey = mutation({
+  args: {
+    assignmentId: v.id("assignments"),
+    storageKey: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const { assignment, classroom } = await getClassroomForAssignment(
+      ctx,
+      args.assignmentId,
+    );
+    await requireInstructorAccess(ctx, classroom._id, user._id);
+
+    // Validate the storage key matches the expected format
+    const expectedKey = getObjectKey(classroom._id, assignment._id);
+    if (args.storageKey !== expectedKey) {
+      throw new Error("Invalid storage key");
+    }
+
+    await ctx.db.patch(args.assignmentId, {
+      starterCodeStorageKey: args.storageKey,
+    });
+
+    return args.assignmentId;
   },
 });
 

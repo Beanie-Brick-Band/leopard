@@ -13,6 +13,8 @@
   "license": "ISC",
   "packageManager": "pnpm@10.19.0",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.997.0",
+    "@aws-sdk/s3-request-presigner": "^3.997.0",
     "@convex-dev/better-auth": "^0.10.10",
     "@package/coder-sdk": "workspace:^",
     "@package/validators": "workspace:^",
