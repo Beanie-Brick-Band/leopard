@@ -28,6 +28,7 @@ import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
 import { launchWorkspace } from "~/app/app/actions";
+import { WorkspaceLaunchingOverlay } from "~/components/workspace-launching-overlay";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 
 function Content({
@@ -120,6 +121,7 @@ function Content({
 
   return (
     <div className="container mx-auto p-6">
+      <WorkspaceLaunchingOverlay isLaunching={isLaunching} />
       <div className="mb-4">
         <Link
           href={`/student/classroom/${classroomId}`}

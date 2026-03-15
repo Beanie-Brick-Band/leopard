@@ -28,9 +28,6 @@ export async function launchWorkspace(assignmentId: Id<"assignments">) {
   // Next.js automatically sets NODE_ENV to 'development' when running `next dev`
   const isDevelopment = env.NODE_ENV === "development";
 
-  // TODO: artificially wait for 15 seconds to ensure the workspace is up
-  await new Promise((resolve) => setTimeout(resolve, 15000));
-
   // In development, redirect through an intermediate endpoint that sets the cookie
   // The reverse proxy (@package/dev-proxy) serves this page and handles the flow
   // In production, set cookie and redirect directly
