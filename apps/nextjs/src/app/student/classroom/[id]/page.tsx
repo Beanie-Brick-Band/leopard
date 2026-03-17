@@ -20,6 +20,7 @@ import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
 import { launchWorkspace } from "~/app/app/actions";
+import { WorkspaceLaunchingOverlay } from "~/components/workspace-launching-overlay";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 
 interface Classroom {
@@ -73,6 +74,7 @@ function AssignmentCard({
 
   return (
     <Card>
+      <WorkspaceLaunchingOverlay isLaunching={isLaunching} />
       <CardHeader className="space-y-2">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
