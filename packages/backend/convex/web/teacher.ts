@@ -99,12 +99,28 @@ export const getClassroomDetails = query({
       }),
     );
 
+    const assistants = await Promise.all(
+      classroom.assistantIds.map(async (id) => {
+        const authUser = await authComponent.getAnyUserById(ctx, id);
+        return {
+          userId: id,
+          name:
+            (authUser?.name && authUser.name.trim()) ||
+            (authUser?.displayUsername && authUser.displayUsername.trim()) ||
+            (authUser?.username && authUser.username.trim()) ||
+            null,
+          email: authUser?.email ?? null,
+        };
+      }),
+    );
+
     return {
       classroom,
       assignments,
       enrolledStudents: enrolledStudentsWithProfiles,
       studentCount: enrolledStudentsWithProfiles.length,
       pendingEnrollments: [],
+      assistants,
     };
   },
 });
@@ -170,6 +186,44 @@ export const updateClassroom = mutation({
     }
 
     await ctx.db.patch(args.classroomId, patch);
+  },
+});
+
+export const promoteToAssistant = mutation({
+  args: {
+    classroomId: v.id("classrooms"),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const classroom = await requireClassroomOwnerOrAdmin(ctx, args.classroomId, user._id);
+
+    if (args.userId === classroom.ownerId) {
+      throw new Error("The classroom owner cannot be added as a TA");
+    }
+
+    if (classroom.assistantIds.includes(args.userId)) {
+      throw new Error("This user is already a TA for this classroom");
+    }
+
+    await ctx.db.patch(args.classroomId, {
+      assistantIds: [...classroom.assistantIds, args.userId],
+    });
+  },
+});
+
+export const removeAssistant = mutation({
+  args: {
+    classroomId: v.id("classrooms"),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const classroom = await requireClassroomOwnerOrAdmin(ctx, args.classroomId, user._id);
+
+    await ctx.db.patch(args.classroomId, {
+      assistantIds: classroom.assistantIds.filter((id) => id !== args.userId),
+    });
   },
 });
 
