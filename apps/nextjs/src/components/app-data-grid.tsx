@@ -15,6 +15,7 @@ const defaultColDef: ColDef = {
   resizable: true,
   flex: 1,
   minWidth: 140,
+  cellStyle: { display: "flex", alignItems: "center" },
 };
 
 interface AppDataGridProps<TData> {

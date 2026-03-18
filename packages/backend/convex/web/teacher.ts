@@ -99,28 +99,12 @@ export const getClassroomDetails = query({
       }),
     );
 
-    const assistants = await Promise.all(
-      classroom.assistantIds.map(async (id) => {
-        const authUser = await authComponent.getAnyUserById(ctx, id);
-        return {
-          userId: id,
-          name:
-            (authUser?.name && authUser.name.trim()) ||
-            (authUser?.displayUsername && authUser.displayUsername.trim()) ||
-            (authUser?.username && authUser.username.trim()) ||
-            null,
-          email: authUser?.email ?? null,
-        };
-      }),
-    );
-
     return {
       classroom,
       assignments,
       enrolledStudents: enrolledStudentsWithProfiles,
       studentCount: enrolledStudentsWithProfiles.length,
-      pendingEnrollments: [],
-      assistants,
+      assistantCount: classroom.assistantIds.length,
     };
   },
 });
@@ -197,6 +181,17 @@ export const promoteToAssistant = mutation({
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
     const classroom = await requireClassroomOwnerOrAdmin(ctx, args.classroomId, user._id);
+
+    const enrollment = await ctx.db
+      .query("classroomStudentsRelations")
+      .withIndex("studentId_classroomId", (q) =>
+        q.eq("studentId", args.userId).eq("classroomId", args.classroomId),
+      )
+      .first();
+
+    if (!enrollment) {
+      throw new Error("User must be enrolled in the classroom to be promoted to TA");
+    }
 
     if (args.userId === classroom.ownerId) {
       throw new Error("The classroom owner cannot be added as a TA");

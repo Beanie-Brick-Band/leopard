@@ -4,6 +4,7 @@ import type { ColDef } from "ag-grid-community";
 import { use, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
+import { MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
@@ -63,7 +64,7 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
     assignments,
     studentCount,
     enrolledStudents,
-    assistants,
+    assistantCount,
   } = classroomDetails;
 
   const assistantIds = new Set(classroom.assistantIds);
@@ -145,11 +146,8 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
         data?: (typeof enrolledStudentRows)[number];
       }) =>
         data ? (
-          <div className="py-2">
+          <div className="flex h-full items-center">
             <p className="font-medium">{data.studentName}</p>
-            <p className="text-muted-foreground font-mono text-xs">
-              {data.studentId}
-            </p>
           </div>
         ) : null,
     },
@@ -175,7 +173,9 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
                 TA
               </span>
             ) : (
-              <span className="text-muted-foreground text-xs">Student</span>
+              <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs font-medium">
+                Student
+              </span>
             )}
           </div>
         ) : null,
@@ -205,8 +205,8 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
           <div className="flex h-full items-center justify-end">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Actions
+                <Button variant="outline" size="icon" className="h-8 w-8">
+                  <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -265,9 +265,7 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
       await promoteToAssistant({ classroomId, userId: promoteTarget.id });
       toast.success("Promoted to teaching assistant");
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to promote",
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to promote");
     } finally {
       setPromoteTarget(null);
     }
@@ -278,9 +276,7 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
       await removeAssistant({ classroomId, userId });
       toast.success("Removed as teaching assistant");
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to demote",
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to demote");
     }
   };
 
@@ -330,7 +326,7 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
         <Card>
           <CardHeader>
             <CardDescription>Teaching Assistants</CardDescription>
-            <CardTitle>{assistants.length}</CardTitle>
+            <CardTitle>{assistantCount}</CardTitle>
           </CardHeader>
         </Card>
       </div>
@@ -365,7 +361,6 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
           <AppDataGrid
             columnDefs={enrolledStudentColumnDefs}
             rowData={enrolledStudentRows}
-            rowHeight={72}
           />
         )}
       </section>
@@ -413,9 +408,7 @@ export default function TeacherClassroomPage({
           <Card>
             <CardHeader>
               <CardTitle>Sign In Required</CardTitle>
-              <CardDescription>
-                Sign in to view this classroom.
-              </CardDescription>
+              <CardDescription>Sign in to view this classroom.</CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild>
