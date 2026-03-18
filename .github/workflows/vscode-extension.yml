@@ -54,6 +54,11 @@ jobs:
           files: apps/vscode-extension/*.vsix
           generate_release_notes: true
 
+      - name: Move latest tag to current commit
+        run: |
+          git tag -f vscode-extension-latest
+          git push -f origin vscode-extension-latest
+
       - name: Update latest release
         uses: softprops/action-gh-release@v2
         with:
