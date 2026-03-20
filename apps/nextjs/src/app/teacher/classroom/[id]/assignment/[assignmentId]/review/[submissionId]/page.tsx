@@ -3,7 +3,7 @@
 import { use, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
-import { ArrowLeft, Flag } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Flag } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
@@ -153,6 +153,19 @@ function ReviewContent({
                 <span className="text-muted-foreground">Workspace</span>
                 <span className="font-mono text-xs">
                   {submission.workspaceId ?? "Not linked"}
+                </span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">Published</span>
+                <span className="font-medium">
+                  {submission.gradesReleased ? (
+                    <span className="text-accent-foreground inline-flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Yes
+                    </span>
+                  ) : (
+                    "No"
+                  )}
                 </span>
               </div>
             </CardContent>
