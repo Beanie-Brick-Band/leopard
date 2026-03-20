@@ -58,13 +58,11 @@ export const submitAssignment = mutation({
     const user = await checkAuth(ctx);
     const role = await requireStudentRole(ctx, user._id);
 
-    // check assignment exists
     const assignment = await ctx.db.get(args.assignmentId);
     if (!assignment) {
       throw new Error("Assignment not found");
     }
 
-    // Check if user is enrolled in the classroom (admins bypass enrollment).
     if (role !== "admin") {
       const classroomId = assignment.classroomId;
       const relation = await ctx.db
@@ -79,13 +77,11 @@ export const submitAssignment = mutation({
       }
     }
 
-    //Due date check
     const currentTime = Date.now();
     if (currentTime > assignment.dueDate) {
       throw new Error("Cannot submit after the due date");
     }
 
-    // Check if submission already exists
     const existingSubmission = await ctx.db
       .query("submissions")
       .withIndex("studentId_assignmentId", (q) =>
@@ -101,10 +97,10 @@ export const submitAssignment = mutation({
       return { submissionId: existingSubmission._id };
     }
 
-    // New submission
     const submissionId = await ctx.db.insert("submissions", {
       assignmentId: args.assignmentId,
       flags: [],
+      flagged: false,
       studentId: user._id,
       workspaceId: args.workspaceId,
       submittedAt: Date.now(),

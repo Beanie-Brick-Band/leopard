@@ -22,8 +22,8 @@ export default defineSchema({
     classroomId: v.id("classrooms"),
     studentId: v.string(), // map this to betterAuth user id
   })
-  .index("studentId_classroomId", ["studentId", "classroomId"])
-  .index("classroomId_studentId", ["classroomId", "studentId"]),
+    .index("studentId_classroomId", ["studentId", "classroomId"])
+    .index("classroomId_studentId", ["classroomId", "studentId"]),
   events: defineTable({
     eventType: v.string(),
     timestamp: v.number(),
@@ -37,7 +37,8 @@ export default defineSchema({
   }),
   submissions: defineTable({
     assignmentId: v.id("assignments"),
-    flags: v.array(v.id("flags")),
+    flags: v.array(v.id("flags")), // UNUSED FIELD
+    flagged: v.optional(v.boolean()),
     grade: v.optional(v.float64()),
     studentId: v.string(), // map this to betterAuth user id
     submissionFeedback: v.optional(v.string()),
@@ -47,9 +48,8 @@ export default defineSchema({
     gradedAt: v.optional(v.number()),
     gradesReleased: v.boolean(),
   })
-  .index("studentId_assignmentId", ["studentId", "assignmentId"])
-  .index("assignmentId_studentId", ["assignmentId", "studentId"])
-  ,
+    .index("studentId_assignmentId", ["studentId", "assignmentId"])
+    .index("assignmentId_studentId", ["assignmentId", "studentId"]),
   workspaces: defineTable({
     coderWorkspaceId: v.string(),
     isActive: v.boolean(),
@@ -63,8 +63,8 @@ export default defineSchema({
     uid: v.string(), // map this to betterAuth user id
     role: v.union(
       v.literal("admin"),
-      v.literal("student"), 
+      v.literal("student"),
       v.literal("teacher"),
-    )
+    ),
   }).index("uid", ["uid"]),
 });

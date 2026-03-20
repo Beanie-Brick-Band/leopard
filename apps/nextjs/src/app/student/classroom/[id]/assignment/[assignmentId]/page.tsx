@@ -33,10 +33,12 @@ function Content({
 }) {
   const assignment = useQuery(api.web.assignment.getById, { id: assignmentId });
   const activeWorkspace = useQuery(api.web.assignment.getMyActiveWorkspace);
-  const lastEditedTimestamp =
-    useQuery(api.web.assignment.getLastEditedTimestamp, {
+  const lastEditedTimestamp = useQuery(
+    api.web.assignment.getLastEditedTimestamp,
+    {
       assignmentId,
-    });
+    },
+  );
   const submissionResult = useQuery(
     api.web.submission.getOwnSubmissionsForAssignment,
     {
@@ -62,7 +64,7 @@ function Content({
     });
   };
 
-  if (assignment === undefined || submissionResult === undefined) {
+  if (submissionResult === undefined || assignment === undefined) {
     return (
       <div className="flex min-h-[300px] items-center justify-center">
         <Spinner />
