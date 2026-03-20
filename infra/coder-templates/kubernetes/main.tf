@@ -134,9 +134,14 @@ resource "coder_agent" "main" {
     # Install the latest code-server.
     curl -fsSL https://code-server.dev/install.sh | sh -s -- --method=standalone --prefix=/tmp/code-server
 
-    # Install the leopard extension
-    curl -fL -o /tmp/latest.vsix http://noname.nolapse.tech/files/latest.vsix
-    /tmp/code-server/bin/code-server --install-extension /tmp/latest.vsix
+    # Get the latest extention from github and install it
+    VSIX_URL=$(curl -s https://api.github.com/repos/Beanie-Brick-Band/leopard/releases/tags/vscode-extension-latest \
+    | grep 'browser_download_url.*vsix' \
+    | cut -d '"' -f 4)
+
+    curl -L -o /tmp/extension.vsix "$VSIX_URL"
+
+    /tmp/code-server/bin/code-server --install-extension /tmp/extension.vsix
 
     # Start code-server in the background.
     /tmp/code-server/bin/code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
