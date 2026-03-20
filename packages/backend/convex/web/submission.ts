@@ -1,7 +1,13 @@
 import { v } from "convex/values";
 
 import { Id } from "../_generated/dataModel";
-import { mutation, MutationCtx, query, QueryCtx } from "../_generated/server";
+import {
+  internalMutation,
+  mutation,
+  MutationCtx,
+  query,
+  QueryCtx,
+} from "../_generated/server";
 import { authComponent } from "../auth";
 import { getUserRole } from "../helpers/roles";
 
@@ -187,6 +193,7 @@ export const getOwnSubmissionsForAssignment = query({
       assignmentId: submission.assignmentId,
       submittedAt: submission.submittedAt,
       gradesReleased: submission.gradesReleased,
+      status: submission.status ?? null,
     };
 
     return { success: true, submission: publicSubmissionInfo };
@@ -209,6 +216,67 @@ export const getAllSubmissionsForAssignment = query({
       )
       .collect();
     return submissions;
+  },
+});
+
+// --- Submission lifecycle internal mutations ---
+
+export const internalSetSubmissionUploading = internalMutation({
+  args: {
+    assignmentId: v.id("assignments"),
+    studentId: v.string(),
+    workspaceId: v.id("workspaces"),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("submissions")
+      .withIndex("studentId_assignmentId", (q) =>
+        q.eq("studentId", args.studentId).eq("assignmentId", args.assignmentId),
+      )
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        status: "uploading",
+        workspaceId: args.workspaceId,
+      });
+      return existing._id;
+    }
+
+    return ctx.db.insert("submissions", {
+      assignmentId: args.assignmentId,
+      studentId: args.studentId,
+      workspaceId: args.workspaceId,
+      flags: [],
+      submittedAt: Date.now(),
+      gradesReleased: false,
+      status: "uploading",
+    });
+  },
+});
+
+export const internalConfirmSubmission = internalMutation({
+  args: {
+    submissionId: v.id("submissions"),
+    submissionStorageKey: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.submissionId, {
+      status: "confirmed",
+      submittedAt: Date.now(),
+      submissionStorageKey: args.submissionStorageKey,
+    });
+  },
+});
+
+export const internalFailSubmission = internalMutation({
+  args: {
+    submissionId: v.id("submissions"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.submissionId, {
+      status: "failed",
+    });
   },
 });
 
