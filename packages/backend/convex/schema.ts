@@ -47,6 +47,15 @@ export default defineSchema({
     gradedBy: v.optional(v.string()), // map this to betterAuth user id
     gradedAt: v.optional(v.number()),
     gradesReleased: v.boolean(),
+    submissionStorageKey: v.optional(v.string()),
+    submissionUploadStatus: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("uploading"),
+        v.literal("confirmed"),
+        v.literal("failed"),
+      ),
+    ),
   })
     .index("studentId_assignmentId", ["studentId", "assignmentId"])
     .index("assignmentId_studentId", ["assignmentId", "studentId"]),

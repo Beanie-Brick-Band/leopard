@@ -1,6 +1,7 @@
 import {
   DeleteObjectCommand,
   GetObjectCommand,
+  HeadObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
@@ -40,6 +41,20 @@ export async function generateDownloadUrl(key: string): Promise<string> {
     Key: key,
   });
   return getSignedUrl(client, command, { expiresIn: 3600 }); // 60 minutes
+}
+
+export async function verifyObjectExists(key: string): Promise<boolean> {
+  const client = getClient();
+  try {
+    await client.send(new HeadObjectCommand({ Bucket: BUCKET, Key: key }));
+    return true;
+  } catch (err: unknown) {
+    const code = (err as { name?: string })?.name;
+    if (code === "NoSuchKey" || code === "NotFound") {
+      return false;
+    }
+    throw err;
+  }
 }
 
 export async function deleteObject(key: string): Promise<void> {

@@ -11,6 +11,7 @@
 import type * as api_coder from "../api/coder.js";
 import type * as api_extension from "../api/extension.js";
 import type * as auth from "../auth.js";
+import type * as helpers_coder from "../helpers/coder.js";
 import type * as helpers_minio from "../helpers/minio.js";
 import type * as helpers_roles from "../helpers/roles.js";
 import type * as helpers_storageKeys from "../helpers/storageKeys.js";
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   "api/coder": typeof api_coder;
   "api/extension": typeof api_extension;
   auth: typeof auth;
+  "helpers/coder": typeof helpers_coder;
   "helpers/minio": typeof helpers_minio;
   "helpers/roles": typeof helpers_roles;
   "helpers/storageKeys": typeof helpers_storageKeys;
