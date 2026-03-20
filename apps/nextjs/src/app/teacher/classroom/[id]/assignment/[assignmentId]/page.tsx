@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   Clock,
   Save,
+  Send,
   Trash2,
   Users,
 } from "lucide-react";
@@ -76,6 +77,7 @@ function AssignmentContent({
   const [isSavingAssignment, setIsSavingAssignment] = useState(false);
 
   const [isDeletingAssignment, setIsDeletingAssignment] = useState(false);
+  const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
 
   if (assignment === undefined) {
     return (
@@ -175,8 +177,17 @@ function AssignmentContent({
   const gradedCount =
     submissions?.filter((submission) => submission.grade !== undefined)
       .length ?? 0;
+  const publishedCount =
+    submissions?.reduce(
+      (acc, submission) => acc + (submission.gradesReleased ? 1 : 0),
+      0,
+    ) ?? 0;
   const sortedSubmissions =
     submissions?.slice().sort((a, b) => b.submittedAt - a.submittedAt) ?? [];
+  const unreleasedGradedCount =
+    submissions?.filter((s) => s.grade !== undefined && !s.gradesReleased)
+      .length ?? 0;
+
   const submissionRows = sortedSubmissions.map((submission) => {
     const studentName =
       submission.studentName ??
@@ -318,7 +329,9 @@ function AssignmentContent({
           />
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-semibold">Submissions</h2>
+            <div className="flex items-end justify-between">
+              <h2 className="text-2xl font-semibold">Submissions</h2>
+            </div>
             {submissions === undefined ? (
               <div className="flex min-h-[120px] items-center justify-center">
                 <Spinner />
@@ -506,12 +519,45 @@ function AssignmentContent({
                   </span>
                 </div>
               ) : null}
+              <div className="flex justify-between">
+                <span className="text-muted-foreground text-sm">Published</span>
+                <span className="font-semibold">
+                  {publishedCount} (
+                  {submittedCount > 0
+                    ? Math.round((publishedCount / submittedCount) * 100)
+                    : 0}
+                  %)
+                </span>
+              </div>
+              <Separator />
+              {submissions === undefined ||
+              gradedCount === 0 ? null : unreleasedGradedCount > 0 ? (
+                <Button
+                  className="w-full"
+                  onClick={() => setIsPublishDialogOpen(true)}
+                >
+                  <Send className="mr-2 h-4 w-4" />
+                  Publish Grades
+                </Button>
+              ) : (
+                <span className="text-accent-foreground flex items-center gap-1 text-sm">
+                  Published grades <CheckCircle2 className="h-3 w-3" />
+                </span>
+              )}
             </CardContent>
           </Card>
 
           <StarterCodeCard assignmentId={assignmentId} />
         </div>
       </div>
+
+      <PublishConfirmationDialog
+        open={isPublishDialogOpen}
+        onClose={() => setIsPublishDialogOpen(false)}
+        assignmentId={assignmentId}
+        assignmentName={assignment.name}
+        gradedCount={unreleasedGradedCount}
+      />
     </div>
   );
 }
@@ -554,5 +600,87 @@ export default function TeacherAssignmentPage({
         </div>
       </AuthLoading>
     </main>
+  );
+}
+
+interface PublishConfirmationDialogProps {
+  open: boolean;
+  onClose: () => void;
+  assignmentId: Id<"assignments">;
+  assignmentName: string;
+  gradedCount: number;
+}
+
+function PublishConfirmationDialog({
+  open,
+  onClose,
+  assignmentId,
+  assignmentName,
+  gradedCount,
+}: PublishConfirmationDialogProps) {
+  const publishGrades = useMutation(api.web.teacherAssignments.publishGrades);
+  const [isPublishing, setIsPublishing] = useState(false);
+
+  const handleConfirm = async () => {
+    setIsPublishing(true);
+    try {
+      await publishGrades({ assignmentId });
+      toast.success("All grades published.");
+      onClose();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to publish grades",
+      );
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <div
+      className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Publish All Grades?</CardTitle>
+          <CardDescription>
+            Students will immediately be able to view their grades and feedback.
+            This action cannot be undone.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-1 rounded-md border p-3 text-sm">
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">Assignment</span>
+              <span className="font-medium">{assignmentName}</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">Grades to publish</span>
+              <span className="font-medium">{gradedCount}</span>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={onClose} disabled={isPublishing}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirm} disabled={isPublishing}>
+              {isPublishing ? (
+                "Publishing..."
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  Confirm Publish
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
