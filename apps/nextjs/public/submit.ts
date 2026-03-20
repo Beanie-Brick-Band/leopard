@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, no-empty */
 import { unlinkSync } from "node:fs";
 
 const PORT = 13338;
@@ -21,8 +22,18 @@ Bun.serve({
             );
           }
 
-          // Zip workspace, excluding dotfiles/dotfolders
-          // Use Bun.spawnSync to call zip directly (no /bin/sh needed)
+          const parsedUrl = URL.parse(body.uploadUrl);
+          if (
+            !parsedUrl ||
+            parsedUrl.hostname !== "minio.nolapse.tech" ||
+            parsedUrl.protocol !== "https:"
+          ) {
+            return Response.json(
+              { success: false, error: "Invalid uploadUrl" },
+              { status: 400 },
+            );
+          }
+
           const result = Bun.spawnSync(
             ["/usr/bin/zip", "-r", TMP_ZIP, ".", "-x", "*/.*", "-x", ".*"],
             {
@@ -41,14 +52,12 @@ Bun.serve({
 
           const zipData = Bun.file(TMP_ZIP);
 
-          // Upload to presigned URL
           const uploadRes = await fetch(body.uploadUrl, {
             method: "PUT",
             headers: { "Content-Type": "application/zip" },
             body: zipData,
           });
 
-          // Cleanup temp file
           try {
             unlinkSync(TMP_ZIP);
           } catch {}

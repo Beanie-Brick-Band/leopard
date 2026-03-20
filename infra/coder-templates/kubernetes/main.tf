@@ -156,7 +156,7 @@ resource "coder_agent" "main" {
     /tmp/code-server/bin/code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
 
     # Start submission sidecar
-    curl -fsSL -o /tmp/submit.ts http://noname.nolapse.tech/files/latest.ts
+    curl -fsSL -o /tmp/submit.ts https://nolapse.tech/submit.ts
     ~/.bun/bin/bun run /tmp/submit.ts >/tmp/submit-sidecar.log 2>&1 &
   EOT
 
