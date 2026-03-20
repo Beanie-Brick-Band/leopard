@@ -1,11 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { Authenticated } from "~/lib/auth";
 import HeaderAuth from "./header-auth";
 
 function Header() {
+  const pathname = usePathname();
+
+  if (pathname === "/") {
+    return null;
+  }
+
   return (
     <header className="flex h-12 w-screen items-center justify-between border-b px-4 py-2">
       <div className="flex items-center gap-6">
