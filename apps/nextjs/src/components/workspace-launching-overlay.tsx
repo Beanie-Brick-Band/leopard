@@ -1,23 +1,66 @@
+import { CheckCircle2 } from "lucide-react";
+
+import { Button } from "@package/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@package/ui/dialog";
 import { Spinner } from "@package/ui/spinner";
 
 export function WorkspaceLaunchingOverlay({
   isLaunching,
+  workspaceUrl,
+  onClose,
 }: {
   isLaunching: boolean;
+  workspaceUrl: string | null;
+  onClose: () => void;
 }) {
-  if (!isLaunching) return null;
+  const isOpen = isLaunching || Boolean(workspaceUrl);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-background flex flex-col items-center gap-4 rounded-lg border p-8 shadow-lg">
-        <Spinner className="size-8" />
-        <div className="text-center">
-          <p className="text-lg font-semibold">Launching workspace</p>
-          <p className="text-muted-foreground text-sm">
-            This should take around 30 seconds...
-          </p>
-        </div>
-      </div>
-    </div>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <DialogContent showCloseButton={!isLaunching}>
+        {isLaunching ? (
+          <DialogHeader className="items-center">
+            <Spinner className="size-8" />
+            <DialogTitle>Launching workspace</DialogTitle>
+            <DialogDescription>
+              This should take around 30 seconds...
+            </DialogDescription>
+          </DialogHeader>
+        ) : (
+          <>
+            <DialogHeader className="items-center">
+              <CheckCircle2 className="size-8 text-green-500" />
+              <DialogTitle>Workspace ready</DialogTitle>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={onClose}>
+                Close
+              </Button>
+              <Button asChild>
+                <a
+                  href={workspaceUrl ?? ""}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open Workspace
+                </a>
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
