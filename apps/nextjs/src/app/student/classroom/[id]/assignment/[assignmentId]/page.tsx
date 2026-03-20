@@ -237,10 +237,10 @@ function Content({
                       : "Not submitted"}
                 </span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between gap-4 text-sm">
                 <span className="text-muted-foreground">Due Date</span>
-                <span className="font-medium">
-                  {new Date(assignment.dueDate).toLocaleDateString()}
+                <span className="text-right font-medium">
+                  {new Date(assignment.dueDate).toLocaleString()}
                 </span>
               </div>
               <Separator />
