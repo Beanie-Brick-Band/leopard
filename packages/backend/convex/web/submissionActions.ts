@@ -7,8 +7,15 @@ import {
   createWorkspaceBuild,
   getWorkspaceMetadataByUserAndWorkspaceName,
 } from "@package/coder-sdk";
-import { internal } from "../_generated/api";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+import { internal as _internal } from "../_generated/api";
 import { action, internalAction } from "../_generated/server";
+
+// The `internal` type may not resolve correctly in all TS project configs (e.g.
+// vscode-extension tsc) due to circular _generated/api.d.ts resolution, so we
+// cast to `any` and use this alias throughout the file instead.
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+const internal: any = _internal;
 import { authComponent } from "../auth";
 import { getCoderClient, getCoderOrigin } from "../helpers/coder";
 import {
