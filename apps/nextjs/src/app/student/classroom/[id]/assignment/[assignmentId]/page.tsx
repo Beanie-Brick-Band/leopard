@@ -4,8 +4,6 @@ import { startTransition, use, useActionState, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import { ArrowLeft, Calendar, CheckCircle2, Clock } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
@@ -22,6 +20,7 @@ import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
 import { launchWorkspace } from "~/app/app/actions";
+import { Editor } from "~/components/editor";
 import { WorkspaceLaunchingOverlay } from "~/components/workspace-launching-overlay";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 
@@ -171,9 +170,11 @@ function Content({
             <CardContent>
               {assignment.description ? (
                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {assignment.description}
-                  </ReactMarkdown>
+                  <Editor
+                    content={assignment.description}
+                    onChange={() => undefined}
+                    editable={false}
+                  />
                 </div>
               ) : (
                 <p className="text-muted-foreground text-sm">

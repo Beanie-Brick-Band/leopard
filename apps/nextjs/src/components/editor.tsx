@@ -1,12 +1,10 @@
 "use client";
 
 import type { Editor as TiptapEditor } from "@tiptap/react";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Markdown } from "@tiptap/markdown";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { common, createLowlight } from "lowlight";
 import {
   Bold,
   Code,
@@ -19,14 +17,13 @@ import {
   Redo,
   Undo,
 } from "lucide-react";
+import CodeBlockShiki from "tiptap-extension-code-block-shiki";
 
 import { cn } from "@package/ui";
 import { Button } from "@package/ui/button";
 
-const lowlight = createLowlight(common);
-
 interface EditorProps {
-  content: string;
+  content?: string;
   onChange: (content: string) => void;
   placeholder?: string;
   editable?: boolean;
@@ -158,7 +155,7 @@ function MenuBar({ editor }: { editor: TiptapEditor | null }) {
 
 export function Editor({
   content,
-  // onChange,
+  onChange,
   placeholder,
   editable = true,
 }: EditorProps) {
@@ -167,22 +164,46 @@ export function Editor({
       StarterKit.configure({
         codeBlock: false,
       }),
-      CodeBlockLowlight.configure({
-        lowlight,
+      CodeBlockShiki.configure({
+        defaultTheme: "tokyo-night",
+        themes: {
+          light: "github-light",
+          dark: "github-dark",
+        },
       }),
       Markdown,
       Placeholder.configure({
         placeholder: placeholder ?? "Start writing...",
       }),
-    ],
-    content,
-    contentType: "markdown",
-    editable,
+    ] as Parameters<typeof useEditor>[0]["extensions"],
+    content: content
+      ? (() => {
+          try {
+            return JSON.parse(content) as TiptapEditor["storage"];
+          } catch {
+            return undefined;
+          }
+        })()
+      : undefined,
+    contentType: "json",
+    editable: editable,
     immediatelyRender: false,
-    onUpdate: (_) => {
-      // FIXME: Will be address in next PR
-      // const editorState = editor.getJSON();
-      // onChange(JSON.stringify(editorState));
+    onUpdate: ({ editor }) => {
+      if (!editable) {
+        return;
+      }
+      // Render loop preventing when starting from editable state);
+      if (
+        content?.trim() === "" &&
+        editor.getMarkdown().replaceAll("&nbsp;", "").trim().length === 0
+      ) {
+        return;
+      }
+      const editorState = editor.getJSON();
+      const serializedState = JSON.stringify(editorState);
+      if (serializedState !== content) {
+        onChange(serializedState);
+      }
     },
     editorProps: {
       attributes: {
@@ -192,8 +213,15 @@ export function Editor({
     },
   });
 
+  // Weird dynamic editable requirement on TipTap
+  editor?.setEditable(editable);
+
   return (
-    <div className="border-border overflow-hidden rounded-lg border">
+    <div
+      className={cn({
+        border: editable,
+      })}
+    >
       {editable && <MenuBar editor={editor} />}
       <EditorContent editor={editor} />
     </div>
