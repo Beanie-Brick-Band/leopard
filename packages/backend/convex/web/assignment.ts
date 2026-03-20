@@ -97,6 +97,25 @@ export const getMyActiveWorkspace = query({
   },
 });
 
+export const getMyWorkspaceForAssignment = query({
+  args: { assignmentId: v.id("assignments") },
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    await ensureCanAccessAssignment(ctx, user._id, args.assignmentId);
+
+    return ctx.db
+      .query("workspaces")
+      .withIndex("assignmentId_userId", (q) =>
+        q.eq("assignmentId", args.assignmentId).eq("userId", user._id),
+      )
+      .first();
+  },
+});
+
 export const setUserActiveWorkspace = internalMutation({
   args: {
     userId: v.string(),
@@ -171,7 +190,9 @@ export const getLastEditedTimestamp = query({
 
     const workspace = await ctx.db
       .query("workspaces")
-      .withIndex("assignmentId_userId", (q) => q.eq("assignmentId", args.assignmentId).eq("userId", auth._id))
+      .withIndex("assignmentId_userId", (q) =>
+        q.eq("assignmentId", args.assignmentId).eq("userId", auth._id),
+      )
       .first();
 
     if (!workspace) {
