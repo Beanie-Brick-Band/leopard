@@ -158,7 +158,7 @@ function MenuBar({ editor }: { editor: TiptapEditor | null }) {
 
 export function Editor({
   content,
-  onChange,
+  // onChange,
   placeholder,
   editable = true,
 }: EditorProps) {
@@ -179,8 +179,10 @@ export function Editor({
     contentType: "markdown",
     editable,
     immediatelyRender: false,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getMarkdown());
+    onUpdate: (_) => {
+      // FIXME: Will be address in next PR
+      // const editorState = editor.getJSON();
+      // onChange(JSON.stringify(editorState));
     },
     editorProps: {
       attributes: {

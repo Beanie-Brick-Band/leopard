@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColDef } from "ag-grid-community";
-import { use, useEffect, useState } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import {
@@ -32,7 +32,6 @@ import { Spinner } from "@package/ui/spinner";
 
 import { AppDataGrid } from "~/components/app-data-grid";
 import { Editor } from "~/components/editor";
-import { MarkdownViewer } from "~/components/markdown-viewer";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 import { StarterCodeCard } from "./starter-code-card";
 
@@ -62,25 +61,20 @@ function AssignmentContent({
   const deleteAssignment = useMutation(
     api.web.teacherAssignments.deleteAssignment,
   );
+  type UpdateAssignmentArgs = Parameters<typeof updateAssignment>[0];
+
+  // Unfortunate inline type definition for draft
+  interface AssignmentDraft {
+    name: NonNullable<UpdateAssignmentArgs["name"]>;
+    description: NonNullable<UpdateAssignmentArgs["description"]>;
+    releaseDate: string;
+    dueDate: string;
+  }
 
   const [isEditing, setIsEditing] = useState(false);
+  const [draft, setDraft] = useState<AssignmentDraft | null>(null);
   const [isSavingAssignment, setIsSavingAssignment] = useState(false);
   const [isDeletingAssignment, setIsDeletingAssignment] = useState(false);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [releaseDate, setReleaseDate] = useState("");
-  const [dueDate, setDueDate] = useState("");
-
-  useEffect(() => {
-    if (!assignment || isEditing) {
-      return;
-    }
-
-    setName(assignment.name);
-    setDescription(assignment.description ?? "");
-    setReleaseDate(formatDateForInput(assignment.releaseDate));
-    setDueDate(formatDateForInput(assignment.dueDate));
-  }, [assignment, isEditing]);
 
   if (assignment === undefined) {
     return (
@@ -90,12 +84,37 @@ function AssignmentContent({
     );
   }
 
-  const handleSaveAssignment = async () => {
+  const startEditing = () => {
+    setDraft({
+      name: assignment.name,
+      description: assignment.description ?? "",
+      releaseDate: formatDateForInput(assignment.releaseDate),
+      dueDate: formatDateForInput(assignment.dueDate),
+    });
+    setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setDraft(null);
+    setIsEditing(false);
+  };
+
+  const updateDraft = (updates: Partial<AssignmentDraft>) => {
+    setDraft((currentDraft) =>
+      currentDraft ? { ...currentDraft, ...updates } : currentDraft,
+    );
+  };
+
+  const save = async () => {
+    if (!draft) {
+      return;
+    }
+
     setIsSavingAssignment(true);
 
     try {
-      const parsedReleaseDate = Date.parse(releaseDate);
-      const parsedDueDate = Date.parse(dueDate);
+      const parsedReleaseDate = Date.parse(draft.releaseDate);
+      const parsedDueDate = Date.parse(draft.dueDate);
 
       if (Number.isNaN(parsedReleaseDate) || Number.isNaN(parsedDueDate)) {
         throw new Error("Invalid date values");
@@ -103,19 +122,19 @@ function AssignmentContent({
       if (parsedDueDate <= parsedReleaseDate) {
         throw new Error("Due date must be after release date");
       }
-      if (!name.trim()) {
+      if (!draft.name.trim()) {
         throw new Error("Assignment name is required");
       }
 
       await updateAssignment({
         assignmentId,
-        name: name.trim(),
-        description: description.trim(),
+        name: draft.name.trim(),
+        description: draft.description,
         releaseDate: parsedReleaseDate,
         dueDate: parsedDueDate,
       });
       toast.success("Assignment updated");
-      setIsEditing(false);
+      cancelEditing();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to update assignment",
@@ -144,6 +163,12 @@ function AssignmentContent({
   };
 
   const dueDateValue = new Date(assignment.dueDate);
+  const editorContent = isEditing
+    ? (draft?.description ?? "")
+    : assignment.description;
+  const editorKey = isEditing
+    ? "editing"
+    : `view-${assignment.description ?? ""}`;
   const totalStudents = submissions?.length ?? 0;
   const submittedCount = submissions?.length ?? 0;
   const gradedCount =
@@ -259,24 +284,18 @@ function AssignmentContent({
 
           <Separator />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Description</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isEditing ? (
-                <Editor
-                  content={description}
-                  onChange={setDescription}
-                  placeholder="Enter assignment description..."
-                />
-              ) : assignment.description ? (
-                <MarkdownViewer content={assignment.description} />
-              ) : (
-                <p className="text-muted-foreground text-sm">No description.</p>
-              )}
-            </CardContent>
-          </Card>
+          <Editor
+            key={editorKey}
+            content={editorContent ?? ""}
+            onChange={(content) => {
+              if (!isEditing || !draft) {
+                return;
+              }
+              updateDraft({ description: content });
+            }}
+            placeholder="Enter assignment description..."
+            editable={isEditing}
+          />
 
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">Submissions</h2>
@@ -305,8 +324,10 @@ function AssignmentContent({
                     <Label htmlFor="assignment-name">Name</Label>
                     <Input
                       id="assignment-name"
-                      value={name}
-                      onChange={(event) => setName(event.target.value)}
+                      value={draft?.name ?? ""}
+                      onChange={(event) =>
+                        updateDraft({ name: event.target.value })
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -316,8 +337,10 @@ function AssignmentContent({
                     <Input
                       id="assignment-release-date"
                       type="datetime-local"
-                      value={releaseDate}
-                      onChange={(event) => setReleaseDate(event.target.value)}
+                      value={draft?.releaseDate ?? ""}
+                      onChange={(event) =>
+                        updateDraft({ releaseDate: event.target.value })
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -325,14 +348,16 @@ function AssignmentContent({
                     <Input
                       id="assignment-due-date"
                       type="datetime-local"
-                      value={dueDate}
-                      onChange={(event) => setDueDate(event.target.value)}
+                      value={draft?.dueDate ?? ""}
+                      onChange={(event) =>
+                        updateDraft({ dueDate: event.target.value })
+                      }
                     />
                   </div>
                   <div className="flex gap-2">
                     <Button
                       className="flex-1"
-                      onClick={handleSaveAssignment}
+                      onClick={save}
                       disabled={isSavingAssignment}
                     >
                       {isSavingAssignment ? (
@@ -346,7 +371,7 @@ function AssignmentContent({
                     </Button>
                     <Button
                       variant="outline"
-                      onClick={() => setIsEditing(false)}
+                      onClick={cancelEditing}
                       disabled={isSavingAssignment}
                     >
                       Cancel
@@ -390,7 +415,7 @@ function AssignmentContent({
 
                   <Separator />
 
-                  <Button onClick={() => setIsEditing(true)} className="w-full">
+                  <Button onClick={startEditing} className="w-full">
                     Edit Assignment
                   </Button>
                   <Button
