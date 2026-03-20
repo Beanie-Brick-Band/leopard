@@ -74,6 +74,7 @@ function AssignmentContent({
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<AssignmentDraft | null>(null);
   const [isSavingAssignment, setIsSavingAssignment] = useState(false);
+
   const [isDeletingAssignment, setIsDeletingAssignment] = useState(false);
 
   if (assignment === undefined) {
