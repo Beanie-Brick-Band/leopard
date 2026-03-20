@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import { ArrowLeft, Flag } from "lucide-react";
@@ -49,38 +49,33 @@ function ReviewContent({
     api.web.submission.toggleSubmissionFlag,
   );
 
-  const [grade, setGrade] = useState("");
-  const [feedback, setFeedback] = useState("");
+  const [newGrade, setNewGrade] = useState<string | null>(null);
+  const [newFeedback, setNewFeedback] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
   const studentDisplayName =
     submission?.studentName ??
     submission?.studentEmail?.split("@")[0] ??
     submission?.studentId;
 
-  useEffect(() => {
-    if (!submission) {
-      return;
-    }
-
-    setGrade(submission.grade?.toString() ?? "");
-    setFeedback(submission.submissionFeedback ?? "");
-  }, [submission]);
-
   if (assignment === undefined || submission === undefined) {
     return (
-      <div className="flex min-h-[320px] items-center justify-center">
+      <div className="flex min-h-80 items-center justify-center">
         <Spinner />
       </div>
     );
   }
 
+  const displayGrade = newGrade ?? submission.grade?.toString() ?? "";
+  const displayFeedback = newFeedback ?? submission.submissionFeedback ?? "";
+
   const handleSave = async () => {
     const nextGrade =
-      grade.trim() === ""
+      displayGrade.trim() === ""
         ? null
-        : Number.isNaN(Number(grade))
+        : Number.isNaN(Number(displayGrade))
           ? Number.NaN
-          : Number(grade);
+          : Number(displayGrade);
 
     if (Number.isNaN(nextGrade)) {
       toast.error("Grade must be a valid number");
@@ -102,7 +97,7 @@ function ReviewContent({
       promises.push(
         provideSubmissionFeedback({
           submissionId: submission._id,
-          feedback,
+          feedback: displayFeedback,
         }),
       );
 
@@ -211,8 +206,8 @@ function ReviewContent({
                 <Label htmlFor="review-grade">Grade</Label>
                 <Input
                   id="review-grade"
-                  value={grade}
-                  onChange={(event) => setGrade(event.target.value)}
+                  value={displayGrade}
+                  onChange={(event) => setNewGrade(event.target.value)}
                   placeholder="e.g. 95"
                   type="number"
                   step="0.01"
@@ -224,8 +219,8 @@ function ReviewContent({
                 <textarea
                   id="review-feedback"
                   rows={6}
-                  value={feedback}
-                  onChange={(event) => setFeedback(event.target.value)}
+                  value={displayFeedback}
+                  onChange={(event) => setNewFeedback(event.target.value)}
                   placeholder="Feedback for the student"
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[140px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 />
