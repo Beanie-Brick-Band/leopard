@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, use, useActionState, useEffect } from "react";
+import { startTransition, use, useActionState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
@@ -59,22 +59,35 @@ function AssignmentCard({
     },
   );
   const [workspaceUrl, launchAction, isLaunching] = useActionState(
-    () => launchWorkspace(assignment._id),
+    (_: unknown, assignmentId: string | null) => {
+      if (!assignmentId) {
+        return null;
+      }
+      return launchWorkspace(assignment._id);
+    },
     null as string | null,
   );
 
-  useEffect(() => {
-    if (workspaceUrl) {
-      window.location.assign(workspaceUrl);
-    }
-  }, [workspaceUrl]);
+  const handleLaunchWorkspace = () => {
+    startTransition(() => {
+      launchAction(assignment._id);
+    });
+  };
 
   const hasSubmission = submissionResult?.success === true;
   const dueDate = new Date(assignment.dueDate);
 
   return (
     <Card>
-      <WorkspaceLaunchingOverlay isLaunching={isLaunching} />
+      <WorkspaceLaunchingOverlay
+        isLaunching={isLaunching}
+        workspaceUrl={workspaceUrl}
+        onClose={() => {
+          startTransition(() => {
+            launchAction(null);
+          });
+        }}
+      />
       <CardHeader className="space-y-2">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
@@ -94,9 +107,7 @@ function AssignmentCard({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              startTransition(launchAction);
-            }}
+            onClick={handleLaunchWorkspace}
             disabled={isLaunching}
           >
             {isLaunching ? "Launching..." : "Launch Workspace"}

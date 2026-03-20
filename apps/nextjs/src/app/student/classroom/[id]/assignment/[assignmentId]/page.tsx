@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  startTransition,
-  use,
-  useActionState,
-  useEffect,
-  useState,
-} from "react";
+import { startTransition, use, useActionState, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import { ArrowLeft, Calendar, CheckCircle2, Clock } from "lucide-react";
@@ -49,17 +43,21 @@ function Content({
   const submitAssignment = useMutation(api.web.submission.submitAssignment);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitConfirmOpen, setIsSubmitConfirmOpen] = useState(false);
-
   const [workspaceUrl, launchAction, isLaunching] = useActionState(
-    () => launchWorkspace(assignmentId),
+    (_: unknown, id: Id<"assignments"> | null) => {
+      if (!id) {
+        return null;
+      }
+      return launchWorkspace(id);
+    },
     null as string | null,
   );
 
-  useEffect(() => {
-    if (workspaceUrl) {
-      window.location.assign(workspaceUrl);
-    }
-  }, [workspaceUrl]);
+  const handleLaunchWorkspace = () => {
+    startTransition(() => {
+      launchAction(assignmentId);
+    });
+  };
 
   if (assignment === undefined || submissionResult === undefined) {
     return (
@@ -121,7 +119,15 @@ function Content({
 
   return (
     <div className="container mx-auto p-6">
-      <WorkspaceLaunchingOverlay isLaunching={isLaunching} />
+      <WorkspaceLaunchingOverlay
+        isLaunching={isLaunching}
+        workspaceUrl={workspaceUrl}
+        onClose={() => {
+          startTransition(() => {
+            launchAction(null);
+          });
+        }}
+      />
       <div className="mb-4">
         <Link
           href={`/student/classroom/${classroomId}`}
@@ -253,9 +259,7 @@ function Content({
                   </Button>
                   <Button
                     className="w-full"
-                    onClick={() => {
-                      startTransition(launchAction);
-                    }}
+                    onClick={handleLaunchWorkspace}
                     disabled={isLaunching}
                   >
                     {isLaunching ? "Launching..." : "Launch Workspace"}
