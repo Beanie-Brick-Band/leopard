@@ -4,6 +4,7 @@ import type { ColDef } from "ag-grid-community";
 import { use, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
+import { MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
@@ -16,6 +17,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@package/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@package/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@package/ui/dropdown-menu";
 import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
@@ -28,7 +43,13 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
   });
   const removeStudent = useMutation(api.web.teacher.removeStudent);
   const deleteClassroom = useMutation(api.web.teacher.deleteClassroom);
+  const promoteToAssistant = useMutation(api.web.teacher.promoteToAssistant);
+  const removeAssistant = useMutation(api.web.teacher.removeAssistant);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [promoteTarget, setPromoteTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   if (classroomDetails === undefined) {
     return (
@@ -38,14 +59,19 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
     );
   }
 
-  const { classroom, assignments, enrolledStudents } = classroomDetails;
+  const {
+    classroom,
+    assignments,
+    studentCount,
+    enrolledStudents,
+    assistantCount,
+  } = classroomDetails;
+
+  const assistantIds = new Set(classroom.assistantIds);
 
   const handleRemoveStudent = async (studentId: string) => {
     try {
-      await removeStudent({
-        classroomId,
-        studentId,
-      });
+      await removeStudent({ classroomId, studentId });
       toast.success("Student removed");
     } catch (error) {
       toast.error(
@@ -99,6 +125,7 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
       "Unnamed student";
 
     return {
+      isTa: assistantIds.has(enrollment.studentId),
       joinedIso: new Date(enrollment._creationTime).toISOString(),
       studentEmail: enrollment.studentEmail ?? "No email available",
       studentId: enrollment.studentId,
@@ -119,11 +146,8 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
         data?: (typeof enrolledStudentRows)[number];
       }) =>
         data ? (
-          <div className="py-2">
+          <div className="flex h-full items-center">
             <p className="font-medium">{data.studentName}</p>
-            <p className="text-muted-foreground font-mono text-xs">
-              {data.studentId}
-            </p>
           </div>
         ) : null,
     },
@@ -131,6 +155,30 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
       field: "studentEmail",
       headerName: "Email",
       minWidth: 240,
+    },
+    {
+      field: "isTa",
+      headerName: "Role",
+      minWidth: 100,
+      maxWidth: 120,
+      cellRenderer: ({
+        data,
+      }: {
+        data?: (typeof enrolledStudentRows)[number];
+      }) =>
+        data ? (
+          <div className="flex h-full items-center">
+            {data.isTa ? (
+              <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-medium">
+                TA
+              </span>
+            ) : (
+              <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs font-medium">
+                Student
+              </span>
+            )}
+          </div>
+        ) : null,
     },
     {
       field: "joinedIso",
@@ -155,13 +203,39 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
       }) =>
         data ? (
           <div className="flex h-full items-center justify-end">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleRemoveStudent(data.studentId)}
-            >
-              Remove
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="h-8 w-8">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {data.isTa ? (
+                  <DropdownMenuItem
+                    onClick={() => handleDemoteTa(data.studentId)}
+                  >
+                    Demote from TA
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    onClick={() =>
+                      setPromoteTarget({
+                        id: data.studentId,
+                        name: data.studentName,
+                      })
+                    }
+                  >
+                    Promote to TA
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => handleRemoveStudent(data.studentId)}
+                >
+                  Remove from classroom
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         ) : null,
     },
@@ -182,6 +256,27 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
         error instanceof Error ? error.message : "Failed to delete classroom",
       );
       setIsDeleting(false);
+    }
+  };
+
+  const handleConfirmPromote = async () => {
+    if (!promoteTarget) return;
+    try {
+      await promoteToAssistant({ classroomId, userId: promoteTarget.id });
+      toast.success("Promoted to teaching assistant");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to promote");
+    } finally {
+      setPromoteTarget(null);
+    }
+  };
+
+  const handleDemoteTa = async (userId: string) => {
+    try {
+      await removeAssistant({ classroomId, userId });
+      toast.success("Removed as teaching assistant");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to demote");
     }
   };
 
@@ -215,6 +310,27 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
         </div>
       </div>
 
+      <div className="grid gap-3 md:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardDescription>Assignments</CardDescription>
+            <CardTitle>{assignments.length}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Enrolled Students</CardDescription>
+            <CardTitle>{studentCount}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Teaching Assistants</CardDescription>
+            <CardTitle>{assistantCount}</CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+
       <Separator />
 
       <section className="space-y-3">
@@ -245,10 +361,34 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
           <AppDataGrid
             columnDefs={enrolledStudentColumnDefs}
             rowData={enrolledStudentRows}
-            rowHeight={72}
           />
         )}
       </section>
+
+      <Dialog
+        open={promoteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setPromoteTarget(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Promote to Teaching Assistant</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to promote{" "}
+              <span className="font-medium">{promoteTarget?.name}</span> to a
+              teaching assistant? They will be able to grade submissions and
+              provide feedback.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPromoteTarget(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmPromote}>Promote</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

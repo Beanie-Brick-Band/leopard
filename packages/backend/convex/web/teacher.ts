@@ -104,7 +104,7 @@ export const getClassroomDetails = query({
       assignments,
       enrolledStudents: enrolledStudentsWithProfiles,
       studentCount: enrolledStudentsWithProfiles.length,
-      pendingEnrollments: [],
+      assistantCount: classroom.assistantIds.length,
     };
   },
 });
@@ -170,6 +170,55 @@ export const updateClassroom = mutation({
     }
 
     await ctx.db.patch(args.classroomId, patch);
+  },
+});
+
+export const promoteToAssistant = mutation({
+  args: {
+    classroomId: v.id("classrooms"),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const classroom = await requireClassroomOwnerOrAdmin(ctx, args.classroomId, user._id);
+
+    const enrollment = await ctx.db
+      .query("classroomStudentsRelations")
+      .withIndex("studentId_classroomId", (q) =>
+        q.eq("studentId", args.userId).eq("classroomId", args.classroomId),
+      )
+      .first();
+
+    if (!enrollment) {
+      throw new Error("User must be enrolled in the classroom to be promoted to TA");
+    }
+
+    if (args.userId === classroom.ownerId) {
+      throw new Error("The classroom owner cannot be added as a TA");
+    }
+
+    if (classroom.assistantIds.includes(args.userId)) {
+      throw new Error("This user is already a TA for this classroom");
+    }
+
+    await ctx.db.patch(args.classroomId, {
+      assistantIds: [...classroom.assistantIds, args.userId],
+    });
+  },
+});
+
+export const removeAssistant = mutation({
+  args: {
+    classroomId: v.id("classrooms"),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    const classroom = await requireClassroomOwnerOrAdmin(ctx, args.classroomId, user._id);
+
+    await ctx.db.patch(args.classroomId, {
+      assistantIds: classroom.assistantIds.filter((id) => id !== args.userId),
+    });
   },
 });
 
