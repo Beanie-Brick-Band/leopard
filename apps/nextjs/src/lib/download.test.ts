@@ -29,6 +29,7 @@ describe("triggerDownload", () => {
   it("creates an anchor element, clicks it, and removes it", () => {
     triggerDownload("https://example.com/file.zip");
 
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(document.createElement).toHaveBeenCalledWith("a");
     expect(appendChildSpy).toHaveBeenCalledTimes(1);
     expect(clickSpy).toHaveBeenCalledTimes(1);

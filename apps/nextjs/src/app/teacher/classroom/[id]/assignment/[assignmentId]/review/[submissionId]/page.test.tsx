@@ -1,6 +1,6 @@
+import { Suspense } from "react";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Suspense } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
@@ -25,7 +25,7 @@ const {
 
 vi.mock("convex/react", () => ({
   useQuery: (...args: unknown[]) => mockUseQuery(...args) as unknown,
-  useMutation: () => mockUseMutation(),
+  useMutation: () => mockUseMutation() as unknown,
 }));
 
 vi.mock("@package/backend/convex/_generated/api", () => ({
@@ -43,11 +43,12 @@ vi.mock("@package/backend/convex/_generated/api", () => ({
 
 vi.mock("~/app/app/actions", () => ({
   getSubmissionDownload: (...args: unknown[]) =>
-    mockGetSubmissionDownload(...args),
+    mockGetSubmissionDownload(...args) as unknown,
 }));
 
 vi.mock("~/lib/download", () => ({
-  triggerDownload: (...args: unknown[]) => mockTriggerDownload(...args),
+  triggerDownload: (...args: unknown[]) =>
+    mockTriggerDownload(...args) as unknown,
 }));
 
 vi.mock("sonner", () => ({ toast: mockToast }));
@@ -132,6 +133,7 @@ async function renderPage() {
     submissionId: SUBMISSION_ID,
   });
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   await act(async () => {
     render(
       <Suspense fallback={<div>Loading...</div>}>
@@ -155,9 +157,7 @@ describe("TeacherSubmissionReviewPage", () => {
 
       await renderPage();
 
-      expect(
-        screen.queryByText("Review Submission"),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText("Review Submission")).not.toBeInTheDocument();
     });
   });
 
@@ -168,9 +168,7 @@ describe("TeacherSubmissionReviewPage", () => {
       await renderPage();
 
       expect(screen.getByText("Review Submission")).toBeInTheDocument();
-      expect(
-        screen.getByText(/Test Assignment.*Jane Doe/),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Test Assignment.*Jane Doe/)).toBeInTheDocument();
     });
 
     it("renders workspace ID", async () => {
@@ -270,9 +268,7 @@ describe("TeacherSubmissionReviewPage", () => {
 
     it("shows error toast when download fails", async () => {
       const user = userEvent.setup();
-      mockGetSubmissionDownload.mockRejectedValue(
-        new Error("Access denied"),
-      );
+      mockGetSubmissionDownload.mockRejectedValue(new Error("Access denied"));
       setupQueryMocks({
         submission: makeSubmission({
           submissionStorageKey: "submissions/c1/a1/s1/submission.zip",

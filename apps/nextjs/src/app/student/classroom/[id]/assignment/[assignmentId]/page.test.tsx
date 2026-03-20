@@ -1,6 +1,6 @@
+import { Suspense } from "react";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Suspense } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
@@ -9,17 +9,13 @@ import StudentAssignmentPage from "./page";
 
 // --- Hoisted mocks ---
 
-const {
-  mockUseQuery,
-  mockSubmitWorkspace,
-  mockLaunchWorkspace,
-  mockToast,
-} = vi.hoisted(() => ({
-  mockUseQuery: vi.fn(),
-  mockSubmitWorkspace: vi.fn(),
-  mockLaunchWorkspace: vi.fn(),
-  mockToast: { success: vi.fn(), error: vi.fn() },
-}));
+const { mockUseQuery, mockSubmitWorkspace, mockLaunchWorkspace, mockToast } =
+  vi.hoisted(() => ({
+    mockUseQuery: vi.fn(),
+    mockSubmitWorkspace: vi.fn(),
+    mockLaunchWorkspace: vi.fn(),
+    mockToast: { success: vi.fn(), error: vi.fn() },
+  }));
 
 vi.mock("convex/react", () => ({
   useQuery: (...args: unknown[]) => mockUseQuery(...args) as unknown,
@@ -41,8 +37,10 @@ vi.mock("@package/backend/convex/_generated/api", () => ({
 }));
 
 vi.mock("~/app/app/actions", () => ({
-  launchWorkspace: (...args: unknown[]) => mockLaunchWorkspace(...args),
-  submitWorkspace: (...args: unknown[]) => mockSubmitWorkspace(...args),
+  launchWorkspace: (...args: unknown[]) =>
+    mockLaunchWorkspace(...args) as unknown,
+  submitWorkspace: (...args: unknown[]) =>
+    mockSubmitWorkspace(...args) as unknown,
 }));
 
 vi.mock("sonner", () => ({ toast: mockToast }));
@@ -112,7 +110,10 @@ function makeWorkspace(overrides: Record<string, unknown> = {}) {
  */
 function setupQueryMocks({
   assignment = makeAssignment(),
-  workspace = makeWorkspace() as ReturnType<typeof makeWorkspace> | null | undefined,
+  workspace = makeWorkspace() as
+    | ReturnType<typeof makeWorkspace>
+    | null
+    | undefined,
   submissionResult = { success: false as const },
 }: {
   assignment?: ReturnType<typeof makeAssignment>;
@@ -133,6 +134,7 @@ async function renderPage() {
     assignmentId: ASSIGNMENT_ID,
   });
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   await act(async () => {
     render(
       <Suspense fallback={<div>Loading...</div>}>
@@ -391,9 +393,7 @@ describe("StudentAssignmentPage", () => {
         ),
       ).toBeInTheDocument();
 
-      await user.click(
-        screen.getByRole("button", { name: "Confirm Submit" }),
-      );
+      await user.click(screen.getByRole("button", { name: "Confirm Submit" }));
 
       await waitFor(() => {
         expect(mockSubmitWorkspace).toHaveBeenCalledWith(ASSIGNMENT_ID);
@@ -427,9 +427,7 @@ describe("StudentAssignmentPage", () => {
       );
 
       // Confirm the submission
-      await user.click(
-        screen.getByRole("button", { name: "Confirm Submit" }),
-      );
+      await user.click(screen.getByRole("button", { name: "Confirm Submit" }));
 
       await waitFor(() => {
         expect(mockToast.error).toHaveBeenCalledWith("Network error");
@@ -450,9 +448,7 @@ describe("StudentAssignmentPage", () => {
 
       await user.click(screen.getByRole("button", { name: "Cancel" }));
 
-      expect(
-        screen.queryByText("Submit Assignment?"),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText("Submit Assignment?")).not.toBeInTheDocument();
     });
   });
 
@@ -481,9 +477,7 @@ describe("StudentAssignmentPage", () => {
       await user.click(
         screen.getByRole("button", { name: "Retry Submission" }),
       );
-      await user.click(
-        screen.getByRole("button", { name: "Confirm Submit" }),
-      );
+      await user.click(screen.getByRole("button", { name: "Confirm Submit" }));
 
       await waitFor(() => {
         expect(

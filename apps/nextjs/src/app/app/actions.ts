@@ -15,7 +15,7 @@ export async function submitWorkspace(assignmentId: Id<"assignments">) {
     throw new Error("Not authenticated");
   }
 
-  return fetchAction(
+  await fetchAction(
     api.web.submissionActions.triggerSubmission,
     { assignmentId },
     { token },
@@ -32,7 +32,7 @@ export async function getSubmissionDownload(submissionId: Id<"submissions">) {
     api.web.submissionActions.getSubmissionDownloadUrl,
     { submissionId },
     { token },
-  );
+  ) as Promise<{ downloadUrl: string }>;
 }
 
 export async function launchWorkspace(assignmentId: Id<"assignments">) {
