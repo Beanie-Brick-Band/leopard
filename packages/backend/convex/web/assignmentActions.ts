@@ -14,11 +14,10 @@ import {
   getWorkspaceMetadataByUserAndWorkspaceName,
   listWorkspaces,
 } from "@package/coder-sdk";
-import { createClient } from "@package/coder-sdk/client";
-
 import { internal } from "../_generated/api";
 import { action } from "../_generated/server";
 import { authComponent } from "../auth";
+import { getCoderClient, getCoderOrigin } from "../helpers/coder";
 import { generateDownloadUrl } from "../helpers/minio";
 
 export const launchWorkspace = action({
@@ -29,10 +28,7 @@ export const launchWorkspace = action({
       throw new Error("Not authenticated");
     }
 
-    const coderClient = createClient({
-      baseUrl: process.env.CODER_API_URL!,
-      auth: process.env.CODER_API_KEY!,
-    });
+    const coderClient = getCoderClient();
 
     const coderUserId = user._id.toString();
     const sanitizedEmail = user.email.replace(/[^a-zA-Z0-9]/g, "-");
@@ -304,10 +300,9 @@ export const launchWorkspace = action({
       assignmentId: args.assignmentId,
     });
 
-    const coderApiUrl = new URL(process.env.CODER_API_URL!);
-    const coderHost = coderApiUrl.host;
+    const coderOrigin = getCoderOrigin();
 
-    const workspaceUrl = `https://${coderHost}/@${coderUserId}/${workspaceMetadata.data.name}.main/apps/code-server`;
+    const workspaceUrl = `${coderOrigin}/@${coderUserId}/${workspaceMetadata.data.name}.main/apps/code-server`;
 
     return { workspaceUrl, coderUserSessionKey: coderUserSessionKey.data.key! };
   },
