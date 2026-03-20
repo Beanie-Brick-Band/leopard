@@ -1,5 +1,6 @@
 "use client";
 
+import type { ColDef } from "ag-grid-community";
 import { use, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
@@ -18,6 +19,7 @@ import {
 import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
+import { AppDataGrid } from "~/components/app-data-grid";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 
 function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
@@ -36,13 +38,7 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
     );
   }
 
-  const {
-    classroom,
-    assignments,
-    studentCount,
-    pendingEnrollments,
-    enrolledStudents,
-  } = classroomDetails;
+  const { classroom, assignments, enrolledStudents } = classroomDetails;
 
   const handleRemoveStudent = async (studentId: string) => {
     try {
@@ -57,6 +53,119 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
       );
     }
   };
+
+  const assignmentRows = assignments.map((assignment) => ({
+    assignmentName: assignment.name,
+    dueDateIso: new Date(assignment.dueDate).toISOString(),
+    href: `/teacher/classroom/${classroomId}/assignment/${assignment._id}`,
+  }));
+  const assignmentColumnDefs: ColDef<(typeof assignmentRows)[number]>[] = [
+    {
+      field: "assignmentName",
+      headerName: "Assignment",
+      minWidth: 240,
+    },
+    {
+      field: "dueDateIso",
+      headerName: "Due",
+      minWidth: 220,
+      valueFormatter: ({ value }) =>
+        typeof value === "string" ? new Date(value).toLocaleString() : "",
+    },
+    {
+      colId: "actions",
+      headerName: "Actions",
+      filter: false,
+      flex: 0,
+      maxWidth: 140,
+      minWidth: 120,
+      resizable: false,
+      sortable: false,
+      cellRenderer: ({ data }: { data?: (typeof assignmentRows)[number] }) =>
+        data ? (
+          <div className="flex h-full items-center justify-end">
+            <Button asChild size="sm" variant="outline">
+              <Link href={data.href}>Open</Link>
+            </Button>
+          </div>
+        ) : null,
+    },
+  ];
+
+  const enrolledStudentRows = enrolledStudents.map((enrollment) => {
+    const studentName =
+      enrollment.studentName ??
+      enrollment.studentEmail?.split("@")[0] ??
+      "Unnamed student";
+
+    return {
+      joinedIso: new Date(enrollment._creationTime).toISOString(),
+      studentEmail: enrollment.studentEmail ?? "No email available",
+      studentId: enrollment.studentId,
+      studentLabel: `${studentName} ${enrollment.studentEmail ?? ""} ${enrollment.studentId}`,
+      studentName,
+    };
+  });
+  const enrolledStudentColumnDefs: ColDef<
+    (typeof enrolledStudentRows)[number]
+  >[] = [
+    {
+      field: "studentLabel",
+      headerName: "Student",
+      minWidth: 260,
+      cellRenderer: ({
+        data,
+      }: {
+        data?: (typeof enrolledStudentRows)[number];
+      }) =>
+        data ? (
+          <div className="py-2">
+            <p className="font-medium">{data.studentName}</p>
+            <p className="text-muted-foreground font-mono text-xs">
+              {data.studentId}
+            </p>
+          </div>
+        ) : null,
+    },
+    {
+      field: "studentEmail",
+      headerName: "Email",
+      minWidth: 240,
+    },
+    {
+      field: "joinedIso",
+      headerName: "Joined",
+      minWidth: 220,
+      valueFormatter: ({ value }) =>
+        typeof value === "string" ? new Date(value).toLocaleString() : "",
+    },
+    {
+      colId: "actions",
+      headerName: "Actions",
+      filter: false,
+      flex: 0,
+      maxWidth: 150,
+      minWidth: 130,
+      resizable: false,
+      sortable: false,
+      cellRenderer: ({
+        data,
+      }: {
+        data?: (typeof enrolledStudentRows)[number];
+      }) =>
+        data ? (
+          <div className="flex h-full items-center justify-end">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleRemoveStudent(data.studentId)}
+            >
+              Remove
+            </Button>
+          </div>
+        ) : null,
+    },
+  ];
 
   const handleDeleteClassroom = async () => {
     if (!confirm("Delete classroom and all related assignments/submissions?")) {
@@ -106,27 +215,6 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardDescription>Assignments</CardDescription>
-            <CardTitle>{assignments.length}</CardTitle>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardDescription>Enrolled Students</CardDescription>
-            <CardTitle>{studentCount}</CardTitle>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardDescription>Pending Enrollments</CardDescription>
-            <CardTitle>{pendingEnrollments.length}</CardTitle>
-          </CardHeader>
-        </Card>
-      </div>
-
       <Separator />
 
       <section className="space-y-3">
@@ -138,49 +226,10 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
             </CardContent>
           </Card>
         ) : (
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[720px] text-sm">
-                  <thead className="bg-muted/40">
-                    <tr className="border-b">
-                      <th className="px-4 py-3 text-left font-medium">
-                        Assignment
-                      </th>
-                      <th className="px-4 py-3 text-left font-medium">Due</th>
-                      <th className="px-4 py-3 text-right font-medium">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {assignments.map((assignment) => (
-                      <tr
-                        key={assignment._id}
-                        className="border-b last:border-b-0"
-                      >
-                        <td className="px-4 py-3 align-top font-medium">
-                          {assignment.name}
-                        </td>
-                        <td className="text-muted-foreground px-4 py-3 align-top">
-                          {new Date(assignment.dueDate).toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-right align-top">
-                          <Button asChild variant="outline">
-                            <Link
-                              href={`/teacher/classroom/${classroomId}/assignment/${assignment._id}`}
-                            >
-                              Open
-                            </Link>
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+          <AppDataGrid
+            columnDefs={assignmentColumnDefs}
+            rowData={assignmentRows}
+          />
         )}
       </section>
 
@@ -193,63 +242,11 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
             </CardContent>
           </Card>
         ) : (
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[720px] text-sm">
-                  <thead className="bg-muted/40">
-                    <tr className="border-b">
-                      <th className="px-4 py-3 text-left font-medium">
-                        Student
-                      </th>
-                      <th className="px-4 py-3 text-left font-medium">Email</th>
-                      <th className="px-4 py-3 text-left font-medium">
-                        Joined
-                      </th>
-                      <th className="px-4 py-3 text-right font-medium">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {enrolledStudents.map((enrollment) => (
-                      <tr
-                        key={enrollment._id}
-                        className="border-b last:border-b-0"
-                      >
-                        <td className="px-4 py-3 align-top">
-                          <p className="font-medium">
-                            {enrollment.studentName ??
-                              enrollment.studentEmail?.split("@")[0] ??
-                              "Unnamed student"}
-                          </p>
-                          <p className="text-muted-foreground font-mono text-xs">
-                            {enrollment.studentId}
-                          </p>
-                        </td>
-                        <td className="text-muted-foreground px-4 py-3 align-top">
-                          {enrollment.studentEmail ?? "No email available"}
-                        </td>
-                        <td className="text-muted-foreground px-4 py-3 align-top">
-                          {new Date(enrollment._creationTime).toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-right align-top">
-                          <Button
-                            variant="outline"
-                            onClick={() =>
-                              handleRemoveStudent(enrollment.studentId)
-                            }
-                          >
-                            Remove
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+          <AppDataGrid
+            columnDefs={enrolledStudentColumnDefs}
+            rowData={enrolledStudentRows}
+            rowHeight={72}
+          />
         )}
       </section>
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import type { ColDef } from "ag-grid-community";
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
@@ -29,6 +30,7 @@ import { Label } from "@package/ui/label";
 import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
+import { AppDataGrid } from "~/components/app-data-grid";
 import { Editor } from "~/components/editor";
 import { MarkdownViewer } from "~/components/markdown-viewer";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
@@ -149,6 +151,75 @@ function AssignmentContent({
       .length ?? 0;
   const sortedSubmissions =
     submissions?.slice().sort((a, b) => b.submittedAt - a.submittedAt) ?? [];
+  const submissionRows = sortedSubmissions.map((submission) => {
+    const studentName =
+      submission.studentName ??
+      submission.studentEmail?.split("@")[0] ??
+      submission.studentId;
+
+    return {
+      grade: submission.grade ?? null,
+      href: `/teacher/classroom/${classroomId}/assignment/${assignmentId}/review/${submission._id}`,
+      studentLabel: `${studentName} ${submission.studentEmail ?? ""} ${submission.studentId}`,
+      studentName,
+      submittedAtIso: new Date(submission.submittedAt).toISOString(),
+    };
+  });
+  const submissionColumnDefs: ColDef<(typeof submissionRows)[number]>[] = [
+    {
+      field: "studentLabel",
+      headerName: "Student",
+      minWidth: 240,
+      cellRenderer: ({ data }: { data?: (typeof submissionRows)[number] }) =>
+        data ? <p className="font-medium">{data.studentName}</p> : null,
+    },
+    {
+      field: "submittedAtIso",
+      headerName: "Submitted",
+      minWidth: 220,
+      sort: "desc",
+      valueFormatter: ({ value }) =>
+        typeof value === "string" ? new Date(value).toLocaleString() : "",
+    },
+    {
+      field: "grade",
+      headerName: "Grade",
+      filter: "agNumberColumnFilter",
+      flex: 0,
+      maxWidth: 150,
+      minWidth: 120,
+      valueFormatter: ({ value }) =>
+        typeof value === "number" ? `${value}` : "Not graded",
+      cellRenderer: ({
+        value,
+      }: {
+        value?: (typeof submissionRows)[number]["grade"];
+      }) =>
+        typeof value === "number" ? (
+          <span className="font-medium">{value}</span>
+        ) : (
+          <span className="text-muted-foreground">Not graded</span>
+        ),
+    },
+    {
+      colId: "actions",
+      headerName: "Actions",
+      filter: false,
+      flex: 0,
+      maxWidth: 150,
+      minWidth: 130,
+      resizable: false,
+      sortable: false,
+      cellRenderer: ({ data }: { data?: (typeof submissionRows)[number] }) =>
+        data ? (
+          <div className="flex h-full items-center justify-end">
+            <Button asChild size="sm" variant="outline">
+              <Link href={data.href}>Review</Link>
+            </Button>
+          </div>
+        ) : null,
+    },
+  ];
 
   return (
     <div className="container mx-auto p-6">
@@ -213,78 +284,11 @@ function AssignmentContent({
               <div className="flex min-h-[120px] items-center justify-center">
                 <Spinner />
               </div>
-            ) : submissions.length === 0 ? (
-              <Card>
-                <CardContent className="text-muted-foreground py-10 text-center text-sm">
-                  No submissions yet from enrolled students.
-                </CardContent>
-              </Card>
             ) : (
-              <Card>
-                <CardContent className="p-0">
-                  <div className="overflow-x-auto">
-                    <table className="w-full min-w-[720px] text-sm">
-                      <thead className="bg-muted/40">
-                        <tr className="border-b">
-                          <th className="px-4 py-3 text-left font-medium">
-                            Student
-                          </th>
-                          <th className="px-4 py-3 text-left font-medium">
-                            Submitted
-                          </th>
-                          <th className="px-4 py-3 text-left font-medium">
-                            Grade
-                          </th>
-                          <th className="px-4 py-3 text-right font-medium">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {sortedSubmissions.map((submission) => (
-                          <tr
-                            key={submission._id}
-                            className="border-b last:border-b-0"
-                          >
-                            <td className="px-4 py-3 align-top">
-                              <p className="font-medium">
-                                {submission.studentName ??
-                                  submission.studentEmail?.split("@")[0] ??
-                                  submission.studentId}
-                              </p>
-                            </td>
-                            <td className="text-muted-foreground px-4 py-3 align-top">
-                              {new Date(
-                                submission.submittedAt,
-                              ).toLocaleString()}
-                            </td>
-                            <td className="px-4 py-3 align-top">
-                              {submission.grade !== undefined ? (
-                                <span className="font-medium">
-                                  {submission.grade}
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground">
-                                  Not graded
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-4 py-3 text-right align-top">
-                              <Button asChild variant="outline">
-                                <Link
-                                  href={`/teacher/classroom/${classroomId}/assignment/${assignmentId}/review/${submission._id}`}
-                                >
-                                  Review
-                                </Link>
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
+              <AppDataGrid
+                columnDefs={submissionColumnDefs}
+                rowData={submissionRows}
+              />
             )}
           </section>
         </div>
