@@ -12,6 +12,7 @@ import {
 } from "../_generated/server";
 import { authComponent } from "../auth";
 import { getObjectKey } from "../helpers/storageKeys";
+import { checkGraderAccess } from "./submission";
 import { requireInstructorAccess } from "./teacher";
 import { getUserRole, requireAuth } from "./user";
 
@@ -402,6 +403,30 @@ export const provideSubmissionFeedback = mutation({
     });
 
     return submission._id;
+  },
+});
+
+export const publishGrades = mutation({
+  args: {
+    assignmentId: v.id("assignments"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    await checkGraderAccess(user._id, ctx, args.assignmentId);
+
+    const submissions = await ctx.db
+      .query("submissions")
+      .withIndex("assignmentId_studentId", (q) =>
+        q.eq("assignmentId", args.assignmentId),
+      )
+      .collect();
+
+    await Promise.all(
+      submissions
+        .filter((s) => !s.gradesReleased)
+        .map((s) => ctx.db.patch(s._id, { gradesReleased: true })),
+    );
   },
 });
 

@@ -15,7 +15,7 @@ const requireStudentRole = async (ctx: DatabaseCtx, userId: string) => {
   return role;
 };
 
-const checkGraderAccess = async (
+export const checkGraderAccess = async (
   uid: string,
   ctx: DatabaseCtx,
   assignmentId: Id<"assignments">,
