@@ -3,11 +3,12 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Flag } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
 import { api } from "@package/backend/convex/_generated/api";
+import { cn } from "@package/ui";
 import { Button } from "@package/ui/button";
 import {
   Card,
@@ -43,6 +44,11 @@ function ReviewContent({
   const provideSubmissionFeedback = useMutation(
     api.web.teacherAssignments.provideSubmissionFeedback,
   );
+
+  const toggleSubmissionFlag = useMutation(
+    api.web.submission.toggleSubmissionFlag,
+  );
+
   const [grade, setGrade] = useState("");
   const [feedback, setFeedback] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -158,12 +164,28 @@ function ReviewContent({
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Replay</CardTitle>
-              <CardDescription>
-                Scrub through the workspace edit history for this submission.
-              </CardDescription>
-            </CardHeader>
+            <div className="flex justify-between pr-6">
+              <CardHeader className="flex-1">
+                <CardTitle>Replay</CardTitle>
+                <CardDescription>
+                  Scrub through the workspace edit history for this submission.
+                </CardDescription>
+              </CardHeader>
+              <div>
+                <Button
+                  className={cn("gap-2 font-medium text-white transition-all", {
+                    "bg-red-800 hover:bg-blue-500": submission.flagged,
+                    "bg-red-700 hover:bg-red-600": !submission.flagged,
+                  })}
+                  onClick={() =>
+                    toggleSubmissionFlag({ submissionId: submission._id })
+                  }
+                >
+                  <Flag className="h-4 w-4" />
+                  {submission.flagged ? "Unflag Submission" : "Flag Submission"}
+                </Button>
+              </div>
+            </div>
             <CardContent>
               {submission.workspaceId ? (
                 <TextReplayScrubberComponent
