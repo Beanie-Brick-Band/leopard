@@ -219,6 +219,7 @@ export const updateAssignment = mutation({
     }
 
     await ctx.db.patch(assignment._id, patch);
+
     return assignment._id;
   },
 });
