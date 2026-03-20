@@ -211,3 +211,24 @@ export const getAllSubmissionsForAssignment = query({
     return submissions;
   },
 });
+
+export const toggleSubmissionFlag = mutation({
+  args: {
+    submissionId: v.id("submissions"),
+  },
+  handler: async (ctx, args) => {
+    const user = await checkAuth(ctx);
+
+    const submission = await ctx.db.get(args.submissionId);
+    if (!submission) {
+      throw new Error("Submission not found");
+    }
+
+    await checkGraderAccess(user._id, ctx, submission.assignmentId);
+
+    await ctx.db.patch(args.submissionId, {
+      flagged: !submission.flagged,
+    });
+    return;
+  },
+});
