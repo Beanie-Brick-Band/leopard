@@ -10,17 +10,27 @@ function HeaderAuth() {
   return (
     <div className="flex gap-2">
       <Authenticated>
-        <Link href="/auth/sign-out" passHref>
-          <Button variant="secondary">Sign Out</Button>
-        </Link>
-        <Link href="/app" passHref>
-          <Button>Go to App</Button>
-        </Link>
+        <Button
+          asChild
+          variant="secondary"
+          className="border border-black/10 shadow-sm dark:border-white/10"
+        >
+          <Link href="/auth/sign-out">Sign Out</Link>
+        </Button>
+        <Button
+          asChild
+          className="shadow-primary/20 border border-black/10 shadow-sm dark:border-white/10"
+        >
+          <Link href="/app">Go to App</Link>
+        </Button>
       </Authenticated>
       <Unauthenticated>
-        <Link href="/auth/sign-in" passHref>
-          <Button>Sign In</Button>
-        </Link>
+        <Button
+          asChild
+          className="shadow-primary/20 border border-black/10 shadow-sm dark:border-white/10"
+        >
+          <Link href="/auth/sign-in">Sign In</Link>
+        </Button>
       </Unauthenticated>
     </div>
   );
