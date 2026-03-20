@@ -246,14 +246,14 @@ function AssignmentContent({
       maxWidth: 150,
       minWidth: 120,
       valueFormatter: ({ value }) =>
-        typeof value === "number" ? `${value}` : "Not graded",
+        typeof value === "number" ? `${value}%` : "Not graded",
       cellRenderer: ({
         value,
       }: {
         value?: (typeof submissionRows)[number]["grade"];
       }) =>
         typeof value === "number" ? (
-          <span className="font-medium">{value}</span>
+          <span className="font-medium">{value}%</span>
         ) : (
           <span className="text-muted-foreground">Not graded</span>
         ),
@@ -500,6 +500,7 @@ function AssignmentContent({
                           0,
                         ) / gradedCount
                     ).toFixed(1)}
+                    %
                   </span>
                 </div>
               ) : null}
