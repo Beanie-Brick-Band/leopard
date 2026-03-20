@@ -57,9 +57,11 @@ async function seedClassroomAndAssignment(
 
 async function seedTestWorkspace(
   t: ReturnType<typeof makeTestClient>,
+  assignmentId: Parameters<typeof seedWorkspace>[1]["assignmentId"],
   userId: string,
 ) {
   return seedWorkspace(t, {
+    assignmentId,
     userId,
     coderWorkspaceId: `ws_${userId}`,
     isActive: true,
@@ -76,7 +78,7 @@ describe("web/submission", () => {
     it("throws Not authenticated when not logged in", async () => {
       const t = makeTestClient();
       const { assignmentId } = await seedClassroomAndAssignment(t);
-      const workspaceId = await seedTestWorkspace(t, "student_1");
+      const workspaceId = await seedTestWorkspace(t, assignmentId, "student_1");
       safeGetAuthUser.mockResolvedValue(null);
 
       await expect(
@@ -90,7 +92,7 @@ describe("web/submission", () => {
     it("denies non-student", async () => {
       const t = makeTestClient();
       const { assignmentId } = await seedClassroomAndAssignment(t);
-      const workspaceId = await seedTestWorkspace(t, "teacher_1");
+      const workspaceId = await seedTestWorkspace(t, assignmentId, "teacher_1");
       await seedUserRole(t, "teacher_1", "teacher");
       safeGetAuthUser.mockResolvedValue({
         _id: "teacher_1",
@@ -112,7 +114,7 @@ describe("web/submission", () => {
       const { assignmentId } = await seedClassroomAndAssignment(t, {
         dueDate: 1000000,
       });
-      const workspaceId = await seedTestWorkspace(t, "student_1");
+      const workspaceId = await seedTestWorkspace(t, assignmentId, "student_1");
       safeGetAuthUser.mockResolvedValue({
         _id: "student_1",
         email: "s@example.com",
@@ -133,7 +135,7 @@ describe("web/submission", () => {
     it("throws User not enrolled in the classroom", async () => {
       const t = makeTestClient();
       const { assignmentId } = await seedClassroomAndAssignment(t);
-      const workspaceId = await seedTestWorkspace(t, "student_1");
+      const workspaceId = await seedTestWorkspace(t, assignmentId, "student_1");
       safeGetAuthUser.mockResolvedValue({
         _id: "student_1",
         email: "s@example.com",
@@ -157,7 +159,7 @@ describe("web/submission", () => {
         },
       );
       await seedEnrollment(t, classroomId, "student_1");
-      const workspaceId = await seedTestWorkspace(t, "student_1");
+      const workspaceId = await seedTestWorkspace(t, assignmentId, "student_1");
       safeGetAuthUser.mockResolvedValue({
         _id: "student_1",
         email: "s@example.com",
@@ -183,7 +185,7 @@ describe("web/submission", () => {
         },
       );
       await seedEnrollment(t, classroomId, "student_1");
-      const workspaceId = await seedTestWorkspace(t, "student_1");
+      const workspaceId = await seedTestWorkspace(t, assignmentId, "student_1");
       safeGetAuthUser.mockResolvedValue({
         _id: "student_1",
         email: "s@example.com",
@@ -221,8 +223,16 @@ describe("web/submission", () => {
         },
       );
       await seedEnrollment(t, classroomId, "student_1");
-      const workspace1Id = await seedTestWorkspace(t, "student_1");
-      const workspace2Id = await seedTestWorkspace(t, "student_1_2");
+      const workspace1Id = await seedTestWorkspace(
+        t,
+        assignmentId,
+        "student_1",
+      );
+      const workspace2Id = await seedTestWorkspace(
+        t,
+        assignmentId,
+        "student_1_2",
+      );
       safeGetAuthUser.mockResolvedValue({
         _id: "student_1",
         email: "s@example.com",
@@ -263,7 +273,7 @@ describe("web/submission", () => {
         },
       );
       await seedEnrollment(t, classroomId, "student_1");
-      const workspaceId = await seedTestWorkspace(t, "student_1");
+      const workspaceId = await seedTestWorkspace(t, assignmentId, "student_1");
       const submissionId = await seedSubmission(t, {
         assignmentId,
         studentId: "student_1",
@@ -295,7 +305,7 @@ describe("web/submission", () => {
         },
       );
       await seedEnrollment(t, classroomId, "student_1");
-      const workspaceId = await seedTestWorkspace(t, "student_1");
+      const workspaceId = await seedTestWorkspace(t, assignmentId, "student_1");
       const submissionId = await seedSubmission(t, {
         assignmentId,
         studentId: "student_1",
@@ -353,7 +363,7 @@ describe("web/submission", () => {
       const t = makeTestClient();
       const { classroomId, assignmentId } = await seedClassroomAndAssignment(t);
       await seedEnrollment(t, classroomId, "student_1");
-      const workspaceId = await seedTestWorkspace(t, "student_1");
+      const workspaceId = await seedTestWorkspace(t, assignmentId, "student_1");
       await seedSubmission(t, {
         assignmentId,
         studentId: "student_1",
@@ -391,7 +401,7 @@ describe("web/submission", () => {
       const t = makeTestClient();
       const { classroomId, assignmentId } = await seedClassroomAndAssignment(t);
       await seedEnrollment(t, classroomId, "student_1");
-      const workspaceId = await seedTestWorkspace(t, "student_1");
+      const workspaceId = await seedTestWorkspace(t, assignmentId, "student_1");
       await seedSubmission(t, {
         assignmentId,
         studentId: "student_1",
@@ -450,8 +460,8 @@ describe("web/submission", () => {
       );
       await seedEnrollment(t, classroomId, "student_1");
       await seedEnrollment(t, classroomId, "student_2");
-      const ws1 = await seedTestWorkspace(t, "student_1");
-      const ws2 = await seedTestWorkspace(t, "student_2");
+      const ws1 = await seedTestWorkspace(t, assignmentId, "student_1");
+      const ws2 = await seedTestWorkspace(t, assignmentId, "student_2");
       await seedSubmission(t, {
         assignmentId,
         studentId: "student_1",

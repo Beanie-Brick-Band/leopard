@@ -301,6 +301,7 @@ export const launchWorkspace = action({
     await ctx.runMutation(internal.web.assignment.setUserActiveWorkspace, {
       userId: coderUserId,
       coderWorkspaceId: workspaceMetadata.data.id!,
+      assignmentId: args.assignmentId,
     });
 
     const coderApiUrl = new URL(process.env.CODER_API_URL!);
