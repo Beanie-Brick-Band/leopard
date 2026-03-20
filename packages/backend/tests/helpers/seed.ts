@@ -84,6 +84,7 @@ export async function seedEnrollment(
 export async function seedWorkspace(
   t: TestClientLike,
   ws: {
+    assignmentId: Id<"assignments">;
     userId: string;
     coderWorkspaceId: string;
     isActive: boolean;

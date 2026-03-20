@@ -101,6 +101,7 @@ export const setUserActiveWorkspace = internalMutation({
   args: {
     userId: v.string(),
     coderWorkspaceId: v.string(),
+    assignmentId: v.id("assignments"),
   },
   handler: async (ctx, args) => {
     const userWorkspaces = await ctx.db
@@ -126,6 +127,7 @@ export const setUserActiveWorkspace = internalMutation({
         userId: args.userId,
         coderWorkspaceId: args.coderWorkspaceId,
         isActive: true,
+        assignmentId: args.assignmentId,
       });
     }
 
@@ -157,3 +159,33 @@ export const internalGetAssignmentStarterCodeKey = internalQuery({
   },
 });
 
+export const getLastEditedTimestamp = query({
+  args: { assignmentId: v.id("assignments") },
+  handler: async (ctx, args) => {
+    const auth = await authComponent.safeGetAuthUser(ctx);
+    if (!auth) {
+      throw new Error("Unauthorized");
+    }
+
+    await ensureCanAccessAssignment(ctx, auth._id, args.assignmentId);
+
+    const workspace = await ctx.db
+      .query("workspaces")
+      .withIndex("assignmentId_userId", (q) => q.eq("assignmentId", args.assignmentId).eq("userId", auth._id))
+      .first();
+
+    if (!workspace) {
+      return null;
+    }
+
+    const lastEvent = await ctx.db
+      .query("events")
+      .withIndex("workspaceId_timestamp", (q) =>
+        q.eq("workspaceId", workspace._id),
+      )
+      .order("desc")
+      .first();
+
+    return lastEvent?.timestamp ?? null;
+  },
+});

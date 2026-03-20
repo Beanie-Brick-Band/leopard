@@ -54,6 +54,7 @@ export const createMock = internalMutation(async (ctx) => {
     coderWorkspaceId: "273044a0-03a7-49ef-b1a4-e1bbc3c49d9b",
     isActive: true,
     userId: "user_123", // sample user that does not exist
+    assignmentId: assignment1Id,
   });
 
   // Empty workspace
@@ -61,6 +62,7 @@ export const createMock = internalMutation(async (ctx) => {
     coderWorkspaceId: "00000000-0000-0000-0000-000000000000",
     isActive: true,
     userId: "user_123",
+    assignmentId: assignment2Id,
   });
 
   // Update classrooms with assignments

@@ -33,6 +33,10 @@ function Content({
 }) {
   const assignment = useQuery(api.web.assignment.getById, { id: assignmentId });
   const activeWorkspace = useQuery(api.web.assignment.getMyActiveWorkspace);
+  const lastEditedTimestamp =
+    useQuery(api.web.assignment.getLastEditedTimestamp, {
+      assignmentId,
+    });
   const submissionResult = useQuery(
     api.web.submission.getOwnSubmissionsForAssignment,
     {
@@ -235,6 +239,22 @@ function Content({
                     : hasSubmission
                       ? "Submitted"
                       : "Not submitted"}
+                </span>
+              </div>
+              {submittedAt ? (
+                <div className="flex justify-between gap-4 text-sm">
+                  <span className="text-muted-foreground">Submitted At</span>
+                  <span className="text-right font-medium">
+                    {new Date(submittedAt).toLocaleString()}
+                  </span>
+                </div>
+              ) : null}
+              <div className="flex justify-between gap-4 text-sm">
+                <span className="text-muted-foreground">Last Edited</span>
+                <span className="text-right font-medium">
+                  {lastEditedTimestamp
+                    ? new Date(lastEditedTimestamp).toLocaleString()
+                    : "N/A"}
                 </span>
               </div>
               <div className="flex justify-between gap-4 text-sm">
