@@ -9,6 +9,7 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Download,
   Save,
   Send,
   Trash2,
@@ -31,9 +32,11 @@ import { Label } from "@package/ui/label";
 import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
+import { getSubmissionDownload } from "~/app/app/actions";
 import { AppDataGrid } from "~/components/app-data-grid";
 import { Editor } from "~/components/editor";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
+import { triggerDownload } from "~/lib/download";
 import { StarterCodeCard } from "./starter-code-card";
 
 function formatDateForInput(timestamp: number) {
@@ -201,6 +204,8 @@ function AssignmentContent({
       href: `/teacher/classroom/${classroomId}/assignment/${assignmentId}/review/${submission._id}`,
       studentLabel: `${studentName} ${submission.studentEmail ?? ""} ${submission.studentId}`,
       studentName,
+      submissionId: submission._id,
+      submissionStorageKey: submission.submissionStorageKey ?? null,
       submittedAtIso: new Date(submission.submittedAt).toISOString(),
     };
   });
@@ -257,6 +262,45 @@ function AssignmentContent({
         ) : (
           <span className="text-muted-foreground">Not graded</span>
         ),
+    },
+    {
+      colId: "actions",
+      headerName: "Actions",
+      filter: false,
+      flex: 0,
+      maxWidth: 150,
+      minWidth: 130,
+      resizable: false,
+      sortable: false,
+      cellRenderer: ({ data }: { data?: (typeof submissionRows)[number] }) =>
+        data ? (
+          <div className="flex h-full items-center justify-end gap-2">
+            {data.submissionStorageKey ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                title="Download submission"
+                onClick={async () => {
+                  try {
+                    const result = await getSubmissionDownload(
+                      data.submissionId,
+                    );
+                    triggerDownload(result.downloadUrl);
+                  } catch (err) {
+                    toast.error(
+                      err instanceof Error ? err.message : "Download failed",
+                    );
+                  }
+                }}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            ) : null}
+            <Button asChild size="sm" variant="outline">
+              <Link href={data.href}>Review</Link>
+            </Button>
+          </div>
+        ) : null,
     },
   ];
 
