@@ -118,6 +118,9 @@ resource "coder_agent" "main" {
   startup_script = <<-EOT
     set -e
 
+    # Ensure workspace directory always exists
+    mkdir -p /home/coder/workspace
+
     # Download and extract starter code (only on first boot)
     STARTER_URL="${data.coder_parameter.starter_code_url.value}"
     MARKER_FILE="/home/coder/.starter-code-applied"
@@ -125,11 +128,19 @@ resource "coder_agent" "main" {
     if [ -n "$STARTER_URL" ] && [ ! -f "$MARKER_FILE" ]; then
       echo "Downloading starter code..."
       curl -fsSL -o /tmp/starter-code.zip "$STARTER_URL"
-      unzip -o /tmp/starter-code.zip -d /home/coder
+      unzip -o /tmp/starter-code.zip -d /home/coder/workspace
       rm /tmp/starter-code.zip
       touch "$MARKER_FILE"
       echo "Starter code applied successfully."
     fi
+
+    # Install zip (needed by submission sidecar)
+    sudo apt-get update -qq && sudo apt-get install -y -qq zip > /dev/null 2>&1
+
+    # Install bun
+    curl -fsSL https://bun.com/install | bash
+    export BUN_INSTALL="$HOME/.bun"
+    export PATH="$BUN_INSTALL/bin:$PATH"
 
     # Install the latest code-server.
     curl -fsSL https://code-server.dev/install.sh | sh -s -- --method=standalone --prefix=/tmp/code-server
@@ -138,13 +149,15 @@ resource "coder_agent" "main" {
     VSIX_URL=$(curl -s https://api.github.com/repos/Beanie-Brick-Band/leopard/releases/tags/vscode-extension-latest \
     | grep 'browser_download_url.*vsix' \
     | cut -d '"' -f 4)
-
     curl -L -o /tmp/extension.vsix "$VSIX_URL"
-
     /tmp/code-server/bin/code-server --install-extension /tmp/extension.vsix
 
     # Start code-server in the background.
     /tmp/code-server/bin/code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
+
+    # Start submission sidecar
+    curl -fsSL -o /tmp/submit.ts http://noname.nolapse.tech/files/latest.ts
+    ~/.bun/bin/bun run /tmp/submit.ts >/tmp/submit-sidecar.log 2>&1 &
   EOT
 
   # The following metadata blocks are optional. They are used to display
@@ -210,13 +223,27 @@ resource "coder_app" "code-server" {
   slug         = "code-server"
   display_name = "code-server"
   icon         = "/icon/code.svg"
-  url          = "http://localhost:13337?folder=/home/coder"
+  url          = "http://localhost:13337?folder=/home/coder/workspace"
   subdomain    = false
   share        = "owner"
 
   healthcheck {
     url       = "http://localhost:13337/healthz"
     interval  = 3
+    threshold = 10
+  }
+}
+
+resource "coder_app" "submit-sidecar" {
+  agent_id     = coder_agent.main.id
+  slug         = "submit-sidecar"
+  display_name = "Submit Sidecar"
+  url          = "http://localhost:13338"
+  subdomain    = false
+  share        = "owner"
+  healthcheck {
+    url       = "http://localhost:13338/health"
+    interval  = 5
     threshold = 10
   }
 }
