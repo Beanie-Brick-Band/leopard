@@ -134,28 +134,6 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
                 placeholder="Week 3 - Sorting Algorithms"
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="assignment-description">Description</Label>
-              <Editor
-                content={description}
-                onChange={setDescription}
-                placeholder="Describe the assignment objectives and requirements..."
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Starter Code (optional)</Label>
-              <StarterCodeUploader
-                ref={uploaderRef}
-                autoProceed={false}
-                getUploadUrl={() => getUploadUrl({ classroomId })}
-                onUploadSuccess={(storageKey) => {
-                  storageKeyRef.current = storageKey;
-                }}
-              />
-            </div>
-
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="release-date">Release Date</Label>
@@ -178,7 +156,25 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
                 />
               </div>
             </div>
-
+            <div className="space-y-2">
+              <Label htmlFor="assignment-description">Description</Label>
+              <Editor
+                content={description}
+                onChange={setDescription}
+                placeholder="Describe the assignment objectives and requirements..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Starter Code (optional)</Label>
+              <StarterCodeUploader
+                ref={uploaderRef}
+                autoProceed={false}
+                getUploadUrl={() => getUploadUrl({ classroomId })}
+                onUploadSuccess={(storageKey) => {
+                  storageKeyRef.current = storageKey;
+                }}
+              />
+            </div>
             <div className="flex gap-2">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Creating..." : "Create Assignment"}
