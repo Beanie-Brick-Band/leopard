@@ -193,7 +193,7 @@ export const getOwnSubmissionsForAssignment = query({
       assignmentId: submission.assignmentId,
       submittedAt: submission.submittedAt,
       gradesReleased: submission.gradesReleased,
-      status: submission.status ?? null,
+      status: submission.submissionUploadStatus ?? null,
     };
 
     return { success: true, submission: publicSubmissionInfo };
@@ -237,7 +237,7 @@ export const internalSetSubmissionUploading = internalMutation({
 
     if (existing) {
       await ctx.db.patch(existing._id, {
-        status: "uploading",
+        submissionUploadStatus: "uploading",
         workspaceId: args.workspaceId,
       });
       return existing._id;
@@ -250,7 +250,7 @@ export const internalSetSubmissionUploading = internalMutation({
       flags: [],
       submittedAt: Date.now(),
       gradesReleased: false,
-      status: "uploading",
+      submissionUploadStatus: "uploading",
     });
   },
 });
@@ -262,7 +262,7 @@ export const internalConfirmSubmission = internalMutation({
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.submissionId, {
-      status: "confirmed",
+      submissionUploadStatus: "confirmed",
       submittedAt: Date.now(),
       submissionStorageKey: args.submissionStorageKey,
     });
@@ -275,7 +275,7 @@ export const internalFailSubmission = internalMutation({
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.submissionId, {
-      status: "failed",
+      submissionUploadStatus: "failed",
     });
   },
 });

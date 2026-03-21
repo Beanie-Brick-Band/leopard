@@ -133,14 +133,8 @@ export const setUserActiveWorkspace = internalMutation({
     for (const ws of userWorkspaces) {
       if (ws.coderWorkspaceId === args.coderWorkspaceId) {
         targetWorkspace = ws;
-        const patch: {
-          isActive?: boolean;
-          assignmentId?: typeof args.assignmentId;
-        } = {};
-        if (!ws.isActive) patch.isActive = true;
-        if (args.assignmentId) patch.assignmentId = args.assignmentId;
-        if (Object.keys(patch).length > 0) {
-          await ctx.db.patch(ws._id, patch);
+        if (!ws.isActive) {
+          await ctx.db.patch(ws._id, { isActive: true });
         }
       } else if (ws.isActive) {
         await ctx.db.patch(ws._id, { isActive: false });
