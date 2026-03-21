@@ -13,6 +13,7 @@ export const getUserRecord = internalQuery({
   },
 });
 
+/** Convex actions can't access ctx.db, so they call these internalQueries via ctx.runQuery */
 export const getAssignment = internalQuery({
   args: { assignmentId: v.id("assignments") },
   handler: async (ctx, args) => {
@@ -20,6 +21,7 @@ export const getAssignment = internalQuery({
   },
 });
 
+/** Convex actions can't access ctx.db, so they call these internalQueries via ctx.runQuery */
 export const getClassroom = internalQuery({
   args: { classroomId: v.id("classrooms") },
   handler: async (ctx, args) => {
@@ -49,32 +51,6 @@ export const getStudentSubmission = internalQuery({
         q.eq("studentId", args.studentId).eq("assignmentId", args.assignmentId),
       )
       .first();
-  },
-});
-
-export const getEnrolledStudents = internalQuery({
-  args: { classroomId: v.id("classrooms") },
-  handler: async (ctx, args) => {
-    return ctx.db
-      .query("classroomStudentsRelations")
-      .withIndex("classroomId_studentId", (q) =>
-        q.eq("classroomId", args.classroomId),
-      )
-      .collect();
-  },
-});
-
-export const getWorkspaceByAssignment = internalQuery({
-  args: { assignmentId: v.id("assignments"), studentId: v.string() },
-  handler: async (ctx, args) => {
-    const workspaces = await ctx.db
-      .query("workspaces")
-      .withIndex("assignmentId", (q) =>
-        q.eq("assignmentId", args.assignmentId),
-      )
-      .collect();
-
-    return workspaces.find((ws) => ws.userId === args.studentId) ?? null;
   },
 });
 

@@ -7,15 +7,10 @@ import {
   createWorkspaceBuild,
   getWorkspaceMetadataByUserAndWorkspaceName,
 } from "@package/coder-sdk";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-import { internal as _internal } from "../_generated/api";
-import { action, internalAction } from "../_generated/server";
+import { z } from "zod";
 
-// The `internal` type may not resolve correctly in all TS project configs (e.g.
-// vscode-extension tsc) due to circular _generated/api.d.ts resolution, so we
-// cast to `any` and use this alias throughout the file instead.
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-const internal: any = _internal;
+import { internal } from "../_generated/api";
+import { action } from "../_generated/server";
 import { authComponent } from "../auth";
 import { getCoderClient, getCoderOrigin } from "../helpers/coder";
 import {
@@ -24,6 +19,11 @@ import {
   verifyObjectExists,
 } from "../helpers/minio";
 import { getSubmissionObjectKey } from "../helpers/storageKeys";
+
+const sidecarResponseSchema = z.object({
+  success: z.boolean(),
+  error: z.string().optional(),
+});
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 2000;
@@ -56,7 +56,7 @@ async function callSidecar(
         throw new Error(`Sidecar HTTP ${res.status}: ${text}`);
       }
 
-      const result = (await res.json()) as { success: boolean; error?: string };
+      const result = sidecarResponseSchema.parse(await res.json());
       if (result.success) {
         return { success: true };
       }
@@ -134,7 +134,7 @@ export const triggerSubmission = action({
       internal.web.submissionQueries.getStudentSubmission,
       { studentId: user._id, assignmentId: args.assignmentId },
     );
-    if (existingSubmission?.status === "confirmed") {
+    if (existingSubmission?.submissionUploadStatus === "confirmed") {
       throw new Error("Assignment already submitted");
     }
 
@@ -147,6 +147,11 @@ export const triggerSubmission = action({
     );
     if (!workspace) {
       throw new Error("No active workspace found. Launch a workspace first.");
+    }
+    if (workspace.assignmentId !== args.assignmentId) {
+      throw new Error(
+        "Active workspace is not linked to this assignment. Launch the correct workspace first.",
+      );
     }
 
     // Get Coder workspace details
@@ -242,148 +247,6 @@ export const triggerSubmission = action({
     });
 
     return { success: true, submissionId };
-  },
-});
-
-export const internalTriggerAutoSubmission = internalAction({
-  args: { assignmentId: v.id("assignments") },
-  handler: async (ctx, args) => {
-    const assignment = await ctx.runQuery(
-      internal.web.submissionQueries.getAssignment,
-      {
-        assignmentId: args.assignmentId,
-      },
-    );
-    if (!assignment) return;
-
-    const classroom = await ctx.runQuery(
-      internal.web.submissionQueries.getClassroom,
-      {
-        classroomId: assignment.classroomId,
-      },
-    );
-    if (!classroom) return;
-
-    // Get all enrolled students
-    const enrollments = await ctx.runQuery(
-      internal.web.submissionQueries.getEnrolledStudents,
-      { classroomId: classroom._id },
-    );
-
-    const coderClient = getCoderClient();
-
-    for (const enrollment of enrollments) {
-      try {
-        // Check if student already has a confirmed submission
-        const existing = await ctx.runQuery(
-          internal.web.submissionQueries.getStudentSubmission,
-          {
-            studentId: enrollment.studentId,
-            assignmentId: args.assignmentId,
-          },
-        );
-        if (existing?.status === "confirmed") continue;
-
-        // Find workspace for this assignment
-        const workspace = await ctx.runQuery(
-          internal.web.submissionQueries.getWorkspaceByAssignment,
-          {
-            assignmentId: args.assignmentId,
-            studentId: enrollment.studentId,
-          },
-        );
-        if (!workspace) continue;
-
-        // Check if Coder workspace is running
-        const coderUserId = enrollment.studentId;
-        const workspaceMeta = await getWorkspaceMetadataByUserAndWorkspaceName({
-          client: coderClient,
-          path: {
-            user: coderUserId,
-            workspacename: args.assignmentId.toString(),
-          },
-        });
-
-        if (workspaceMeta.error || !workspaceMeta.data) continue;
-        if (workspaceMeta.data.latest_build?.status !== "running") continue;
-
-        // Generate upload URL and trigger sidecar
-        const storageKey = getSubmissionObjectKey(
-          classroom._id,
-          args.assignmentId,
-          enrollment.studentId,
-        );
-        const uploadUrl = await generateUploadUrl(storageKey);
-
-        const submissionId = await ctx.runMutation(
-          internal.web.submission.internalSetSubmissionUploading,
-          {
-            assignmentId: args.assignmentId,
-            studentId: enrollment.studentId,
-            workspaceId: workspace._id,
-          },
-        );
-
-        // Create user session token for path-based app access
-        const studentSession = await createNewSessionKey({
-          client: coderClient,
-          path: { user: coderUserId },
-        });
-        if (studentSession.error || !studentSession.data?.key) continue;
-
-        const sidecarResult = await callSidecar(
-          studentSession.data.key,
-          coderUserId,
-          args.assignmentId.toString(),
-          uploadUrl,
-        );
-
-        if (sidecarResult.success) {
-          const exists = await verifyObjectExists(storageKey);
-          if (exists) {
-            await ctx.runMutation(
-              internal.web.submission.internalConfirmSubmission,
-              {
-                submissionId,
-                submissionStorageKey: storageKey,
-              },
-            );
-
-            // Stop workspace
-            if (workspaceMeta.data.id) {
-              await createWorkspaceBuild({
-                client: coderClient,
-                path: { workspace: workspaceMeta.data.id },
-                body: { transition: "stop" },
-              });
-            }
-            await ctx.runMutation(
-              internal.web.assignment.deactivateWorkspace,
-              {
-                workspaceId: workspace._id,
-              },
-            );
-          } else {
-            await ctx.runMutation(
-              internal.web.submission.internalFailSubmission,
-              {
-                submissionId,
-              },
-            );
-          }
-        } else {
-          await ctx.runMutation(
-            internal.web.submission.internalFailSubmission,
-            {
-              submissionId,
-            },
-          );
-        }
-      } catch {
-        // Per-student errors should not stop the batch
-        continue;
-      }
-    }
   },
 });
 

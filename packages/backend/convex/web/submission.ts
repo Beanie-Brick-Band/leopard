@@ -55,68 +55,6 @@ const checkAuth = async (ctx: DatabaseCtx) => {
   return user;
 };
 
-export const submitAssignment = mutation({
-  args: {
-    assignmentId: v.id("assignments"),
-    workspaceId: v.id("workspaces"),
-  },
-  handler: async (ctx, args) => {
-    const user = await checkAuth(ctx);
-    const role = await requireStudentRole(ctx, user._id);
-
-    const assignment = await ctx.db.get(args.assignmentId);
-    if (!assignment) {
-      throw new Error("Assignment not found");
-    }
-
-    if (role !== "admin") {
-      const classroomId = assignment.classroomId;
-      const relation = await ctx.db
-        .query("classroomStudentsRelations")
-        .withIndex("studentId_classroomId", (q) =>
-          q.eq("studentId", user._id).eq("classroomId", classroomId),
-        )
-        .first();
-
-      if (!relation) {
-        throw new Error("User not enrolled in the classroom");
-      }
-    }
-
-    const currentTime = Date.now();
-    if (currentTime > assignment.dueDate) {
-      throw new Error("Cannot submit after the due date");
-    }
-
-    const existingSubmission = await ctx.db
-      .query("submissions")
-      .withIndex("studentId_assignmentId", (q) =>
-        q.eq("studentId", user._id).eq("assignmentId", args.assignmentId),
-      )
-      .first();
-
-    if (existingSubmission) {
-      await ctx.db.patch(existingSubmission._id, {
-        workspaceId: args.workspaceId,
-        submittedAt: Date.now(),
-      });
-      return { submissionId: existingSubmission._id };
-    }
-
-    const submissionId = await ctx.db.insert("submissions", {
-      assignmentId: args.assignmentId,
-      flags: [],
-      flagged: false,
-      studentId: user._id,
-      workspaceId: args.workspaceId,
-      submittedAt: Date.now(),
-      gradesReleased: false,
-    });
-
-    return { submissionId };
-  },
-});
-
 export const gradeSubmission = mutation({
   args: {
     submissionId: v.id("submissions"),
@@ -193,7 +131,7 @@ export const getOwnSubmissionsForAssignment = query({
       assignmentId: submission.assignmentId,
       submittedAt: submission.submittedAt,
       gradesReleased: submission.gradesReleased,
-      status: submission.status ?? null,
+      submissionUploadStatus: submission.submissionUploadStatus ?? null,
     };
 
     return { success: true, submission: publicSubmissionInfo };
@@ -237,7 +175,7 @@ export const internalSetSubmissionUploading = internalMutation({
 
     if (existing) {
       await ctx.db.patch(existing._id, {
-        status: "uploading",
+        submissionUploadStatus: "uploading",
         workspaceId: args.workspaceId,
       });
       return existing._id;
@@ -250,7 +188,7 @@ export const internalSetSubmissionUploading = internalMutation({
       flags: [],
       submittedAt: Date.now(),
       gradesReleased: false,
-      status: "uploading",
+      submissionUploadStatus: "uploading",
     });
   },
 });
@@ -262,7 +200,7 @@ export const internalConfirmSubmission = internalMutation({
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.submissionId, {
-      status: "confirmed",
+      submissionUploadStatus: "confirmed",
       submittedAt: Date.now(),
       submissionStorageKey: args.submissionStorageKey,
     });
@@ -275,7 +213,7 @@ export const internalFailSubmission = internalMutation({
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.submissionId, {
-      status: "failed",
+      submissionUploadStatus: "failed",
     });
   },
 });
