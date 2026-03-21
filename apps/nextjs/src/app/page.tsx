@@ -6,9 +6,9 @@ export default function HomePage() {
   return (
     <main className="relative min-h-screen overflow-x-hidden overflow-y-auto overscroll-contain bg-zinc-950 text-white">
       {/* Decorative gradient blobs */}
-      <div className="animate-blob absolute top-0 left-1/4 h-48 w-48 rounded-full bg-amber-600/10 blur-3xl sm:h-72 sm:w-72 md:h-96 md:w-96" />
-      <div className="animate-blob animation-delay-2000 absolute right-1/4 bottom-1/4 h-40 w-40 rounded-full bg-orange-600/10 blur-3xl sm:h-60 sm:w-60 md:h-80 md:w-80" />
-      <div className="animate-blob animation-delay-4000 absolute top-1/3 right-1/3 h-36 w-36 rounded-full bg-yellow-600/10 blur-3xl sm:h-56 sm:w-56 md:h-72 md:w-72" />
+      <div className="animate-blob absolute top-0 left-1/4 h-48 w-48 rounded-full bg-sky-500/10 blur-3xl sm:h-72 sm:w-72 md:h-96 md:w-96" />
+      <div className="animate-blob animation-delay-2000 absolute right-1/4 bottom-1/4 h-40 w-40 rounded-full bg-blue-600/10 blur-3xl sm:h-60 sm:w-60 md:h-80 md:w-80" />
+      <div className="animate-blob animation-delay-4000 absolute top-1/3 right-1/3 h-36 w-36 rounded-full bg-indigo-500/10 blur-3xl sm:h-56 sm:w-56 md:h-72 md:w-72" />
 
       {/* GitHub Link */}
       <a
@@ -137,17 +137,17 @@ export default function HomePage() {
                 <h1 className="font-heading bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl md:text-6xl lg:text-7xl">
                   Leopard
                 </h1>
-                <div className="mt-1 h-0.5 w-20 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 sm:mt-2 sm:h-1 sm:w-32" />
+                <div className="mt-1 h-0.5 w-20 rounded-full bg-gradient-to-r from-sky-400 to-blue-600 sm:mt-2 sm:h-1 sm:w-32" />
               </div>
             </div>
 
-            <p className="text-lg font-light text-amber-500/90 italic sm:text-xl md:text-2xl">
+            <p className="text-lg font-light text-sky-300/90 italic sm:text-xl md:text-2xl">
               Authentic Code, Verified Learning
             </p>
 
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5">
-              <div className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />
-              <span className="text-xs font-medium tracking-wide text-amber-500/90 sm:text-sm">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1.5">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-sky-400" />
+              <span className="text-xs font-medium tracking-wide text-sky-300/90 sm:text-sm">
                 COMING SOON
               </span>
             </div>
@@ -161,7 +161,7 @@ export default function HomePage() {
 
             <Link
               href="/app"
-              className="bg-foreground text-background w-fit rounded-sm px-8 py-2"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 w-fit rounded-sm px-8 py-2 transition-colors"
             >
               Open
             </Link>
@@ -169,8 +169,8 @@ export default function HomePage() {
 
           {/* Right side - Staggered Feature Cards */}
           <div className="flex flex-col gap-4 sm:gap-6 lg:pr-12">
-            <div className="transform rounded-xl border border-amber-900/30 bg-gradient-to-br from-zinc-900 to-zinc-900/50 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-amber-600/50 hover:shadow-2xl hover:shadow-amber-900/20 sm:rounded-2xl sm:p-8">
-              <div className="mb-3 text-3xl text-amber-500 sm:mb-4 sm:text-4xl">
+            <div className="transform rounded-xl border border-sky-950/40 bg-gradient-to-br from-zinc-900 to-zinc-900/50 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-sky-500/50 hover:shadow-2xl hover:shadow-sky-950/25 sm:rounded-2xl sm:p-8">
+              <div className="mb-3 text-3xl text-sky-400 sm:mb-4 sm:text-4xl">
                 &lt;/&gt;
               </div>
               <h3 className="font-heading mb-2 bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-xl font-bold text-transparent sm:mb-3 sm:text-2xl">
@@ -182,8 +182,8 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="transform rounded-xl border border-orange-900/30 bg-gradient-to-br from-zinc-900 to-zinc-900/50 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-orange-600/50 hover:shadow-2xl hover:shadow-orange-900/20 sm:rounded-2xl sm:p-8 lg:ml-12">
-              <div className="mb-3 text-3xl text-orange-500 sm:mb-4 sm:text-4xl">
+            <div className="transform rounded-xl border border-blue-950/40 bg-gradient-to-br from-zinc-900 to-zinc-900/50 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-950/25 sm:rounded-2xl sm:p-8 lg:ml-12">
+              <div className="mb-3 text-3xl text-blue-400 sm:mb-4 sm:text-4xl">
                 ⟲
               </div>
               <h3 className="font-heading mb-2 bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-xl font-bold text-transparent sm:mb-3 sm:text-2xl">
@@ -195,8 +195,8 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="transform rounded-xl border border-red-900/30 bg-gradient-to-br from-zinc-900 to-zinc-900/50 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-red-600/50 hover:shadow-2xl hover:shadow-red-900/20 sm:rounded-2xl sm:p-8 lg:ml-6">
-              <div className="mb-3 text-3xl text-red-500 sm:mb-4 sm:text-4xl">
+            <div className="transform rounded-xl border border-indigo-950/40 bg-gradient-to-br from-zinc-900 to-zinc-900/50 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/50 hover:shadow-2xl hover:shadow-indigo-950/25 sm:rounded-2xl sm:p-8 lg:ml-6">
+              <div className="mb-3 text-3xl text-indigo-400 sm:mb-4 sm:text-4xl">
                 ▶
               </div>
               <h3 className="font-heading mb-2 bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-xl font-bold text-transparent sm:mb-3 sm:text-2xl">

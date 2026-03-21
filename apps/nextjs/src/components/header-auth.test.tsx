@@ -19,7 +19,7 @@ vi.mock("~/lib/auth", () => ({
 
 describe("HeaderAuth", () => {
   describe("when authenticated", () => {
-    it("renders sign out and go to app buttons", () => {
+    it("renders sign out and go to app links", () => {
       render(
         <ConvexAuthTestProvider isAuthenticated={true}>
           <HeaderAuth />
@@ -27,10 +27,10 @@ describe("HeaderAuth", () => {
       );
 
       expect(
-        screen.getByRole("button", { name: "Sign Out" }),
+        screen.getByRole("link", { name: "Sign Out" }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: "Go to App" }),
+        screen.getByRole("link", { name: "Go to App" }),
       ).toBeInTheDocument();
     });
 
@@ -42,7 +42,7 @@ describe("HeaderAuth", () => {
       );
 
       expect(
-        screen.queryByRole("button", { name: "Sign In" }),
+        screen.queryByRole("link", { name: "Sign In" }),
       ).not.toBeInTheDocument();
     });
 
@@ -65,19 +65,17 @@ describe("HeaderAuth", () => {
   });
 
   describe("when unauthenticated", () => {
-    it("renders sign in button", () => {
+    it("renders sign in link", () => {
       render(
         <ConvexAuthTestProvider isAuthenticated={false}>
           <HeaderAuth />
         </ConvexAuthTestProvider>,
       );
 
-      expect(
-        screen.getByRole("button", { name: "Sign In" }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Sign In" })).toBeInTheDocument();
     });
 
-    it("does not render sign out or go to app buttons", () => {
+    it("does not render sign out or go to app links", () => {
       render(
         <ConvexAuthTestProvider isAuthenticated={false}>
           <HeaderAuth />
@@ -85,10 +83,10 @@ describe("HeaderAuth", () => {
       );
 
       expect(
-        screen.queryByRole("button", { name: "Sign Out" }),
+        screen.queryByRole("link", { name: "Sign Out" }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole("button", { name: "Go to App" }),
+        screen.queryByRole("link", { name: "Go to App" }),
       ).not.toBeInTheDocument();
     });
 
@@ -115,13 +113,13 @@ describe("HeaderAuth", () => {
       );
 
       expect(
-        screen.queryByRole("button", { name: "Sign In" }),
+        screen.queryByRole("link", { name: "Sign In" }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole("button", { name: "Sign Out" }),
+        screen.queryByRole("link", { name: "Sign Out" }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole("button", { name: "Go to App" }),
+        screen.queryByRole("link", { name: "Go to App" }),
       ).not.toBeInTheDocument();
     });
   });
