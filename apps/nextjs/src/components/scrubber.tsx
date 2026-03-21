@@ -49,10 +49,12 @@ function getLanguageFromFilePath(filePath: string): string {
 
 interface TextReplayScrubberProps {
   workspaceId?: Id<"workspaces">;
+  frozenReplay?: boolean;
 }
 
 export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
   workspaceId,
+  frozenReplay = false,
 }) => {
   const searchParams = useSearchParams();
 
@@ -82,13 +84,20 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
     isScrubbing?: boolean;
     stickingTo?: number | null;
   }>({
-    value: 0,
+    value: frozenReplay ? 100 : 0,
     state: "None",
     isScrubbing: false,
     stickingTo: null,
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
+
+  // due to a bug that occurs where sometimes the terminal is considered a file
+  const shouldIgnoreFrozenReplayFilePath = React.useCallback(
+    (filePath: string) =>
+      frozenReplay && /^\/terminal[1-9]\d*(?:\..*)?$/.test(filePath),
+    [frozenReplay],
+  );
 
   // Autoplay effect
   useEffect(() => {
@@ -157,6 +166,7 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
   };
 
   const handleScrubChange = (value: number) => {
+    if (frozenReplay) return; // Disable scrubbing if replay is frozen
     // While scrubbing, if close enough to a marker, "stick" to that marker
     setState((s) => {
       if (!s.isScrubbing) {
@@ -201,6 +211,7 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
     displayedUserTranscript?.forEach((event) => {
       if (event.eventType === WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT) {
         event.metadata.contentChanges.forEach((change) => {
+          if (shouldIgnoreFrozenReplayFilePath(change.filePath)) return;
           paths.add(change.filePath);
         });
       }
@@ -213,7 +224,7 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
       }
     });
     return Array.from(paths);
-  }, [displayedUserTranscript]);
+  }, [displayedUserTranscript, shouldIgnoreFrozenReplayFilePath]);
 
   // State that tracks the currently selected file
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
@@ -249,6 +260,7 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
           lastEvent.metadata.contentChanges.length - 1
         ];
       if (!lastChange) return;
+      if (shouldIgnoreFrozenReplayFilePath(lastChange.filePath)) return;
 
       // Switch to that file if it's different from the current selection
       // only do so when the user is playing the replay, not when scrubbing
@@ -265,13 +277,22 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
     if (!isPlaying && !state.isScrubbing) return;
 
     const renamedSelectedFile = lastEvent.metadata.renamedFiles.find(
-      (rename) => rename.oldFilePath === selectedFilePath,
+      (rename) =>
+        rename.oldFilePath === selectedFilePath &&
+        !shouldIgnoreFrozenReplayFilePath(rename.oldFilePath) &&
+        !shouldIgnoreFrozenReplayFilePath(rename.newFilePath),
     );
 
     if (renamedSelectedFile) {
       setSelectedFilePath(renamedSelectedFile.newFilePath);
     }
-  }, [displayedUserTranscript, selectedFilePath, isPlaying, state.isScrubbing]);
+  }, [
+    displayedUserTranscript,
+    selectedFilePath,
+    isPlaying,
+    state.isScrubbing,
+    shouldIgnoreFrozenReplayFilePath,
+  ]);
 
   // Build the text progressively by replaying events for the selected file only
   const displayedOutputText = React.useMemo(() => {
@@ -287,6 +308,7 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
     displayedUserTranscript?.forEach((event) => {
       if (event.eventType === WorkspaceEvents.NAME.DID_CHANGE_TEXT_DOCUMENT) {
         event.metadata.contentChanges.forEach((change) => {
+          if (shouldIgnoreFrozenReplayFilePath(change.filePath)) return;
           const lines = fileContents.get(change.filePath) ?? [""];
 
           const isInsertion =
@@ -320,7 +342,12 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
 
     const lines = fileContents.get(selectedFilePath) ?? [""];
     return lines.join("\n");
-  }, [displayedUserTranscript, selectedFilePath, currentFilePaths]);
+  }, [
+    displayedUserTranscript,
+    selectedFilePath,
+    currentFilePaths,
+    shouldIgnoreFrozenReplayFilePath,
+  ]);
 
   // Detect the language from the file path
   const detectedLanguage = React.useMemo(
@@ -395,33 +422,36 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
           {displayedOutputText}
         </ShikiHighlighter>
       </div>
-
-      <div className="h-8">
-        <Scrubber
-          min={0}
-          max={100}
-          value={state.value}
-          onScrubStart={handleScrubStart}
-          onScrubEnd={handleScrubEnd}
-          onScrubChange={handleScrubChange}
-          markers={markerPositions}
-          className="[&_.bar]:h-4!"
-        />
-      </div>
-
-      <div className="flex justify-center pb-8">
-        <button
-          onClick={() => setIsPlaying(!isPlaying)}
-          className="flex w-20 items-center justify-center rounded-md bg-blue-500 px-6 py-2 text-white transition-colors hover:bg-blue-600"
-          aria-label={isPlaying ? "Pause" : "Play"}
-        >
-          {isPlaying ? (
-            <span className="-m-1 text-4xl">⏸</span>
-          ) : (
-            <span className="text-2xl">▶</span>
-          )}
-        </button>
-      </div>
+      {/* only show when frozenReplay is false */}
+      {!frozenReplay && (
+        <div className="h-8">
+          <Scrubber
+            min={0}
+            max={100}
+            value={state.value}
+            onScrubStart={handleScrubStart}
+            onScrubEnd={handleScrubEnd}
+            onScrubChange={handleScrubChange}
+            markers={markerPositions}
+            className="[&_.bar]:h-4!"
+          />
+        </div>
+      )}
+      {!frozenReplay && (
+        <div className="flex justify-center pb-8">
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="flex w-20 items-center justify-center rounded-md bg-blue-500 px-6 py-2 text-white transition-colors hover:bg-blue-600"
+            aria-label={isPlaying ? "Pause" : "Play"}
+          >
+            {isPlaying ? (
+              <span className="-m-1 text-4xl">⏸</span>
+            ) : (
+              <span className="text-2xl">▶</span>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

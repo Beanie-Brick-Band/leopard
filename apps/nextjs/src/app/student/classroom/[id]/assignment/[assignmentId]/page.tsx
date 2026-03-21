@@ -21,6 +21,7 @@ import { Spinner } from "@package/ui/spinner";
 
 import { launchWorkspace } from "~/app/app/actions";
 import { Editor } from "~/components/editor";
+import { TextReplayScrubberComponent } from "~/components/scrubber";
 import { WorkspaceLaunchingOverlay } from "~/components/workspace-launching-overlay";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 
@@ -32,7 +33,12 @@ function Content({
   assignmentId: Id<"assignments">;
 }) {
   const assignment = useQuery(api.web.assignment.getById, { id: assignmentId });
-  const activeWorkspace = useQuery(api.web.assignment.getMyActiveWorkspace);
+  const assignmentWorkspace = useQuery(
+    api.web.assignment.getMyWorkspaceForAssignment,
+    {
+      assignmentId,
+    },
+  );
   const lastEditedTimestamp = useQuery(
     api.web.assignment.getLastEditedTimestamp,
     {
@@ -84,9 +90,11 @@ function Content({
     submission && "gradedAt" in submission ? submission.gradedAt : undefined;
   const submittedAt = submission?.submittedAt;
   const isPastDue = Date.now() > assignment.dueDate;
+  const hasWorkspaceForAssignment =
+    assignmentWorkspace !== undefined && assignmentWorkspace !== null;
 
   const handleSubmit = async () => {
-    if (!activeWorkspace) {
+    if (!assignmentWorkspace) {
       toast.error("Launch your workspace first before submitting.");
       return;
     }
@@ -95,7 +103,7 @@ function Content({
     try {
       await submitAssignment({
         assignmentId,
-        workspaceId: activeWorkspace._id,
+        workspaceId: assignmentWorkspace._id,
       });
       toast.success(
         hasSubmission ? "Assignment re-submitted." : "Assignment submitted.",
@@ -189,7 +197,19 @@ function Content({
               )}
             </CardContent>
           </Card>
-
+          {hasWorkspaceForAssignment && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Current Work</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TextReplayScrubberComponent
+                  workspaceId={assignmentWorkspace._id}
+                  frozenReplay={true}
+                />
+              </CardContent>
+            </Card>
+          )}
           {grade !== undefined ? (
             <Card className="border-green-500/50">
               <CardHeader>
@@ -274,8 +294,8 @@ function Content({
                     disabled={
                       isSubmitting ||
                       isPastDue ||
-                      activeWorkspace === undefined ||
-                      activeWorkspace === null
+                      assignmentWorkspace === undefined ||
+                      assignmentWorkspace === null
                     }
                   >
                     {isSubmitting ? "Submitting..." : "Submit Assignment"}
@@ -287,11 +307,11 @@ function Content({
                   >
                     {isLaunching ? "Launching..." : "Launch Workspace"}
                   </Button>
-                  {activeWorkspace === undefined ? (
+                  {assignmentWorkspace === undefined ? (
                     <p className="text-muted-foreground text-xs">
-                      Checking active workspace...
+                      Checking assignment workspace...
                     </p>
-                  ) : activeWorkspace === null ? (
+                  ) : assignmentWorkspace === null ? (
                     <p className="text-muted-foreground text-xs">
                       Launch a workspace before submitting.
                     </p>
@@ -301,7 +321,7 @@ function Content({
                     </p>
                   ) : (
                     <p className="text-muted-foreground text-xs">
-                      Submission uses your currently active workspace.
+                      Submission uses this assignment's workspace.
                     </p>
                   )}
                 </>
