@@ -27,6 +27,7 @@ import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
 import { launchWorkspace, submitWorkspace } from "~/app/app/actions";
+import { Editor } from "~/components/editor";
 import { WorkspaceLaunchingOverlay } from "~/components/workspace-launching-overlay";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 
