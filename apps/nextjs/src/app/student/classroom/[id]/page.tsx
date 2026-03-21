@@ -74,7 +74,6 @@ function AssignmentCard({
     });
   };
 
-  const hasSubmission = submissionResult?.success === true;
   const dueDate = new Date(assignment.dueDate);
 
   return (
@@ -94,10 +93,17 @@ function AssignmentCard({
             <CardTitle className="text-lg">{assignment.name}</CardTitle>
             <CardDescription>Due {dueDate.toLocaleString()}</CardDescription>
           </div>
-          {hasSubmission ? (
+          {submissionResult?.success &&
+          !submissionResult.submission?.gradesReleased ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
               <CheckCircle2 className="h-3 w-3" />
               Submitted
+            </span>
+          ) : submissionResult?.success &&
+            submissionResult.submission?.gradesReleased ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+              <CheckCircle2 className="h-3 w-3" />
+              Graded: {submissionResult.submission.grade}%
             </span>
           ) : null}
         </div>
