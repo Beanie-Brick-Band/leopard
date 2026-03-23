@@ -406,6 +406,30 @@ export const provideSubmissionFeedback = mutation({
   },
 });
 
+export const hideGrades = mutation({
+  args: {
+    assignmentId: v.id("assignments"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    await checkGraderAccess(user._id, ctx, args.assignmentId);
+
+    const submissions = await ctx.db
+      .query("submissions")
+      .withIndex("assignmentId_studentId", (q) =>
+        q.eq("assignmentId", args.assignmentId),
+      )
+      .collect();
+
+    await Promise.all(
+      submissions
+        .filter((s) => s.gradesReleased)
+        .map((s) => ctx.db.patch(s._id, { gradesReleased: false })),
+    );
+  },
+});
+
 export const publishGrades = mutation({
   args: {
     assignmentId: v.id("assignments"),
