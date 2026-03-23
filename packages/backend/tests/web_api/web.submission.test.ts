@@ -1,10 +1,10 @@
 import { convexTest } from "convex-test";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { api } from "../../convex/_generated/api";
+import { api, internal } from "../../convex/_generated/api";
 import * as apiModule from "../../convex/_generated/api";
 import { Doc } from "../../convex/_generated/dataModel";
-import { QueryCtx } from "../../convex/_generated/server";
+import { MutationCtx, QueryCtx } from "../../convex/_generated/server";
 import schema from "../../convex/schema";
 import {
   seedAssignment,
@@ -30,6 +30,8 @@ function makeTestClient() {
   const modules: Record<string, () => Promise<unknown>> = {
     "convex/_generated/api.ts": () => Promise.resolve(apiModule),
     "convex/web/submission.ts": () => import("../../convex/web/submission"),
+    "convex/web/submissionQueries.ts": () =>
+      import("../../convex/web/submissionQueries"),
   };
   return convexTest(schema, modules);
 }
@@ -298,6 +300,233 @@ describe("web/submission", () => {
       expect(res.map((s) => s.studentId).sort()).toEqual(
         ["student_1", "student_2"].sort(),
       );
+    });
+  });
+
+  describe("internalSetSubmissionUploading", () => {
+    it("creates a new submission with uploading status", async () => {
+      const t = makeTestClient();
+      const { classroomId, assignmentId } =
+        await seedClassroomAndAssignment(t);
+      const workspaceId = await seedTestWorkspace(
+        t,
+        assignmentId,
+        "student_1",
+      );
+
+      const submissionId = await t.mutation(
+        internal.web.submission.internalSetSubmissionUploading,
+        {
+          assignmentId,
+          studentId: "student_1",
+          workspaceId,
+        },
+      );
+
+      const saved = await t.run(async (ctx: QueryCtx) =>
+        ctx.db.get(submissionId),
+      );
+      expect(saved).not.toBeNull();
+      expect(saved!.submissionUploadStatus).toBe("uploading");
+      expect(saved!.studentId).toBe("student_1");
+      expect(saved!.assignmentId).toBe(assignmentId);
+      expect(saved!.workspaceId).toBe(workspaceId);
+      expect(saved!.gradesReleased).toBe(false);
+    });
+
+    it("updates existing submission to uploading status", async () => {
+      const t = makeTestClient();
+      const { classroomId, assignmentId } =
+        await seedClassroomAndAssignment(t);
+      const ws1 = await seedTestWorkspace(t, assignmentId, "student_1");
+      const ws2 = await seedTestWorkspace(t, assignmentId, "student_1_v2");
+      const existingId = await seedSubmission(t, {
+        assignmentId,
+        studentId: "student_1",
+        workspaceId: ws1,
+      });
+
+      const returnedId = await t.mutation(
+        internal.web.submission.internalSetSubmissionUploading,
+        {
+          assignmentId,
+          studentId: "student_1",
+          workspaceId: ws2,
+        },
+      );
+
+      expect(returnedId).toBe(existingId);
+      const saved = await t.run(async (ctx: QueryCtx) =>
+        ctx.db.get(existingId),
+      );
+      expect(saved!.submissionUploadStatus).toBe("uploading");
+      expect(saved!.workspaceId).toBe(ws2);
+    });
+  });
+
+  describe("internalConfirmSubmission", () => {
+    it("sets submission to confirmed with storage key", async () => {
+      const t = makeTestClient();
+      const nowSpy = vi.spyOn(Date, "now").mockReturnValue(999);
+      const { assignmentId } = await seedClassroomAndAssignment(t);
+      const workspaceId = await seedTestWorkspace(
+        t,
+        assignmentId,
+        "student_1",
+      );
+      const submissionId = await seedSubmission(t, {
+        assignmentId,
+        studentId: "student_1",
+        workspaceId,
+      });
+
+      await t.mutation(internal.web.submission.internalConfirmSubmission, {
+        submissionId,
+        submissionStorageKey: "classrooms/c1/assignments/a1/student_1.zip",
+      });
+
+      const saved = await t.run(async (ctx: QueryCtx) =>
+        ctx.db.get(submissionId),
+      );
+      expect(saved!.submissionUploadStatus).toBe("confirmed");
+      expect(saved!.submissionStorageKey).toBe(
+        "classrooms/c1/assignments/a1/student_1.zip",
+      );
+      expect(saved!.submittedAt).toBe(999);
+
+      nowSpy.mockRestore();
+    });
+  });
+
+  describe("internalFailSubmission", () => {
+    it("sets submission to failed status", async () => {
+      const t = makeTestClient();
+      const { assignmentId } = await seedClassroomAndAssignment(t);
+      const workspaceId = await seedTestWorkspace(
+        t,
+        assignmentId,
+        "student_1",
+      );
+      const submissionId = await seedSubmission(t, {
+        assignmentId,
+        studentId: "student_1",
+        workspaceId,
+      });
+
+      await t.mutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
+
+      const saved = await t.run(async (ctx: QueryCtx) =>
+        ctx.db.get(submissionId),
+      );
+      expect(saved!.submissionUploadStatus).toBe("failed");
+    });
+  });
+
+  describe("submissionQueries", () => {
+    it("getUserRecord returns user by uid", async () => {
+      const t = makeTestClient();
+      await seedUserRole(t, "student_1", "student");
+
+      const result = await t.query(
+        internal.web.submissionQueries.getUserRecord,
+        { userId: "student_1" },
+      );
+      expect(result).not.toBeNull();
+      expect(result!.uid).toBe("student_1");
+      expect(result!.role).toBe("student");
+    });
+
+    it("getUserRecord returns null for unknown user", async () => {
+      const t = makeTestClient();
+
+      const result = await t.query(
+        internal.web.submissionQueries.getUserRecord,
+        { userId: "nonexistent" },
+      );
+      expect(result).toBeNull();
+    });
+
+    it("getAssignment returns assignment by id", async () => {
+      const t = makeTestClient();
+      const { assignmentId } = await seedClassroomAndAssignment(t);
+
+      const result = await t.query(
+        internal.web.submissionQueries.getAssignment,
+        { assignmentId },
+      );
+      expect(result).not.toBeNull();
+      expect(result!._id).toBe(assignmentId);
+      expect(result!.name).toBe("A1");
+    });
+
+    it("getClassroom returns classroom by id", async () => {
+      const t = makeTestClient();
+      const { classroomId } = await seedClassroomAndAssignment(t);
+
+      const result = await t.query(
+        internal.web.submissionQueries.getClassroom,
+        { classroomId },
+      );
+      expect(result).not.toBeNull();
+      expect(result!._id).toBe(classroomId);
+    });
+
+    it("checkEnrollment returns true when enrolled", async () => {
+      const t = makeTestClient();
+      const { classroomId } = await seedClassroomAndAssignment(t);
+      await seedEnrollment(t, classroomId, "student_1");
+
+      const result = await t.query(
+        internal.web.submissionQueries.checkEnrollment,
+        { studentId: "student_1", classroomId },
+      );
+      expect(result).toBe(true);
+    });
+
+    it("checkEnrollment returns false when not enrolled", async () => {
+      const t = makeTestClient();
+      const { classroomId } = await seedClassroomAndAssignment(t);
+
+      const result = await t.query(
+        internal.web.submissionQueries.checkEnrollment,
+        { studentId: "student_1", classroomId },
+      );
+      expect(result).toBe(false);
+    });
+
+    it("getStudentSubmission returns submission for student+assignment", async () => {
+      const t = makeTestClient();
+      const { assignmentId } = await seedClassroomAndAssignment(t);
+      const workspaceId = await seedTestWorkspace(
+        t,
+        assignmentId,
+        "student_1",
+      );
+      const submissionId = await seedSubmission(t, {
+        assignmentId,
+        studentId: "student_1",
+        workspaceId,
+      });
+
+      const result = await t.query(
+        internal.web.submissionQueries.getStudentSubmission,
+        { studentId: "student_1", assignmentId },
+      );
+      expect(result).not.toBeNull();
+      expect(result!._id).toBe(submissionId);
+    });
+
+    it("getStudentSubmission returns null when no submission exists", async () => {
+      const t = makeTestClient();
+      const { assignmentId } = await seedClassroomAndAssignment(t);
+
+      const result = await t.query(
+        internal.web.submissionQueries.getStudentSubmission,
+        { studentId: "student_1", assignmentId },
+      );
+      expect(result).toBeNull();
     });
   });
 });
