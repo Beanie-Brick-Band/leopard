@@ -96,6 +96,69 @@ describe("web/teacherAssignments", () => {
         }),
       ).rejects.toThrow("Not authorized to view classroom assignments");
     });
+
+    it("allows students to see assignment with releaseDate in the past", async () => {
+      const t = makeTestClient();
+      const classroomId = await seedClassroom(t, { ownerId: "teacher_1" });
+      const assignmentId = await seedAssignment(t, classroomId, {
+        releaseDate: Date.now() - 1000,
+      });
+      await seedEnrollment(t, classroomId, "student_1");
+
+      safeGetAuthUser.mockResolvedValue({
+        _id: "student_1",
+        email: "s@example.com",
+      });
+      const res = await t.query(
+        api.web.teacherAssignments.getAssignmentsByClassroom,
+        {
+          classroomId,
+        },
+      );
+      expect(res.map((a) => a._id)).toEqual([assignmentId]);
+    });
+
+    it("dissallows students to see assignment with releaseDate in the future", async () => {
+      const t = makeTestClient();
+      const classroomId = await seedClassroom(t, { ownerId: "teacher_1" });
+      await seedAssignment(t, classroomId, {
+        releaseDate: Date.now() + 1000000,
+      });
+      await seedEnrollment(t, classroomId, "student_1");
+
+      safeGetAuthUser.mockResolvedValue({
+        _id: "student_1",
+        email: "s@example.com",
+      });
+      const res = await t.query(
+        api.web.teacherAssignments.getAssignmentsByClassroom,
+        {
+          classroomId,
+        },
+      );
+      expect(res.length).toBe(0);
+    });
+
+    it("allows teachers to see all assignments regardless of releaseDate", async () => {
+      const t = makeTestClient();
+      await seedUserRole(t, "teacher_1", "teacher");
+      const classroomId = await seedClassroom(t, { ownerId: "teacher_1" });
+      const assignmentId = await seedAssignment(t, classroomId, {
+        releaseDate: Date.now() + 1000000,
+      });
+
+      safeGetAuthUser.mockResolvedValue({
+        _id: "teacher_1",
+        email: "t@example.com",
+      });
+      const res = await t.query(
+        api.web.teacherAssignments.getAssignmentsByClassroom,
+        {
+          classroomId,
+        },
+      );
+      expect(res.map((a) => a._id)).toEqual([assignmentId]);
+    });
   });
 
   describe("createAssignment / updateAssignment", () => {
