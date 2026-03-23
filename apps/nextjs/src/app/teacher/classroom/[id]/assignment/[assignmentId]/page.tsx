@@ -78,6 +78,7 @@ function AssignmentContent({
 
   const [isDeletingAssignment, setIsDeletingAssignment] = useState(false);
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
+  const [isHideGradesDialogOpen, setIsHideGradesDialogOpen] = useState(false);
 
   if (assignment === undefined) {
     return (
@@ -540,9 +541,12 @@ function AssignmentContent({
                   Publish Grades
                 </Button>
               ) : (
-                <span className="text-accent-foreground flex items-center gap-1 text-sm">
-                  Published grades <CheckCircle2 className="h-3 w-3" />
-                </span>
+                <Button
+                  className="w-full"
+                  onClick={() => setIsHideGradesDialogOpen(true)}
+                >
+                  Hide Grades
+                </Button>
               )}
             </CardContent>
           </Card>
@@ -557,6 +561,14 @@ function AssignmentContent({
         assignmentId={assignmentId}
         assignmentName={assignment.name}
         gradedCount={unreleasedGradedCount}
+      />
+
+      <HideGradesConfirmationDialog
+        open={isHideGradesDialogOpen}
+        onClose={() => setIsHideGradesDialogOpen(false)}
+        assignmentId={assignmentId}
+        assignmentName={assignment.name}
+        publishedCount={publishedCount}
       />
     </div>
   );
@@ -645,12 +657,11 @@ function PublishConfirmationDialog({
       className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <CardHeader>
           <CardTitle>Publish All Grades?</CardTitle>
           <CardDescription>
             Students will immediately be able to view their grades and feedback.
-            This action cannot be undone.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -677,6 +688,81 @@ function PublishConfirmationDialog({
                   Confirm Publish
                 </>
               )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+interface HideGradesConfirmationDialogProps {
+  open: boolean;
+  onClose: () => void;
+  assignmentId: Id<"assignments">;
+  assignmentName: string;
+  publishedCount: number;
+}
+
+function HideGradesConfirmationDialog({
+  open,
+  onClose,
+  assignmentId,
+  assignmentName,
+  publishedCount,
+}: HideGradesConfirmationDialogProps) {
+  const hideGrades = useMutation(api.web.teacherAssignments.hideGrades);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    try {
+      await hideGrades({ assignmentId });
+      toast.success("All grades hidden.");
+      onClose();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to hide grades",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <div
+      className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <Card className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+        <CardHeader>
+          <CardTitle>Hide All Grades?</CardTitle>
+          <CardDescription>
+            Students will immediately not able to view their grades and
+            feedback.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-1 rounded-md border p-3 text-sm">
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">Assignment</span>
+              <span className="font-medium">{assignmentName}</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">Published grades</span>
+              <span className="font-medium">{publishedCount}</span>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={onClose} disabled={isLoading}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirm} disabled={isLoading}>
+              {isLoading ? "Hiding grades..." : "Confirm to Hide Grades"}
             </Button>
           </div>
         </CardContent>
