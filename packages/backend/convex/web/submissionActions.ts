@@ -80,64 +80,6 @@ export const triggerSubmission = action({
       throw new Error("Not authenticated");
     }
 
-    // Verify student role
-    const userRecord = await ctx.runQuery(
-      internal.web.submissionQueries.getUserRecord,
-      {
-        userId: user._id,
-      },
-    );
-    if (userRecord?.role && userRecord.role !== "student") {
-      throw new Error("Only students can submit assignments");
-    }
-
-    // Get assignment + classroom
-    const assignment = await ctx.runQuery(
-      internal.web.submissionQueries.getAssignment,
-      {
-        assignmentId: args.assignmentId,
-      },
-    );
-    if (!assignment) {
-      throw new Error("Assignment not found");
-    }
-
-    const classroom = await ctx.runQuery(
-      internal.web.submissionQueries.getClassroom,
-      {
-        classroomId: assignment.classroomId,
-      },
-    );
-    if (!classroom) {
-      throw new Error("Classroom not found");
-    }
-
-    // Verify enrollment
-    const isEnrolled = await ctx.runQuery(
-      internal.web.submissionQueries.checkEnrollment,
-      {
-        studentId: user._id,
-        classroomId: classroom._id,
-      },
-    );
-    if (!isEnrolled) {
-      throw new Error("Not enrolled in this classroom");
-    }
-
-    // Check deadline
-    if (Date.now() > assignment.dueDate) {
-      throw new Error("Cannot submit after the due date");
-    }
-
-    // Check no existing confirmed submission
-    const existingSubmission = await ctx.runQuery(
-      internal.web.submissionQueries.getStudentSubmission,
-      { studentId: user._id, assignmentId: args.assignmentId },
-    );
-    if (existingSubmission?.submissionUploadStatus === "confirmed") {
-      throw new Error("Assignment already submitted");
-    }
-
     // Get active workspace
     const workspace = await ctx.runQuery(
       internal.web.assignment.getUserActiveWorkspace,
@@ -152,6 +94,25 @@ export const triggerSubmission = action({
       throw new Error(
         "Active workspace is not linked to this assignment. Launch the correct workspace first.",
       );
+    }
+
+    // Validate and create/update submission (checks role, enrollment, due date, duplicates)
+    const submissionId = await ctx.runMutation(
+      internal.web.submission.internalSubmitAssignment,
+      {
+        assignmentId: args.assignmentId,
+        studentId: user._id,
+        workspaceId: workspace._id,
+      },
+    );
+
+    // Look up classroom for storage key
+    const assignment = await ctx.runQuery(
+      internal.web.submissionQueries.getAssignment,
+      { assignmentId: args.assignmentId },
+    );
+    if (!assignment) {
+      throw new Error("Assignment not found");
     }
 
     // Get Coder workspace details
@@ -172,21 +133,11 @@ export const triggerSubmission = action({
 
     // Generate presigned upload URL
     const storageKey = getSubmissionObjectKey(
-      classroom._id,
+      assignment.classroomId,
       args.assignmentId,
       user._id,
     );
     const uploadUrl = await generateUploadUrl(storageKey);
-
-    // Set submission to uploading
-    const submissionId = await ctx.runMutation(
-      internal.web.submission.internalSetSubmissionUploading,
-      {
-        assignmentId: args.assignmentId,
-        studentId: user._id,
-        workspaceId: workspace._id,
-      },
-    );
 
     // Create a session token for the workspace owner so we can access the path-based app
     const userSession = await createNewSessionKey({

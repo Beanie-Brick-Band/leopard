@@ -30,8 +30,6 @@ function makeTestClient() {
   const modules: Record<string, () => Promise<unknown>> = {
     "convex/_generated/api.ts": () => Promise.resolve(apiModule),
     "convex/web/submission.ts": () => import("../../convex/web/submission"),
-    "convex/web/submissionQueries.ts": () =>
-      import("../../convex/web/submissionQueries"),
   };
   return convexTest(schema, modules);
 }
@@ -303,11 +301,133 @@ describe("web/submission", () => {
     });
   });
 
-  describe("internalSetSubmissionUploading", () => {
+  describe("internalSubmitAssignment", () => {
+    it("denies non-student role", async () => {
+      const t = makeTestClient();
+      const { assignmentId } = await seedClassroomAndAssignment(t);
+      const workspaceId = await seedTestWorkspace(
+        t,
+        assignmentId,
+        "teacher_1",
+      );
+      await seedUserRole(t, "teacher_1", "teacher");
+
+      await expect(
+        t.mutation(internal.web.submission.internalSubmitAssignment, {
+          assignmentId,
+          studentId: "teacher_1",
+          workspaceId,
+        }),
+      ).rejects.toThrow(
+        "Only students can submit and view their own submissions",
+      );
+    });
+
+    it("throws Assignment not found for invalid id", async () => {
+      const t = makeTestClient();
+      const { assignmentId } = await seedClassroomAndAssignment(t);
+      const workspaceId = await seedTestWorkspace(
+        t,
+        assignmentId,
+        "student_1",
+      );
+
+      const deletedId = await t.run(async (ctx: MutationCtx) => {
+        await ctx.db.delete(assignmentId);
+        return assignmentId;
+      });
+
+      await expect(
+        t.mutation(internal.web.submission.internalSubmitAssignment, {
+          assignmentId: deletedId,
+          studentId: "student_1",
+          workspaceId,
+        }),
+      ).rejects.toThrow("Assignment not found");
+    });
+
+    it("throws when student is not enrolled", async () => {
+      const t = makeTestClient();
+      const { assignmentId } = await seedClassroomAndAssignment(t);
+      const workspaceId = await seedTestWorkspace(
+        t,
+        assignmentId,
+        "student_1",
+      );
+
+      await expect(
+        t.mutation(internal.web.submission.internalSubmitAssignment, {
+          assignmentId,
+          studentId: "student_1",
+          workspaceId,
+        }),
+      ).rejects.toThrow("User not enrolled in the classroom");
+    });
+
+    it("throws when submitting after due date", async () => {
+      const t = makeTestClient();
+      const nowSpy = vi.spyOn(Date, "now").mockReturnValue(100);
+      const { classroomId, assignmentId } =
+        await seedClassroomAndAssignment(t, { dueDate: 50 });
+      await seedEnrollment(t, classroomId, "student_1");
+      const workspaceId = await seedTestWorkspace(
+        t,
+        assignmentId,
+        "student_1",
+      );
+
+      await expect(
+        t.mutation(internal.web.submission.internalSubmitAssignment, {
+          assignmentId,
+          studentId: "student_1",
+          workspaceId,
+        }),
+      ).rejects.toThrow("Cannot submit after the due date");
+
+      nowSpy.mockRestore();
+    });
+
+    it("throws when submission already confirmed", async () => {
+      const t = makeTestClient();
+      vi.spyOn(Date, "now").mockReturnValue(5);
+      const { classroomId, assignmentId } =
+        await seedClassroomAndAssignment(t, { dueDate: 10 });
+      await seedEnrollment(t, classroomId, "student_1");
+      const workspaceId = await seedTestWorkspace(
+        t,
+        assignmentId,
+        "student_1",
+      );
+
+      // Seed a confirmed submission
+      await t.run(async (ctx: MutationCtx) => {
+        await ctx.db.insert("submissions", {
+          assignmentId,
+          studentId: "student_1",
+          workspaceId,
+          flags: [],
+          flagged: false,
+          submittedAt: 3,
+          gradesReleased: false,
+          submissionUploadStatus: "confirmed",
+        });
+      });
+
+      await expect(
+        t.mutation(internal.web.submission.internalSubmitAssignment, {
+          assignmentId,
+          studentId: "student_1",
+          workspaceId,
+        }),
+      ).rejects.toThrow("Assignment already submitted");
+    });
+
     it("creates a new submission with uploading status", async () => {
       const t = makeTestClient();
+      vi.spyOn(Date, "now").mockReturnValue(5);
       const { classroomId, assignmentId } =
-        await seedClassroomAndAssignment(t);
+        await seedClassroomAndAssignment(t, { dueDate: 10 });
+      await seedEnrollment(t, classroomId, "student_1");
       const workspaceId = await seedTestWorkspace(
         t,
         assignmentId,
@@ -315,7 +435,7 @@ describe("web/submission", () => {
       );
 
       const submissionId = await t.mutation(
-        internal.web.submission.internalSetSubmissionUploading,
+        internal.web.submission.internalSubmitAssignment,
         {
           assignmentId,
           studentId: "student_1",
@@ -334,10 +454,12 @@ describe("web/submission", () => {
       expect(saved!.gradesReleased).toBe(false);
     });
 
-    it("updates existing submission to uploading status", async () => {
+    it("updates existing non-confirmed submission to uploading", async () => {
       const t = makeTestClient();
+      vi.spyOn(Date, "now").mockReturnValue(5);
       const { classroomId, assignmentId } =
-        await seedClassroomAndAssignment(t);
+        await seedClassroomAndAssignment(t, { dueDate: 1000000 });
+      await seedEnrollment(t, classroomId, "student_1");
       const ws1 = await seedTestWorkspace(t, assignmentId, "student_1");
       const ws2 = await seedTestWorkspace(t, assignmentId, "student_1_v2");
       const existingId = await seedSubmission(t, {
@@ -347,7 +469,7 @@ describe("web/submission", () => {
       });
 
       const returnedId = await t.mutation(
-        internal.web.submission.internalSetSubmissionUploading,
+        internal.web.submission.internalSubmitAssignment,
         {
           assignmentId,
           studentId: "student_1",
@@ -421,112 +543,6 @@ describe("web/submission", () => {
         ctx.db.get(submissionId),
       );
       expect(saved!.submissionUploadStatus).toBe("failed");
-    });
-  });
-
-  describe("submissionQueries", () => {
-    it("getUserRecord returns user by uid", async () => {
-      const t = makeTestClient();
-      await seedUserRole(t, "student_1", "student");
-
-      const result = await t.query(
-        internal.web.submissionQueries.getUserRecord,
-        { userId: "student_1" },
-      );
-      expect(result).not.toBeNull();
-      expect(result!.uid).toBe("student_1");
-      expect(result!.role).toBe("student");
-    });
-
-    it("getUserRecord returns null for unknown user", async () => {
-      const t = makeTestClient();
-
-      const result = await t.query(
-        internal.web.submissionQueries.getUserRecord,
-        { userId: "nonexistent" },
-      );
-      expect(result).toBeNull();
-    });
-
-    it("getAssignment returns assignment by id", async () => {
-      const t = makeTestClient();
-      const { assignmentId } = await seedClassroomAndAssignment(t);
-
-      const result = await t.query(
-        internal.web.submissionQueries.getAssignment,
-        { assignmentId },
-      );
-      expect(result).not.toBeNull();
-      expect(result!._id).toBe(assignmentId);
-      expect(result!.name).toBe("A1");
-    });
-
-    it("getClassroom returns classroom by id", async () => {
-      const t = makeTestClient();
-      const { classroomId } = await seedClassroomAndAssignment(t);
-
-      const result = await t.query(
-        internal.web.submissionQueries.getClassroom,
-        { classroomId },
-      );
-      expect(result).not.toBeNull();
-      expect(result!._id).toBe(classroomId);
-    });
-
-    it("checkEnrollment returns true when enrolled", async () => {
-      const t = makeTestClient();
-      const { classroomId } = await seedClassroomAndAssignment(t);
-      await seedEnrollment(t, classroomId, "student_1");
-
-      const result = await t.query(
-        internal.web.submissionQueries.checkEnrollment,
-        { studentId: "student_1", classroomId },
-      );
-      expect(result).toBe(true);
-    });
-
-    it("checkEnrollment returns false when not enrolled", async () => {
-      const t = makeTestClient();
-      const { classroomId } = await seedClassroomAndAssignment(t);
-
-      const result = await t.query(
-        internal.web.submissionQueries.checkEnrollment,
-        { studentId: "student_1", classroomId },
-      );
-      expect(result).toBe(false);
-    });
-
-    it("getStudentSubmission returns submission for student+assignment", async () => {
-      const t = makeTestClient();
-      const { assignmentId } = await seedClassroomAndAssignment(t);
-      const workspaceId = await seedTestWorkspace(
-        t,
-        assignmentId,
-        "student_1",
-      );
-      const submissionId = await seedSubmission(t, {
-        assignmentId,
-        studentId: "student_1",
-        workspaceId,
-      });
-
-      const result = await t.query(
-        internal.web.submissionQueries.getStudentSubmission,
-        { studentId: "student_1", assignmentId },
-      );
-      expect(result).not.toBeNull();
-      expect(result!._id).toBe(submissionId);
-    });
-
-    it("getStudentSubmission returns null when no submission exists", async () => {
-      const t = makeTestClient();
-      const { assignmentId } = await seedClassroomAndAssignment(t);
-
-      const result = await t.query(
-        internal.web.submissionQueries.getStudentSubmission,
-        { studentId: "student_1", assignmentId },
-      );
-      expect(result).toBeNull();
     });
   });
 });

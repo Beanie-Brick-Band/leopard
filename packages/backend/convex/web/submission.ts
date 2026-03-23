@@ -159,19 +159,61 @@ export const getAllSubmissionsForAssignment = query({
 
 // --- Submission lifecycle internal mutations ---
 
-export const internalSetSubmissionUploading = internalMutation({
+/**
+ * Core submission logic: validates enrollment, due date, and duplicate submissions,
+ * then creates or updates the submission record with "uploading" status.
+ * Called by the triggerSubmission action which handles auth and external services.
+ */
+export const internalSubmitAssignment = internalMutation({
   args: {
     assignmentId: v.id("assignments"),
     studentId: v.string(),
     workspaceId: v.id("workspaces"),
   },
   handler: async (ctx, args) => {
+    const role = await getUserRole(ctx, args.studentId);
+    if (role !== "student" && role !== "admin") {
+      throw new Error(
+        "Only students can submit and view their own submissions",
+      );
+    }
+
+    const assignment = await ctx.db.get(args.assignmentId);
+    if (!assignment) {
+      throw new Error("Assignment not found");
+    }
+
+    if (role !== "admin") {
+      const relation = await ctx.db
+        .query("classroomStudentsRelations")
+        .withIndex("studentId_classroomId", (q) =>
+          q
+            .eq("studentId", args.studentId)
+            .eq("classroomId", assignment.classroomId),
+        )
+        .first();
+
+      if (!relation) {
+        throw new Error("User not enrolled in the classroom");
+      }
+    }
+
+    if (Date.now() > assignment.dueDate) {
+      throw new Error("Cannot submit after the due date");
+    }
+
     const existing = await ctx.db
       .query("submissions")
       .withIndex("studentId_assignmentId", (q) =>
-        q.eq("studentId", args.studentId).eq("assignmentId", args.assignmentId),
+        q
+          .eq("studentId", args.studentId)
+          .eq("assignmentId", args.assignmentId),
       )
       .first();
+
+    if (existing?.submissionUploadStatus === "confirmed") {
+      throw new Error("Assignment already submitted");
+    }
 
     if (existing) {
       await ctx.db.patch(existing._id, {
@@ -186,6 +228,7 @@ export const internalSetSubmissionUploading = internalMutation({
       studentId: args.studentId,
       workspaceId: args.workspaceId,
       flags: [],
+      flagged: false,
       submittedAt: Date.now(),
       gradesReleased: false,
       submissionUploadStatus: "uploading",
