@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { CodeXml, History, UsersRound } from "lucide-react";
 
+import { isAuthenticated } from "~/lib/auth-server";
+
 const featureItems = [
   {
     icon: CodeXml,
@@ -16,7 +18,9 @@ const featureItems = [
   },
 ] as const;
 
-export default function HomePage() {
+export default async function HomePage() {
+  const authenticated = await isAuthenticated();
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f6f5f2] text-[#17171b]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(173,216,230,0.22),_transparent_26%),radial-gradient(circle_at_bottom_right,_rgba(233,228,214,0.7),_transparent_30%)]" />
@@ -56,20 +60,31 @@ export default function HomePage() {
               ))}
             </div>
 
-            <div className="mt-12 flex flex-col gap-4 sm:flex-row">
-              <Link
-                href="/auth/sign-in"
-                className="inline-flex h-14 min-w-[180px] items-center justify-center rounded-2xl bg-[#191919] px-8 text-lg font-medium text-white transition-transform duration-200 hover:-translate-y-0.5"
-              >
-                Log In
-              </Link>
-              <Link
-                href="/auth/signup"
-                className="inline-flex h-14 min-w-[180px] items-center justify-center rounded-2xl border border-[#d5d5d2] bg-white px-8 text-lg font-medium text-[#383a3f] transition-transform duration-200 hover:-translate-y-0.5"
-              >
-                Sign Up
-              </Link>
-            </div>
+            {authenticated ? (
+              <div className="mt-12 flex flex-col gap-4 sm:flex-row">
+                <Link
+                  href="/app"
+                  className="inline-flex h-14 min-w-[220px] items-center justify-center rounded-2xl bg-[#191919] px-8 text-lg font-medium text-white transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  Open Dashboard
+                </Link>
+              </div>
+            ) : (
+              <div className="mt-12 flex flex-col gap-4 sm:flex-row">
+                <Link
+                  href="/auth/sign-in"
+                  className="inline-flex h-14 min-w-[180px] items-center justify-center rounded-2xl bg-[#191919] px-8 text-lg font-medium text-white transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  className="inline-flex h-14 min-w-[180px] items-center justify-center rounded-2xl border border-[#d5d5d2] bg-white px-8 text-lg font-medium text-[#383a3f] transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </section>
 
           <section className="flex justify-center lg:justify-end">
