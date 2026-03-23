@@ -1,9 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, no-empty */
+/* eslint-disable */
+// @ts-nocheck
+// This is an standalone script used to run a sidecar web server for submissions. It's simply put here so we can have a stable link to it.
+import { randomUUID } from "node:crypto";
 import { unlinkSync } from "node:fs";
 
 const PORT = 13338;
 const WORKSPACE_DIR = "/home/coder/workspace";
-const TMP_ZIP = "/tmp/submission.zip";
 
 Bun.serve({
   port: PORT,
@@ -13,6 +15,7 @@ Bun.serve({
     },
     "/submit": {
       POST: async (req) => {
+        const tmpZip = `/tmp/submission-${randomUUID()}.zip`;
         try {
           const body = (await req.json()) as { uploadUrl?: string };
           if (!body.uploadUrl) {
@@ -24,8 +27,7 @@ Bun.serve({
 
           const parsedUrl = URL.parse(body.uploadUrl);
           if (
-            !parsedUrl ||
-            parsedUrl.hostname !== "minio.nolapse.tech" ||
+            parsedUrl?.hostname !== "minio.nolapse.tech" ||
             parsedUrl.protocol !== "https:"
           ) {
             return Response.json(
@@ -35,7 +37,7 @@ Bun.serve({
           }
 
           const result = Bun.spawnSync(
-            ["/usr/bin/zip", "-r", TMP_ZIP, ".", "-x", "*/.*", "-x", ".*"],
+            ["/usr/bin/zip", "-r", tmpZip, ".", "-x", "*/.*", "-x", ".*"],
             {
               cwd: WORKSPACE_DIR,
               timeout: 60_000,
@@ -50,7 +52,7 @@ Bun.serve({
             );
           }
 
-          const zipData = Bun.file(TMP_ZIP);
+          const zipData = Bun.file(tmpZip);
 
           const uploadRes = await fetch(body.uploadUrl, {
             method: "PUT",
@@ -59,7 +61,7 @@ Bun.serve({
           });
 
           try {
-            unlinkSync(TMP_ZIP);
+            unlinkSync(tmpZip);
           } catch {}
 
           if (!uploadRes.ok) {
@@ -75,7 +77,7 @@ Bun.serve({
           return Response.json({ success: true });
         } catch (err: unknown) {
           try {
-            unlinkSync(TMP_ZIP);
+            unlinkSync(tmpZip);
           } catch {}
           return Response.json(
             {
