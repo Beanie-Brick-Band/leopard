@@ -197,19 +197,6 @@ function Content({
               )}
             </CardContent>
           </Card>
-          {hasWorkspaceForAssignment && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Current Work</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TextReplayScrubberComponent
-                  workspaceId={assignmentWorkspace._id}
-                  frozenReplay={true}
-                />
-              </CardContent>
-            </Card>
-          )}
           {grade !== undefined ? (
             <Card className="border-green-500/50">
               <CardHeader>
@@ -337,7 +324,7 @@ function Content({
 
       {isSubmitConfirmOpen && !hasSubmission ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-md">
+          <Card className="max-h-[90vh] w-full max-w-2xl overflow-y-auto">
             <CardHeader>
               <CardTitle>Submit Assignment?</CardTitle>
               <CardDescription>
@@ -345,21 +332,36 @@ function Content({
                 again or relaunch this workspace after submission.
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={closeSubmitConfirm}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmSubmit}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Submitting..." : "Confirm Submit"}
-              </Button>
+            <CardContent className="space-y-6">
+              {hasWorkspaceForAssignment && (
+                <Card className="border">
+                  <CardHeader>
+                    <CardTitle className="text-base">Current Work</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <TextReplayScrubberComponent
+                      workspaceId={assignmentWorkspace._id}
+                      frozenReplay={true}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={closeSubmitConfirm}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={confirmSubmit}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Confirm Submit"}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
