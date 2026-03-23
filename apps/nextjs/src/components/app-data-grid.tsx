@@ -4,6 +4,7 @@ import type { ColDef, Module } from "ag-grid-community";
 import type { CSSProperties } from "react";
 import { AllCommunityModule } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
+import { useRouter } from "next/navigation";
 
 import { cn } from "@package/ui";
 import { useTheme } from "@package/ui/theme";
@@ -24,6 +25,7 @@ interface AppDataGridProps<TData> {
   rowData: TData[];
   className?: string;
   minWidthClassName?: string;
+  onRowNavigate?: (row: TData) => string | undefined;
   rowHeight?: number;
 }
 
@@ -32,8 +34,10 @@ export function AppDataGrid<TData>({
   rowData,
   className,
   minWidthClassName = "min-w-[720px]",
+  onRowNavigate,
   rowHeight = 56,
 }: AppDataGridProps<TData>) {
+  const router = useRouter();
   const theme = useTheme();
   const isDarkMode = theme.resolvedTheme === "dark";
   const darkModeGridVars: CSSProperties | undefined = isDarkMode
@@ -63,7 +67,12 @@ export function AppDataGrid<TData>({
     >
       <AgGridReact<TData>
         animateRows
-        className={cn("w-full", minWidthClassName, className)}
+        className={cn(
+          "w-full",
+          minWidthClassName,
+          onRowNavigate && "[&_.ag-row]:cursor-pointer",
+          className,
+        )}
         columnDefs={columnDefs}
         containerStyle={{ width: "100%" }}
         defaultColDef={defaultColDef}
@@ -81,6 +90,17 @@ export function AppDataGrid<TData>({
             state: [{ colId: firstCol.getColId(), sort: "asc" }],
             defaultState: { sort: null },
           });
+        }}
+        onRowClicked={(event) => {
+          if (!onRowNavigate || !event.data) return;
+
+          const target = event.event?.target;
+          if (target instanceof Element && target.closest("a, button")) return;
+
+          const href = onRowNavigate(event.data);
+          if (!href) return;
+
+          router.push(href);
         }}
         suppressCellFocus
       />
