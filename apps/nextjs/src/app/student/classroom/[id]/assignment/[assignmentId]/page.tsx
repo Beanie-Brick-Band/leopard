@@ -166,10 +166,17 @@ function Content({
                 <Clock className="h-4 w-4" />
                 {new Date(assignment.dueDate).toLocaleTimeString()}
               </span>
-              {hasSubmission ? (
+              {submissionResult.success &&
+              !submissionResult.submission?.gradesReleased ? (
                 <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
-                  <CheckCircle2 className="h-4 w-4" />
+                  <CheckCircle2 className="h-3 w-3" />
                   Submitted
+                </span>
+              ) : submissionResult.success &&
+                submissionResult.submission?.gradesReleased ? (
+                <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Graded
                 </span>
               ) : null}
             </div>
@@ -209,7 +216,7 @@ function Content({
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-4xl font-bold text-green-600 dark:text-green-400">
-                  {grade}
+                  {grade}%
                 </p>
                 {feedback ? (
                   <div>
