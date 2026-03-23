@@ -221,3 +221,11 @@
     padding: 0;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  .tiptap .shiki,
+  .tiptap .shiki span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
+}
