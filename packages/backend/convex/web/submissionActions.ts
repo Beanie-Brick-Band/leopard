@@ -1,18 +1,19 @@
 "use node";
 
 import { v } from "convex/values";
+import { z } from "zod";
 
 import {
   createNewSessionKey,
   createWorkspaceBuild,
   getWorkspaceMetadataByUserAndWorkspaceName,
 } from "@package/coder-sdk";
-import { z } from "zod";
+import { createClient } from "@package/coder-sdk/client";
 
 import { internal } from "../_generated/api";
 import { action } from "../_generated/server";
 import { authComponent } from "../auth";
-import { getCoderClient, getCoderOrigin } from "../helpers/coder";
+import { ensureWorkspaceRunning } from "../helpers/coder";
 import {
   generateDownloadUrl,
   generateUploadUrl,
@@ -38,7 +39,7 @@ async function callSidecar(
   workspaceName: string,
   uploadUrl: string,
 ): Promise<{ success: boolean; error?: string }> {
-  const sidecarUrl = `${getCoderOrigin()}/@${ownerUsername}/${workspaceName}.main/apps/submit-sidecar/submit`;
+  const sidecarUrl = `${new URL(process.env.CODER_API_URL!).origin}/@${ownerUsername}/${workspaceName}.main/apps/submit-sidecar/submit`;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
@@ -80,19 +81,17 @@ export const triggerSubmission = action({
       throw new Error("Not authenticated");
     }
 
-    // Get active workspace
+    // Get workspace for this specific assignment
     const workspace = await ctx.runQuery(
-      internal.web.assignment.getUserActiveWorkspace,
+      internal.web.assignment.getWorkspaceByAssignment,
       {
         userId: user._id,
+        assignmentId: args.assignmentId,
       },
     );
     if (!workspace) {
-      throw new Error("No active workspace found. Launch a workspace first.");
-    }
-    if (workspace.assignmentId !== args.assignmentId) {
       throw new Error(
-        "Active workspace is not linked to this assignment. Launch the correct workspace first.",
+        "You have never launched a workspace for this assignment. No work to be submitted.",
       );
     }
 
@@ -112,11 +111,17 @@ export const triggerSubmission = action({
       { assignmentId: args.assignmentId },
     );
     if (!assignment) {
+      await ctx.runMutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
       throw new Error("Assignment not found");
     }
 
     // Get Coder workspace details
-    const coderClient = getCoderClient();
+    const coderClient = createClient({
+      baseUrl: process.env.CODER_API_URL!,
+      auth: process.env.CODER_API_KEY!,
+    });
 
     const coderUserId = user._id.toString();
     const workspaceMeta = await getWorkspaceMetadataByUserAndWorkspaceName({
@@ -128,8 +133,33 @@ export const triggerSubmission = action({
     });
 
     if (workspaceMeta.error || !workspaceMeta.data) {
+      await ctx.runMutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
       throw new Error("Could not find Coder workspace");
     }
+
+    try {
+      await ensureWorkspaceRunning({
+        client: coderClient,
+        userId: coderUserId,
+        workspaceName: args.assignmentId.toString(),
+        workspaceId: workspaceMeta.data.id!,
+        currentStatus: workspaceMeta.data.latest_build?.status,
+      });
+    } catch (err) {
+      await ctx.runMutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
+      throw err;
+    }
+
+    // Activate this workspace in the DB (deactivates any other active workspace for this user)
+    await ctx.runMutation(internal.web.assignment.setUserActiveWorkspace, {
+      userId: coderUserId,
+      coderWorkspaceId: workspaceMeta.data.id!,
+      assignmentId: args.assignmentId,
+    });
 
     // Generate presigned upload URL
     const storageKey = getSubmissionObjectKey(
@@ -137,7 +167,15 @@ export const triggerSubmission = action({
       args.assignmentId,
       user._id,
     );
-    const uploadUrl = await generateUploadUrl(storageKey);
+    let uploadUrl: string;
+    try {
+      uploadUrl = await generateUploadUrl(storageKey);
+    } catch (err) {
+      await ctx.runMutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
+      throw err;
+    }
 
     // Create a session token for the workspace owner so we can access the path-based app
     const userSession = await createNewSessionKey({
@@ -172,9 +210,7 @@ export const triggerSubmission = action({
       await ctx.runMutation(internal.web.submission.internalFailSubmission, {
         submissionId,
       });
-      throw new Error(
-        "Upload verification failed — file not found in storage",
-      );
+      throw new Error("Upload verification failed — file not found in storage");
     }
 
     // Confirm submission

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 
+import { internal } from "../_generated/api";
 import { Id } from "../_generated/dataModel";
 import {
   internalMutation,
@@ -12,6 +13,8 @@ import { authComponent } from "../auth";
 import { getUserRole } from "../helpers/roles";
 
 type DatabaseCtx = QueryCtx | MutationCtx;
+
+const UPLOAD_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
 const requireStudentRole = async (ctx: DatabaseCtx, userId: string) => {
   const role = await getUserRole(ctx, userId);
@@ -131,7 +134,6 @@ export const getOwnSubmissionsForAssignment = query({
       assignmentId: submission.assignmentId,
       submittedAt: submission.submittedAt,
       gradesReleased: submission.gradesReleased,
-      submissionUploadStatus: submission.submissionUploadStatus ?? null,
     };
 
     return { success: true, submission: publicSubmissionInfo };
@@ -161,7 +163,8 @@ export const getAllSubmissionsForAssignment = query({
 
 /**
  * Core submission logic: validates enrollment, due date, and duplicate submissions,
- * then creates or updates the submission record with "uploading" status.
+ * then creates the submission record. A timeout is scheduled to auto-delete the
+ * record if the upload isn't confirmed within 5 minutes.
  * Called by the triggerSubmission action which handles auth and external services.
  */
 export const internalSubmitAssignment = internalMutation({
@@ -205,25 +208,20 @@ export const internalSubmitAssignment = internalMutation({
     const existing = await ctx.db
       .query("submissions")
       .withIndex("studentId_assignmentId", (q) =>
-        q
-          .eq("studentId", args.studentId)
-          .eq("assignmentId", args.assignmentId),
+        q.eq("studentId", args.studentId).eq("assignmentId", args.assignmentId),
       )
       .first();
 
-    if (existing?.submissionUploadStatus === "confirmed") {
+    if (existing?.submissionStorageKey) {
       throw new Error("Assignment already submitted");
     }
 
+    // Delete inflight submission before creating a new one
     if (existing) {
-      await ctx.db.patch(existing._id, {
-        submissionUploadStatus: "uploading",
-        workspaceId: args.workspaceId,
-      });
-      return existing._id;
+      await ctx.db.delete(existing._id);
     }
 
-    return ctx.db.insert("submissions", {
+    const submissionId = await ctx.db.insert("submissions", {
       assignmentId: args.assignmentId,
       studentId: args.studentId,
       workspaceId: args.workspaceId,
@@ -231,8 +229,13 @@ export const internalSubmitAssignment = internalMutation({
       flagged: false,
       submittedAt: Date.now(),
       gradesReleased: false,
-      submissionUploadStatus: "uploading",
     });
+    await ctx.scheduler.runAfter(
+      UPLOAD_TIMEOUT_MS,
+      internal.web.submission.internalExpireStaleUpload,
+      { submissionId },
+    );
+    return submissionId;
   },
 });
 
@@ -243,7 +246,6 @@ export const internalConfirmSubmission = internalMutation({
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.submissionId, {
-      submissionUploadStatus: "confirmed",
       submittedAt: Date.now(),
       submissionStorageKey: args.submissionStorageKey,
     });
@@ -255,9 +257,19 @@ export const internalFailSubmission = internalMutation({
     submissionId: v.id("submissions"),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.submissionId, {
-      submissionUploadStatus: "failed",
-    });
+    await ctx.db.delete(args.submissionId);
+  },
+});
+
+export const internalExpireStaleUpload = internalMutation({
+  args: {
+    submissionId: v.id("submissions"),
+  },
+  handler: async (ctx, args) => {
+    const submission = await ctx.db.get(args.submissionId);
+    if (submission && !submission.submissionStorageKey) {
+      await ctx.db.delete(args.submissionId);
+    }
   },
 });
 

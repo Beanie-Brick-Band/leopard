@@ -174,6 +174,21 @@ export const getUserActiveWorkspace = internalQuery({
   },
 });
 
+export const getWorkspaceByAssignment = internalQuery({
+  args: {
+    userId: v.string(),
+    assignmentId: v.id("assignments"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("workspaces")
+      .withIndex("assignmentId_userId", (q) =>
+        q.eq("assignmentId", args.assignmentId).eq("userId", args.userId),
+      )
+      .first();
+  },
+});
+
 export const internalGetAssignmentStarterCodeKey = internalQuery({
   args: { assignmentId: v.id("assignments") },
   handler: async (ctx, args) => {

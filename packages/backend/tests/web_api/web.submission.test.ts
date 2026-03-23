@@ -399,7 +399,7 @@ describe("web/submission", () => {
         "student_1",
       );
 
-      // Seed a confirmed submission
+      // Seed a confirmed submission (has submissionStorageKey)
       await t.run(async (ctx: MutationCtx) => {
         await ctx.db.insert("submissions", {
           assignmentId,
@@ -409,7 +409,7 @@ describe("web/submission", () => {
           flagged: false,
           submittedAt: 3,
           gradesReleased: false,
-          submissionUploadStatus: "confirmed",
+          submissionStorageKey: "some-key",
         });
       });
 
@@ -422,7 +422,7 @@ describe("web/submission", () => {
       ).rejects.toThrow("Assignment already submitted");
     });
 
-    it("creates a new submission with uploading status", async () => {
+    it("creates a new submission without storage key", async () => {
       const t = makeTestClient();
       vi.spyOn(Date, "now").mockReturnValue(5);
       const { classroomId, assignmentId } =
@@ -447,14 +447,14 @@ describe("web/submission", () => {
         ctx.db.get(submissionId),
       );
       expect(saved).not.toBeNull();
-      expect(saved!.submissionUploadStatus).toBe("uploading");
+      expect(saved!.submissionStorageKey).toBeUndefined();
       expect(saved!.studentId).toBe("student_1");
       expect(saved!.assignmentId).toBe(assignmentId);
       expect(saved!.workspaceId).toBe(workspaceId);
       expect(saved!.gradesReleased).toBe(false);
     });
 
-    it("updates existing non-confirmed submission to uploading", async () => {
+    it("deletes stale submission and creates a new one on retry", async () => {
       const t = makeTestClient();
       vi.spyOn(Date, "now").mockReturnValue(5);
       const { classroomId, assignmentId } =
@@ -477,17 +477,24 @@ describe("web/submission", () => {
         },
       );
 
-      expect(returnedId).toBe(existingId);
-      const saved = await t.run(async (ctx: QueryCtx) =>
+      // Old record should be deleted
+      const old = await t.run(async (ctx: QueryCtx) =>
         ctx.db.get(existingId),
       );
-      expect(saved!.submissionUploadStatus).toBe("uploading");
+      expect(old).toBeNull();
+
+      // New record should exist with the new workspace
+      const saved = await t.run(async (ctx: QueryCtx) =>
+        ctx.db.get(returnedId),
+      );
+      expect(saved).not.toBeNull();
       expect(saved!.workspaceId).toBe(ws2);
+      expect(saved!.submissionStorageKey).toBeUndefined();
     });
   });
 
   describe("internalConfirmSubmission", () => {
-    it("sets submission to confirmed with storage key", async () => {
+    it("sets storage key and updates submittedAt", async () => {
       const t = makeTestClient();
       const nowSpy = vi.spyOn(Date, "now").mockReturnValue(999);
       const { assignmentId } = await seedClassroomAndAssignment(t);
@@ -510,7 +517,6 @@ describe("web/submission", () => {
       const saved = await t.run(async (ctx: QueryCtx) =>
         ctx.db.get(submissionId),
       );
-      expect(saved!.submissionUploadStatus).toBe("confirmed");
       expect(saved!.submissionStorageKey).toBe(
         "classrooms/c1/assignments/a1/student_1.zip",
       );
@@ -521,7 +527,7 @@ describe("web/submission", () => {
   });
 
   describe("internalFailSubmission", () => {
-    it("sets submission to failed status", async () => {
+    it("deletes the submission", async () => {
       const t = makeTestClient();
       const { assignmentId } = await seedClassroomAndAssignment(t);
       const workspaceId = await seedTestWorkspace(
@@ -542,7 +548,7 @@ describe("web/submission", () => {
       const saved = await t.run(async (ctx: QueryCtx) =>
         ctx.db.get(submissionId),
       );
-      expect(saved!.submissionUploadStatus).toBe("failed");
+      expect(saved).toBeNull();
     });
   });
 });
