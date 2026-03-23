@@ -4,7 +4,7 @@
   "private": true,
   "description": "Development reverse proxy for Coder workspaces",
   "scripts": {
-    "start": "./start.sh",
+    "start": "node ./start.js",
     "stop": "docker compose down",
     "restart": "docker compose restart",
     "logs": "docker logs -f reverse-proxy",
