@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
 
-import TeacherSubmissionReviewPage from "./page";
+import TeacherSubmissionReviewPage from "~/app/teacher/classroom/[id]/assignment/[assignmentId]/review/[submissionId]/page";
 
 // --- Hoisted mocks ---
 
@@ -32,7 +32,14 @@ vi.mock("@package/backend/convex/_generated/api", () => ({
   api: {
     web: {
       assignment: { getById: "getById" },
+      submission: {
+        toggleSubmissionFlag: "toggleSubmissionFlag",
+      },
+      submissionActions: {
+        getSubmissionDownloadUrl: "getSubmissionDownloadUrl",
+      },
       teacherAssignments: {
+        getSubmissionsByAssignment: "getSubmissionsByAssignment",
         getSubmissionById: "getSubmissionById",
         gradeSubmission: "gradeSubmission",
         provideSubmissionFeedback: "provideSubmissionFeedback",
@@ -69,6 +76,10 @@ vi.mock("next/link", () => ({
     children: React.ReactNode;
     href: string;
   }) => <a href={href}>{children}</a>,
+}));
+
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock("~/components/scrubber", () => ({
@@ -313,7 +324,7 @@ describe("TeacherSubmissionReviewPage", () => {
 
       await renderPage();
 
-      expect(screen.getByLabelText("Grade")).toHaveValue(85);
+      expect(screen.getByLabelText("Grade")).toHaveValue("85");
       expect(screen.getByLabelText("Feedback")).toHaveValue("Good work!");
     });
   });

@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
 
-import StudentAssignmentPage from "./page";
+import StudentAssignmentPage from "~/app/student/classroom/[id]/assignment/[assignmentId]/page";
 
 // --- Hoisted mocks ---
 
@@ -28,9 +28,14 @@ vi.mock("@package/backend/convex/_generated/api", () => ({
       assignment: {
         getById: "getById",
         getMyActiveWorkspace: "getMyActiveWorkspace",
+        getMyWorkspaceForAssignment: "getMyWorkspaceForAssignment",
+        getLastEditedTimestamp: "getLastEditedTimestamp",
       },
       submission: {
         getOwnSubmissionsForAssignment: "getOwnSubmissionsForAssignment",
+      },
+      submissionActions: {
+        triggerSubmission: "triggerSubmission",
       },
     },
   },
@@ -55,6 +60,16 @@ vi.mock("remark-gfm", () => ({
 
 vi.mock("~/components/workspace-launching-overlay", () => ({
   WorkspaceLaunchingOverlay: () => null,
+}));
+
+vi.mock("~/components/scrubber", () => ({
+  TextReplayScrubberComponent: () => (
+    <div data-testid="scrubber">Scrubber Mock</div>
+  ),
+}));
+
+vi.mock("~/components/editor", () => ({
+  Editor: () => <div data-testid="editor">Editor Mock</div>,
 }));
 
 vi.mock("~/lib/auth", () => ({
@@ -123,6 +138,8 @@ function setupQueryMocks({
   mockUseQuery.mockImplementation((ref: string) => {
     if (ref === "getById") return assignment;
     if (ref === "getMyActiveWorkspace") return workspace;
+    if (ref === "getMyWorkspaceForAssignment") return workspace;
+    if (ref === "getLastEditedTimestamp") return null;
     if (ref === "getOwnSubmissionsForAssignment") return submissionResult;
     return undefined;
   });
@@ -180,7 +197,6 @@ describe("StudentAssignmentPage", () => {
             assignmentId: ASSIGNMENT_ID,
             submittedAt: Date.now(),
             gradesReleased: false,
-            status: "confirmed",
           },
         },
       });
@@ -192,46 +208,6 @@ describe("StudentAssignmentPage", () => {
       expect(statusElements.length).toBeGreaterThanOrEqual(1);
     });
 
-    it("shows 'Submitting...' when status is uploading", async () => {
-      setupQueryMocks({
-        submissionResult: {
-          success: true,
-          submission: {
-            studentId: "student1",
-            assignmentId: ASSIGNMENT_ID,
-            submittedAt: Date.now(),
-            gradesReleased: false,
-            status: "uploading",
-          },
-        },
-      });
-
-      await renderPage();
-
-      // Status line shows "Submitting..." and button also shows it
-      const matches = screen.getAllByText("Submitting...");
-      expect(matches.length).toBeGreaterThanOrEqual(1);
-    });
-
-    it("shows 'Failed' when status is failed", async () => {
-      setupQueryMocks({
-        submissionResult: {
-          success: true,
-          submission: {
-            studentId: "student1",
-            assignmentId: ASSIGNMENT_ID,
-            submittedAt: Date.now(),
-            gradesReleased: false,
-            status: "failed",
-          },
-        },
-      });
-
-      await renderPage();
-
-      expect(screen.getByText("Failed")).toBeInTheDocument();
-    });
-
     it("shows 'Graded' when a grade exists", async () => {
       setupQueryMocks({
         submissionResult: {
@@ -241,7 +217,6 @@ describe("StudentAssignmentPage", () => {
             assignmentId: ASSIGNMENT_ID,
             submittedAt: Date.now(),
             gradesReleased: true,
-            status: "confirmed",
             grade: 95,
             gradedAt: Date.now(),
           },
@@ -250,28 +225,9 @@ describe("StudentAssignmentPage", () => {
 
       await renderPage();
 
-      expect(screen.getByText("Graded")).toBeInTheDocument();
-      expect(screen.getByText("95")).toBeInTheDocument();
-    });
-
-    it("shows 'Submitted' for legacy submissions without status field", async () => {
-      setupQueryMocks({
-        submissionResult: {
-          success: true,
-          submission: {
-            studentId: "student1",
-            assignmentId: ASSIGNMENT_ID,
-            submittedAt: Date.now(),
-            gradesReleased: false,
-            // no status field — legacy record
-          },
-        },
-      });
-
-      await renderPage();
-
-      const statusElements = screen.getAllByText("Submitted");
-      expect(statusElements.length).toBeGreaterThanOrEqual(1);
+      const gradedElements = screen.getAllByText("Graded");
+      expect(gradedElements.length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText("95%")).toBeInTheDocument();
     });
   });
 
@@ -285,7 +241,6 @@ describe("StudentAssignmentPage", () => {
             assignmentId: ASSIGNMENT_ID,
             submittedAt: Date.now(),
             gradesReleased: false,
-            status: "confirmed",
           },
         },
       });
@@ -311,27 +266,6 @@ describe("StudentAssignmentPage", () => {
 
       expect(
         screen.getByRole("button", { name: "Submit Assignment" }),
-      ).toBeInTheDocument();
-    });
-
-    it("shows 'Retry Submission' when status is failed", async () => {
-      setupQueryMocks({
-        submissionResult: {
-          success: true,
-          submission: {
-            studentId: "student1",
-            assignmentId: ASSIGNMENT_ID,
-            submittedAt: Date.now(),
-            gradesReleased: false,
-            status: "failed",
-          },
-        },
-      });
-
-      await renderPage();
-
-      expect(
-        screen.getByRole("button", { name: "Retry Submission" }),
       ).toBeInTheDocument();
     });
 
@@ -407,26 +341,13 @@ describe("StudentAssignmentPage", () => {
     it("shows error toast and sets submitError on failure", async () => {
       const user = userEvent.setup();
       mockSubmitWorkspace.mockRejectedValue(new Error("Network error"));
-      setupQueryMocks({
-        submissionResult: {
-          success: true,
-          submission: {
-            studentId: "student1",
-            assignmentId: ASSIGNMENT_ID,
-            submittedAt: Date.now(),
-            gradesReleased: false,
-            status: "failed",
-          },
-        },
-      });
+      setupQueryMocks();
 
       await renderPage();
 
       await user.click(
-        screen.getByRole("button", { name: "Retry Submission" }),
+        screen.getByRole("button", { name: "Submit Assignment" }),
       );
-
-      // Confirm the submission
       await user.click(screen.getByRole("button", { name: "Confirm Submit" }));
 
       await waitFor(() => {
@@ -458,24 +379,12 @@ describe("StudentAssignmentPage", () => {
       mockSubmitWorkspace.mockRejectedValue(
         new Error("Upload verification failed"),
       );
-      setupQueryMocks({
-        submissionResult: {
-          success: true,
-          submission: {
-            studentId: "student1",
-            assignmentId: ASSIGNMENT_ID,
-            submittedAt: Date.now(),
-            gradesReleased: false,
-            status: "failed",
-          },
-        },
-      });
+      setupQueryMocks();
 
       await renderPage();
 
-      // Trigger the submit to set the error
       await user.click(
-        screen.getByRole("button", { name: "Retry Submission" }),
+        screen.getByRole("button", { name: "Submit Assignment" }),
       );
       await user.click(screen.getByRole("button", { name: "Confirm Submit" }));
 

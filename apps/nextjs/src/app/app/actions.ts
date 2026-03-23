@@ -32,7 +32,7 @@ export async function getSubmissionDownload(submissionId: Id<"submissions">) {
     api.web.submissionActions.getSubmissionDownloadUrl,
     { submissionId },
     { token },
-  ) as Promise<{ downloadUrl: string }>;
+  );
 }
 
 export async function launchWorkspace(assignmentId: Id<"assignments">) {

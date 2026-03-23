@@ -2,7 +2,7 @@
 
 import { startTransition, use, useActionState, useState } from "react";
 import Link from "next/link";
-import { useAction, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -28,6 +28,7 @@ import { Spinner } from "@package/ui/spinner";
 
 import { launchWorkspace, submitWorkspace } from "~/app/app/actions";
 import { Editor } from "~/components/editor";
+import { TextReplayScrubberComponent } from "~/components/scrubber";
 import { WorkspaceLaunchingOverlay } from "~/components/workspace-launching-overlay";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 
@@ -57,9 +58,6 @@ function Content({
       assignmentId,
     },
   );
-  const submitAssignment = useAction(
-    api.web.submissionActions.triggerSubmission,
-  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitConfirmOpen, setIsSubmitConfirmOpen] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -88,35 +86,22 @@ function Content({
     );
   }
 
-  const submissionRecord =
-    submissionResult.success === true ? submissionResult.submission : null;
-  const status =
-    submissionRecord && "status" in submissionRecord
-      ? submissionRecord.status
-      : null;
-
-  const isConfirmed = status === "confirmed";
-  const isUploading = status === "uploading" || isSubmitting;
-  const isFailed = status === "failed";
-  // "Submitted" = confirmed, or legacy records without status field
-  const hasSubmission = submissionRecord !== null && (isConfirmed || !status);
+  const submission = submissionResult.success
+    ? submissionResult.submission
+    : null;
+  const hasSubmission = submission !== null;
+  const submittedAt = submission?.submittedAt;
+  const isPastDue = Date.now() > assignment.dueDate;
+  const hasWorkspaceForAssignment = assignmentWorkspace != null;
 
   const grade =
-    submissionRecord && "grade" in submissionRecord
-      ? submissionRecord.grade
-      : undefined;
+    submission && "grade" in submission ? submission.grade : undefined;
   const feedback =
-    submissionRecord && "submissionFeedback" in submissionRecord
-      ? submissionRecord.submissionFeedback
+    submission && "submissionFeedback" in submission
+      ? submission.submissionFeedback
       : undefined;
   const gradedAt =
-    submissionRecord && "gradedAt" in submissionRecord
-      ? submissionRecord.gradedAt
-      : undefined;
-  const submittedAt = submissionRecord?.submittedAt;
-  const isPastDue = Date.now() > assignment.dueDate;
-  const hasWorkspaceForAssignment =
-    assignmentWorkspace !== undefined && assignmentWorkspace !== null;
+    submission && "gradedAt" in submission ? submission.gradedAt : undefined;
 
   const handleSubmit = async () => {
     if (!assignmentWorkspace) {
@@ -274,15 +259,11 @@ function Content({
                 <span className="font-medium">
                   {grade !== undefined
                     ? "Graded"
-                    : isConfirmed
-                      ? "Submitted"
-                      : isUploading
-                        ? "Submitting..."
-                        : isFailed
-                          ? "Failed"
-                          : hasSubmission
-                            ? "Submitted"
-                            : "Not submitted"}
+                    : isSubmitting
+                      ? "Submitting..."
+                      : hasSubmission
+                        ? "Submitted"
+                        : "Not submitted"}
                 </span>
               </div>
               {submittedAt ? (
@@ -309,14 +290,14 @@ function Content({
               </div>
               <Separator />
 
-              {isFailed && submitError ? (
+              {submitError ? (
                 <div className="flex items-start gap-2 rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
                   <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>{submitError}</span>
                 </div>
               ) : null}
 
-              {isConfirmed ? (
+              {hasSubmission ? (
                 <p className="text-muted-foreground text-xs">
                   Assignment submitted successfully. Your workspace has been
                   shut down.
@@ -326,20 +307,13 @@ function Content({
                   <Button
                     className="w-full"
                     onClick={openSubmitConfirm}
-                    disabled={
-                      isUploading ||
-                      isPastDue ||
-                      assignmentWorkspace === undefined ||
-                      assignmentWorkspace === null
-                    }
+                    disabled={isSubmitting || isPastDue || !assignmentWorkspace}
                   >
-                    {isUploading ? (
+                    {isSubmitting ? (
                       <span className="inline-flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Submitting...
                       </span>
-                    ) : isFailed ? (
-                      "Retry Submission"
                     ) : (
                       "Submit Assignment"
                     )}
@@ -376,7 +350,7 @@ function Content({
         </div>
       </div>
 
-      {isSubmitConfirmOpen && !isConfirmed ? (
+      {isSubmitConfirmOpen && !hasSubmission ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <Card className="max-h-[90vh] w-full max-w-2xl overflow-y-auto">
             <CardHeader>

@@ -420,7 +420,9 @@ function ReviewContent({
                 <div className="flex justify-between gap-4">
                   <span className="text-muted-foreground">Current Grade</span>
                   <span className="font-medium">
-                    {submission.grade ?? "Not graded"}
+                    {submission.grade !== undefined
+                      ? `${submission.grade}%`
+                      : "Not graded"}
                   </span>
                 </div>
                 <div className="flex justify-between gap-4">

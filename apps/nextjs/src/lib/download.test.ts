@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { triggerDownload } from "./download";
+import { triggerDownload } from "~/lib/download";
 
 describe("triggerDownload", () => {
   let clickSpy: ReturnType<typeof vi.fn>;
@@ -20,9 +20,6 @@ describe("triggerDownload", () => {
       href: "",
       download: "",
       click: clickSpy,
-      set _href(val: string) {
-        this.href = val;
-      },
     } as unknown as HTMLAnchorElement);
   });
 
