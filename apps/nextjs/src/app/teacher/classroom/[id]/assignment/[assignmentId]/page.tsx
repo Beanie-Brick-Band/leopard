@@ -185,6 +185,7 @@ function AssignmentContent({
 
     return {
       grade: submission.grade ?? null,
+      flagged: submission.flagged ? "Flagged" : "Clear",
       href: `/teacher/classroom/${classroomId}/assignment/${assignmentId}/review/${submission._id}`,
       studentLabel: `${studentName} ${submission.studentEmail ?? ""} ${submission.studentId}`,
       studentName,
@@ -206,6 +207,24 @@ function AssignmentContent({
       sort: "desc",
       valueFormatter: ({ value }) =>
         typeof value === "string" ? new Date(value).toLocaleString() : "",
+    },
+    {
+      field: "flagged",
+      headerName: "Flagged",
+      filter: "agTextColumnFilter",
+      flex: 0,
+      maxWidth: 120,
+      minWidth: 100,
+      cellRenderer: ({
+        value,
+      }: {
+        value?: (typeof submissionRows)[number]["flagged"];
+      }) =>
+        value === "Flagged" ? (
+          <span className="bg-destructive/10 text-destructive rounded-full px-2 py-0.5 text-xs font-medium dark:bg-red-300">
+            Flagged
+          </span>
+        ) : null,
     },
     {
       field: "grade",
