@@ -15,7 +15,6 @@ import {
   listWorkspaces,
 } from "@package/coder-sdk";
 import { createClient } from "@package/coder-sdk/client";
-
 import { internal } from "../_generated/api";
 import { action } from "../_generated/server";
 import { authComponent } from "../auth";
@@ -304,10 +303,9 @@ export const launchWorkspace = action({
       assignmentId: args.assignmentId,
     });
 
-    const coderApiUrl = new URL(process.env.CODER_API_URL!);
-    const coderHost = coderApiUrl.host;
+    const coderOrigin = new URL(process.env.CODER_API_URL!).origin;
 
-    const workspaceUrl = `https://${coderHost}/@${coderUserId}/${workspaceMetadata.data.name}.main/apps/code-server`;
+    const workspaceUrl = `${coderOrigin}/@${coderUserId}/${workspaceMetadata.data.name}.main/apps/code-server`;
 
     return { workspaceUrl, coderUserSessionKey: coderUserSessionKey.data.key! };
   },
