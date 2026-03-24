@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
+import { internal } from "../_generated/api";
 import {
   internalMutation,
   internalQuery,
@@ -10,7 +11,7 @@ import {
 import { authComponent } from "../auth";
 import { getUserRole } from "../helpers/roles";
 
-const ensureCanAccessAssignment = async (
+export const ensureCanAccessAssignment = async (
   ctx: QueryCtx,
   userId: string,
   assignmentId: Id<"assignments">,
@@ -154,6 +155,43 @@ export const setUserActiveWorkspace = internalMutation({
   },
 });
 
+// This function is similar to setUserActiveWorkspace, but it is used for spawning workspaces
+// for submissions hence it doesn't deactivate other workspaces.
+export const ensureWorkspaceActive = internalMutation({
+  args: {
+    userId: v.string(),
+    coderWorkspaceId: v.string(),
+    assignmentId: v.id("assignments"),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.runQuery(
+      internal.web.assignment.getWorkspaceByAssignment,
+      { assignmentId: args.assignmentId, userId: args.userId },
+    );
+
+    if (existing) {
+      if (!existing.isActive) {
+        await ctx.db.patch(existing._id, { isActive: true });
+      }
+      return;
+    }
+
+    await ctx.db.insert("workspaces", {
+      userId: args.userId,
+      coderWorkspaceId: args.coderWorkspaceId,
+      isActive: true,
+      assignmentId: args.assignmentId,
+    });
+  },
+});
+
+export const deactivateWorkspace = internalMutation({
+  args: { workspaceId: v.id("workspaces") },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.workspaceId, { isActive: false });
+  },
+});
+
 export const getUserActiveWorkspace = internalQuery({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
@@ -164,6 +202,21 @@ export const getUserActiveWorkspace = internalQuery({
       )
       .first();
     return workspace;
+  },
+});
+
+export const getWorkspaceByAssignment = internalQuery({
+  args: {
+    userId: v.string(),
+    assignmentId: v.id("assignments"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("workspaces")
+      .withIndex("assignmentId_userId", (q) =>
+        q.eq("assignmentId", args.assignmentId).eq("userId", args.userId),
+      )
+      .first();
   },
 });
 

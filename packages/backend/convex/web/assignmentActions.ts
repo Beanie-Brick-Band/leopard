@@ -18,6 +18,7 @@ import { createClient } from "@package/coder-sdk/client";
 import { internal } from "../_generated/api";
 import { action } from "../_generated/server";
 import { authComponent } from "../auth";
+import { ensureWorkspaceRunning } from "../helpers/coder";
 import { generateDownloadUrl } from "../helpers/minio";
 
 export const launchWorkspace = action({
@@ -161,30 +162,13 @@ export const launchWorkspace = action({
       throw new Error("Failed to fetch or create workspace metadata in Coder");
     }
 
-    // start the workspace if it's not running
-    const workspaceStatus = workspaceMetadata.data.latest_build?.status;
-    const targetWorkspaceId = workspaceMetadata.data.id;
-
-    if (
-      workspaceStatus === "stopped" ||
-      workspaceStatus === "failed" ||
-      workspaceStatus === "pending"
-    ) {
-      const workspaceStart = await createWorkspaceBuild({
-        client: coderClient,
-        path: {
-          workspace: targetWorkspaceId!,
-        },
-        body: {
-          transition: "start",
-        },
-      });
-      if (workspaceStart.error) {
-        throw new Error(
-          `Failed to start workspace: ${JSON.stringify(workspaceStart.error)}`,
-        );
-      }
-    }
+    await ensureWorkspaceRunning({
+      client: coderClient,
+      userId: coderUserId,
+      workspaceName: args.assignmentId.toString(),
+      workspaceId: workspaceMetadata.data.id!,
+      currentStatus: workspaceMetadata.data.latest_build?.status,
+    });
 
     // close all other workspaces for this user
     const workspaces = await listWorkspaces({
@@ -237,64 +221,6 @@ export const launchWorkspace = action({
       !coderUserSessionKey.data.key
     ) {
       throw new Error("Failed to create session key in Coder");
-    }
-
-    // Poll until the workspace is ready (build running + agent connected & ready)
-    const POLL_INTERVAL_MS = 2000;
-    const TIMEOUT_MS = 120_000;
-    const startTime = Date.now();
-
-    while (Date.now() - startTime < TIMEOUT_MS) {
-      const poll = await getWorkspaceMetadataByUserAndWorkspaceName({
-        client: coderClient,
-        path: {
-          user: coderUserId,
-          workspacename: `${args.assignmentId.toString()}`,
-        },
-      });
-
-      if (poll.error || !poll.data) {
-        throw new Error("Failed to poll workspace status");
-      }
-
-      const buildStatus = poll.data.latest_build?.status;
-
-      // Fail fast on terminal error states
-      if (buildStatus === "failed" || buildStatus === "canceled") {
-        throw new Error(`Workspace build entered terminal state: ${buildStatus}`);
-      }
-
-      if (buildStatus === "running") {
-        // Check if any agent is connected and ready
-        const agents =
-          poll.data.latest_build?.resources?.flatMap((r) => r.agents ?? []) ??
-          [];
-
-        const hasReadyAgent = agents.some(
-          (a) => a.status === "connected" && a.lifecycle_state === "ready",
-        );
-
-        // Fail fast if an agent hit an error
-        const hasAgentError = agents.some(
-          (a) =>
-            a.lifecycle_state === "start_error" ||
-            a.lifecycle_state === "start_timeout",
-        );
-
-        if (hasReadyAgent) {
-          break;
-        }
-
-        if (hasAgentError) {
-          throw new Error("Workspace agent failed to start");
-        }
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-    }
-
-    if (Date.now() - startTime >= TIMEOUT_MS) {
-      throw new Error("Workspace did not become ready within 2 minutes");
     }
 
     await ctx.runMutation(internal.web.assignment.setUserActiveWorkspace, {
