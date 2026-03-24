@@ -54,6 +54,15 @@ export function AppDataGrid<TData>({
         overlayNoRowsTemplate="<span class='text-sm'>No rows to display.</span>"
         rowData={rowData}
         rowHeight={rowHeight}
+        onGridReady={(params) => {
+          const firstCol = params.api.getAllDisplayedColumns()[0];
+          if (!firstCol) return;
+
+          params.api.applyColumnState({
+            state: [{ colId: firstCol.getColId(), sort: "asc" }],
+            defaultState: { sort: null },
+          });
+        }}
         suppressCellFocus
       />
     </div>
