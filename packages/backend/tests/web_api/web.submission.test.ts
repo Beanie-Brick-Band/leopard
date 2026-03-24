@@ -361,7 +361,7 @@ describe("web/submission", () => {
           studentId: "student_1",
           workspaceId,
         }),
-      ).rejects.toThrow("User not enrolled in the classroom");
+      ).rejects.toThrow("Not authorized to view this assignment");
     });
 
     it("throws when submitting after due date", async () => {

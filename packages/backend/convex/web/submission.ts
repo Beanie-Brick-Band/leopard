@@ -11,6 +11,7 @@ import {
 } from "../_generated/server";
 import { authComponent } from "../auth";
 import { getUserRole } from "../helpers/roles";
+import { ensureCanAccessAssignment } from "./assignment";
 
 type DatabaseCtx = QueryCtx | MutationCtx;
 
@@ -174,32 +175,12 @@ export const internalSubmitAssignment = internalMutation({
     workspaceId: v.id("workspaces"),
   },
   handler: async (ctx, args) => {
-    const role = await getUserRole(ctx, args.studentId);
-    if (role !== "student" && role !== "admin") {
-      throw new Error(
-        "Only students can submit and view their own submissions",
-      );
-    }
-
-    const assignment = await ctx.db.get(args.assignmentId);
-    if (!assignment) {
-      throw new Error("Assignment not found");
-    }
-
-    if (role !== "admin") {
-      const relation = await ctx.db
-        .query("classroomStudentsRelations")
-        .withIndex("studentId_classroomId", (q) =>
-          q
-            .eq("studentId", args.studentId)
-            .eq("classroomId", assignment.classroomId),
-        )
-        .first();
-
-      if (!relation) {
-        throw new Error("User not enrolled in the classroom");
-      }
-    }
+    await requireStudentRole(ctx, args.studentId);
+    const assignment = await ensureCanAccessAssignment(
+      ctx,
+      args.studentId,
+      args.assignmentId,
+    );
 
     if (Date.now() > assignment.dueDate) {
       throw new Error("Cannot submit after the due date");

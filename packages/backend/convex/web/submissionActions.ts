@@ -10,6 +10,7 @@ import {
 } from "@package/coder-sdk";
 import { createClient } from "@package/coder-sdk/client";
 
+import type { Id } from "../_generated/dataModel";
 import { internal } from "../_generated/api";
 import { action } from "../_generated/server";
 import { authComponent } from "../auth";
@@ -75,7 +76,7 @@ async function callSidecar(
 
 export const triggerSubmission = action({
   args: { assignmentId: v.id("assignments") },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ success: boolean; submissionId: Id<"submissions"> }> => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) {
       throw new Error("Not authenticated");
@@ -154,8 +155,7 @@ export const triggerSubmission = action({
       throw err;
     }
 
-    // Activate this workspace in the DB (deactivates any other active workspace for this user)
-    await ctx.runMutation(internal.web.assignment.setUserActiveWorkspace, {
+    await ctx.runMutation(internal.web.assignment.ensureWorkspaceActive, {
       userId: coderUserId,
       coderWorkspaceId: workspaceMeta.data.id!,
       assignmentId: args.assignmentId,
@@ -220,12 +220,16 @@ export const triggerSubmission = action({
     });
 
     // Stop workspace via Coder API
-    if (workspaceMeta.data.id) {
-      await createWorkspaceBuild({
-        client: coderClient,
-        path: { workspace: workspaceMeta.data.id },
-        body: { transition: "stop" },
-      });
+    try {
+      if (workspaceMeta.data.id) {
+        await createWorkspaceBuild({
+          client: coderClient,
+          path: { workspace: workspaceMeta.data.id },
+          body: { transition: "stop" },
+        });
+      }
+    } catch (error) {
+      // Log error but continue with deactivation
     }
 
     // Deactivate workspace in DB

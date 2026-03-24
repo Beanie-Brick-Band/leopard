@@ -2,7 +2,7 @@
 
 import { startTransition, use, useActionState, useState } from "react";
 import Link from "next/link";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { ArrowLeft, Calendar, CheckCircle2, Clock } from "lucide-react";
 import { toast } from "sonner";
 
@@ -51,7 +51,9 @@ function Content({
       assignmentId,
     },
   );
-  const submitAssignment = useMutation(api.web.submission.submitAssignment);
+  const submitAssignment = useAction(
+    api.web.submissionActions.triggerSubmission,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitConfirmOpen, setIsSubmitConfirmOpen] = useState(false);
   const [workspaceUrl, launchAction, isLaunching] = useActionState(
@@ -103,7 +105,6 @@ function Content({
     try {
       await submitAssignment({
         assignmentId,
-        workspaceId: assignmentWorkspace._id,
       });
       toast.success(
         hasSubmission ? "Assignment re-submitted." : "Assignment submitted.",

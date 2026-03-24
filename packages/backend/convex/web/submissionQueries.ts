@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { internalQuery } from "../_generated/server";
-import { requireInstructorAccess } from "./teacher";
+import { checkGraderAccess } from "./submission";
 
 /** Convex actions can't access ctx.db, so they call these internalQueries via ctx.runQuery */
 export const getAssignment = internalQuery({
@@ -17,11 +17,7 @@ export const getSubmissionForDownload = internalQuery({
     const submission = await ctx.db.get(args.submissionId);
     if (!submission) return null;
 
-    const assignment = await ctx.db.get(submission.assignmentId);
-    if (!assignment) return null;
-
-    // Verify teacher/admin access
-    await requireInstructorAccess(ctx, assignment.classroomId, args.userId);
+    await checkGraderAccess(args.userId, ctx, submission.assignmentId);
 
     return submission;
   },
