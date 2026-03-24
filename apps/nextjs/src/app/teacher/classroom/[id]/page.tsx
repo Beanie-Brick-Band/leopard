@@ -98,24 +98,6 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
       valueFormatter: ({ value }) =>
         typeof value === "string" ? new Date(value).toLocaleString() : "",
     },
-    {
-      colId: "actions",
-      headerName: "Actions",
-      filter: false,
-      flex: 0,
-      maxWidth: 140,
-      minWidth: 120,
-      resizable: false,
-      sortable: false,
-      cellRenderer: ({ data }: { data?: (typeof assignmentRows)[number] }) =>
-        data ? (
-          <div className="flex h-full items-center justify-end">
-            <Button asChild size="sm" variant="outline">
-              <Link href={data.href}>Open</Link>
-            </Button>
-          </div>
-        ) : null,
-    },
   ];
 
   const enrolledStudentRows = enrolledStudents.map((enrollment) => {
@@ -344,6 +326,7 @@ function ClassroomContent({ classroomId }: { classroomId: Id<"classrooms"> }) {
         ) : (
           <AppDataGrid
             columnDefs={assignmentColumnDefs}
+            onRowNavigate={(row) => row.href}
             rowData={assignmentRows}
           />
         )}

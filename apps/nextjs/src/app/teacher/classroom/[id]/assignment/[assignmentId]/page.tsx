@@ -258,24 +258,6 @@ function AssignmentContent({
           <span className="text-muted-foreground">Not graded</span>
         ),
     },
-    {
-      colId: "actions",
-      headerName: "Actions",
-      filter: false,
-      flex: 0,
-      maxWidth: 150,
-      minWidth: 130,
-      resizable: false,
-      sortable: false,
-      cellRenderer: ({ data }: { data?: (typeof submissionRows)[number] }) =>
-        data ? (
-          <div className="flex h-full items-center justify-end">
-            <Button asChild size="sm" variant="outline">
-              <Link href={data.href}>Review</Link>
-            </Button>
-          </div>
-        ) : null,
-    },
   ];
 
   return (
@@ -340,6 +322,7 @@ function AssignmentContent({
             ) : (
               <AppDataGrid
                 columnDefs={submissionColumnDefs}
+                onRowNavigate={(row) => row.href}
                 rowData={submissionRows}
               />
             )}
