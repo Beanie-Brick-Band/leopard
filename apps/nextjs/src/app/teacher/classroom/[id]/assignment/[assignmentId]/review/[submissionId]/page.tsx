@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Download,
   Filter,
   Flag,
 } from "lucide-react";
@@ -41,8 +42,10 @@ import { Label } from "@package/ui/label";
 import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
+import { getSubmissionDownload } from "~/app/app/actions";
 import { TextReplayScrubberComponent } from "~/components/scrubber";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
+import { triggerDownload } from "~/lib/download";
 
 function sanitizeGradeInput(value: string) {
   const digitsAndDotsOnly = value.replace(/[^\d.]/g, "");
@@ -98,6 +101,7 @@ function ReviewContent({
     },
   );
   const [showOverHundredConfirm, setShowOverHundredConfirm] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const studentDisplayName =
     submission?.studentName ??
     submission?.studentEmail?.split("@")[0] ??
@@ -414,7 +418,7 @@ function ReviewContent({
                   <span className="font-medium">{studentDisplayName}</span>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <span className="text-muted-foreground">Grade</span>
+                  <span className="text-muted-foreground">Current Grade</span>
                   <span className="font-medium">
                     {submission.grade !== undefined
                       ? `${submission.grade}%`
@@ -440,6 +444,36 @@ function ReviewContent({
                     )}
                   </span>
                 </div>
+                {submission.submissionStorageKey ? (
+                  <>
+                    <Separator />
+                    <Button
+                      className="w-full"
+                      variant="outline"
+                      disabled={isDownloading}
+                      onClick={async () => {
+                        setIsDownloading(true);
+                        try {
+                          const result = await getSubmissionDownload(
+                            submission._id,
+                          );
+                          triggerDownload(result.downloadUrl);
+                        } catch (err) {
+                          toast.error(
+                            err instanceof Error
+                              ? err.message
+                              : "Failed to get download URL",
+                          );
+                        } finally {
+                          setIsDownloading(false);
+                        }
+                      }}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      {isDownloading ? "Preparing..." : "Download Submission"}
+                    </Button>
+                  </>
+                ) : null}
               </CardContent>
             </Card>
 

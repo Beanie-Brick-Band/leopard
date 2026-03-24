@@ -2,8 +2,15 @@
 
 import { startTransition, use, useActionState, useState } from "react";
 import Link from "next/link";
-import { useAction, useQuery } from "convex/react";
-import { ArrowLeft, Calendar, CheckCircle2, Clock } from "lucide-react";
+import { useQuery } from "convex/react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Loader2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
@@ -19,7 +26,7 @@ import {
 import { Separator } from "@package/ui/separator";
 import { Spinner } from "@package/ui/spinner";
 
-import { launchWorkspace } from "~/app/app/actions";
+import { launchWorkspace, submitWorkspace } from "~/app/app/actions";
 import { Editor } from "~/components/editor";
 import { TextReplayScrubberComponent } from "~/components/scrubber";
 import { WorkspaceLaunchingOverlay } from "~/components/workspace-launching-overlay";
@@ -51,11 +58,10 @@ function Content({
       assignmentId,
     },
   );
-  const submitAssignment = useAction(
-    api.web.submissionActions.triggerSubmission,
-  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitConfirmOpen, setIsSubmitConfirmOpen] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const [workspaceUrl, launchAction, isLaunching] = useActionState(
     (_: unknown, id: Id<"assignments"> | null) => {
       if (!id) {
@@ -80,8 +86,14 @@ function Content({
     );
   }
 
-  const hasSubmission = submissionResult.success === true;
-  const submission = hasSubmission ? submissionResult.submission : null;
+  const submission = submissionResult.success
+    ? submissionResult.submission
+    : null;
+  const hasSubmission = submission !== null;
+  const submittedAt = submission?.submittedAt;
+  const isPastDue = Date.now() > assignment.dueDate;
+  const hasWorkspaceForAssignment = assignmentWorkspace != null;
+
   const grade =
     submission && "grade" in submission ? submission.grade : undefined;
   const feedback =
@@ -90,10 +102,6 @@ function Content({
       : undefined;
   const gradedAt =
     submission && "gradedAt" in submission ? submission.gradedAt : undefined;
-  const submittedAt = submission?.submittedAt;
-  const isPastDue = Date.now() > assignment.dueDate;
-  const hasWorkspaceForAssignment =
-    assignmentWorkspace !== undefined && assignmentWorkspace !== null;
 
   const handleSubmit = async () => {
     if (!assignmentWorkspace) {
@@ -102,17 +110,15 @@ function Content({
     }
 
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
-      await submitAssignment({
-        assignmentId,
-      });
-      toast.success(
-        hasSubmission ? "Assignment re-submitted." : "Assignment submitted.",
-      );
+      await submitWorkspace(assignmentId);
+      toast.success("Assignment submitted successfully.");
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to submit assignment",
-      );
+      const message =
+        error instanceof Error ? error.message : "Failed to submit assignment";
+      setSubmitError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -253,9 +259,11 @@ function Content({
                 <span className="font-medium">
                   {grade !== undefined
                     ? "Graded"
-                    : hasSubmission
-                      ? "Submitted"
-                      : "Not submitted"}
+                    : isSubmitting
+                      ? "Submitting..."
+                      : hasSubmission
+                        ? "Submitted"
+                        : "Not submitted"}
                 </span>
               </div>
               {submittedAt ? (
@@ -281,19 +289,34 @@ function Content({
                 </span>
               </div>
               <Separator />
-              {!hasSubmission ? (
+
+              {submitError ? (
+                <div className="flex items-start gap-2 rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{submitError}</span>
+                </div>
+              ) : null}
+
+              {hasSubmission ? (
+                <p className="text-muted-foreground text-xs">
+                  Assignment submitted successfully. Your workspace has been
+                  shut down.
+                </p>
+              ) : (
                 <>
                   <Button
                     className="w-full"
                     onClick={openSubmitConfirm}
-                    disabled={
-                      isSubmitting ||
-                      isPastDue ||
-                      assignmentWorkspace === undefined ||
-                      assignmentWorkspace === null
-                    }
+                    disabled={isSubmitting || isPastDue || !assignmentWorkspace}
                   >
-                    {isSubmitting ? "Submitting..." : "Submit Assignment"}
+                    {isSubmitting ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Submitting...
+                      </span>
+                    ) : (
+                      "Submit Assignment"
+                    )}
                   </Button>
                   <Button
                     className="w-full"
@@ -316,14 +339,11 @@ function Content({
                     </p>
                   ) : (
                     <p className="text-muted-foreground text-xs">
-                      Submission uses this assignment's workspace.
+                      Submitting will zip your workspace, upload it, and shut
+                      down the workspace.
                     </p>
                   )}
                 </>
-              ) : (
-                <p className="text-muted-foreground text-xs">
-                  Assignment submitted and awaiting grading.
-                </p>
               )}
             </CardContent>
           </Card>
