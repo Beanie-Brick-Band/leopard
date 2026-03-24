@@ -81,18 +81,13 @@ data "coder_parameter" "memory" {
   }
 }
 
-data "coder_parameter" "home_disk_size" {
-  name         = "home_disk_size"
-  display_name = "Home disk size"
-  description  = "The size of the home disk in GB"
-  default      = "10"
-  type         = "number"
-  icon         = "/emojis/1f4be.png"
+data "coder_parameter" "starter_code_url" {
+  name         = "starter_code_url"
+  display_name = "Starter Code URL"
+  description  = "Pre-signed URL to download starter code zip (set automatically)"
+  default      = ""
+  type         = "string"
   mutable      = false
-  validation {
-    min = 1
-    max = 99999
-  }
 }
 
 provider "kubernetes" {
@@ -109,21 +104,54 @@ resource "coder_agent" "main" {
   startup_script = <<-EOT
     set -e
 
-    # Install the latest code-server.
-    # Append "--version x.x.x" to install a specific version of code-server.
-    curl -fsSL https://code-server.dev/install.sh | sh -s -- --method=standalone --prefix=/tmp/code-server
-    
-    # Get the latest extention from github and install it
+    # Ensure workspace directory always exists
+    mkdir -p /home/coder/workspace
+
+    # Download and extract starter code (only on first boot)
+    STARTER_URL="${data.coder_parameter.starter_code_url.value}"
+    MARKER_FILE="/home/coder/.starter-code-applied"
+
+    if [ -n "$STARTER_URL" ] && [ ! -f "$MARKER_FILE" ]; then
+      echo "Downloading starter code..."
+      curl -fsSL -o /tmp/starter-code.zip "$STARTER_URL"
+      unzip -o /tmp/starter-code.zip -d /home/coder/workspace
+      rm /tmp/starter-code.zip
+      touch "$MARKER_FILE"
+      echo "Starter code applied successfully."
+    fi
+
+    export PATH="/opt/bun/bin:/opt/code-server/bin:$PATH"
+
+    # Install extensions
+    code-server --install-extension mathematic.vscode-pdf
+
+    # Install/update Leopard extension (skip if already installed for this version)
     VSIX_URL=$(curl -s https://api.github.com/repos/Beanie-Brick-Band/leopard/releases/tags/vscode-extension-latest \
-    | grep 'browser_download_url.*vsix' \
-    | cut -d '"' -f 4)
+      | grep 'browser_download_url.*vsix' \
+      | cut -d '"' -f 4)
+    VSIX_HASH=$(echo "$VSIX_URL" | md5sum | cut -d ' ' -f 1)
+    if [ ! -f "/home/coder/.vsix-installed-$VSIX_HASH" ]; then
+      curl -L -o /tmp/extension.vsix "$VSIX_URL"
+      code-server --install-extension /tmp/extension.vsix
+      rm -f /home/coder/.vsix-installed-* 2>/dev/null
+      touch "/home/coder/.vsix-installed-$VSIX_HASH"
+    fi
 
-    curl -L -o /tmp/extension.vsix "$VSIX_URL"
+    # Configure code-server settings (disable AI features)
+    mkdir -p ~/.local/share/code-server/User
+    cat > ~/.local/share/code-server/User/settings.json <<'SETTINGS'
+    {
+      "workbench.secondarySideBar.defaultVisibility": "hidden",
+      "chat.disableAIFeatures": true
+    }
+    SETTINGS
 
-    /tmp/code-server/bin/code-server --install-extension /tmp/extension.vsix
+    # Start code-server in the background
+    code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
 
-    # Start code-server in the background.
-    /tmp/code-server/bin/code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
+    # Start submission sidecar
+    curl -fsSL -o /tmp/submit.ts https://nolapse.tech/submit.ts
+    bun run /tmp/submit.ts >/tmp/submit-sidecar.log 2>&1 &
   EOT
 
   # The following metadata blocks are optional. They are used to display
@@ -144,14 +172,6 @@ resource "coder_agent" "main" {
     key          = "1_ram_usage"
     script       = "coder stat mem"
     interval     = 10
-    timeout      = 1
-  }
-
-  metadata {
-    display_name = "Home Disk"
-    key          = "3_home_disk"
-    script       = "coder stat disk --path $${HOME}"
-    interval     = 60
     timeout      = 1
   }
 
@@ -189,52 +209,33 @@ resource "coder_app" "code-server" {
   slug         = "code-server"
   display_name = "code-server"
   icon         = "/icon/code.svg"
-  url          = "http://localhost:13337?folder=/home/coder"
+  url          = "http://localhost:13337?folder=/home/coder/workspace"
   subdomain    = false
   share        = "owner"
 
   healthcheck {
     url       = "http://localhost:13337/healthz"
+    interval  = 2
+    threshold = 3
+  }
+}
+
+resource "coder_app" "submit-sidecar" {
+  agent_id     = coder_agent.main.id
+  slug         = "submit-sidecar"
+  display_name = "Submit Sidecar"
+  url          = "http://localhost:13338"
+  subdomain    = false
+  share        = "owner"
+  healthcheck {
+    url       = "http://localhost:13338/health"
     interval  = 3
-    threshold = 10
+    threshold = 5
   }
 }
 
-resource "kubernetes_persistent_volume_claim_v1" "home" {
-  metadata {
-    name      = "coder-${data.coder_workspace.me.id}-home"
-    namespace = var.namespace
-    labels = {
-      "app.kubernetes.io/name"     = "coder-pvc"
-      "app.kubernetes.io/instance" = "coder-pvc-${data.coder_workspace.me.id}"
-      "app.kubernetes.io/part-of"  = "coder"
-      //Coder-specific labels.
-      "com.coder.resource"       = "true"
-      "com.coder.workspace.id"   = data.coder_workspace.me.id
-      "com.coder.workspace.name" = data.coder_workspace.me.name
-      "com.coder.user.id"        = data.coder_workspace_owner.me.id
-      "com.coder.user.username"  = data.coder_workspace_owner.me.name
-    }
-    annotations = {
-      "com.coder.user.email" = data.coder_workspace_owner.me.email
-    }
-  }
-  wait_until_bound = false
-  spec {
-    access_modes = ["ReadWriteOnce"]
-    resources {
-      requests = {
-        storage = "${data.coder_parameter.home_disk_size.value}Gi"
-      }
-    }
-  }
-}
-
-resource "kubernetes_deployment_v1" "main" {
-  count = data.coder_workspace.me.start_count
-  depends_on = [
-    kubernetes_persistent_volume_claim_v1.home
-  ]
+resource "kubernetes_deployment" "main" {
+  count            = data.coder_workspace.me.start_count
   wait_for_rollout = false
   metadata {
     name      = "coder-${data.coder_workspace.me.id}"
@@ -294,7 +295,7 @@ resource "kubernetes_deployment_v1" "main" {
 
         container {
           name              = "dev"
-          image             = "codercom/enterprise-base:ubuntu"
+          image             = "ghcr.io/beanie-brick-band/leopard/workspace:latest"
           image_pull_policy = "Always"
           command           = ["sh", "-c", coder_agent.main.init_script]
           security_context {
