@@ -5,21 +5,46 @@ description: How students launch a workspace, work on an assignment, and submit 
 
 # Workspaces and Submitting
 
+Leopard submits the workspace attached to the assignment you are viewing, so the safest flow is: open the assignment, launch the workspace, do your work, then return and submit from the same page.
+
 ## Launching a Workspace
 
-The workspace is your coding environment for the assignment.
-
-To launch it:
+<AnnotatedScreenshot
+  src="/images/user-guide/students/assignment-ready-annotated.png"
+  alt="Assignment page with the description and submit controls."
+  imageWidth={1440}
+  imageHeight={1400}
+  title="What to notice before submitting work"
+  annotations={[
+    {
+      x: 30,
+      y: 213,
+      width: 1036,
+      height: 478,
+      text: "Read the full assignment description before you start coding.",
+    },
+    {
+      x: 1062,
+      y: 100,
+      width: 348,
+      height: 351,
+      text: "The status card tracks due date, last edit time, and submission state.",
+    },
+    {
+      x: 1087,
+      y: 290,
+      width: 298,
+      height: 60,
+      text: "Once a workspace exists, Submit Assignment becomes available.",
+    },
+  ]}
+/>
 
 1. Open the assignment.
-2. Click `Launch Workspace`.
-3. Wait while Leopard prepares it.
-4. Click `Open Workspace` when it is ready.
-
-You may see messages like:
-
-- `Launching workspace`
-- `Workspace ready`
+2. Read the description so you know which task you are opening.
+3. Click `Launch Workspace`.
+4. Wait while Leopard prepares the environment.
+5. Return to the assignment page when you are ready to submit from Leopard.
 
 ## Working in the Workspace
 
@@ -34,58 +59,58 @@ Depending on the course setup, you may:
 
 ## Starter Code
 
-Some assignments include starter code from the teacher.
-
-Starter code may contain:
-
-- a project skeleton
-- partially completed code
-- instructions
-- sample files
-
-If starter code exists, use it unless your teacher tells you otherwise.
+If the teacher attached starter code, Leopard uses that starter project as the starting point for your workspace.
 
 ## Submitting Your Work
 
-Leopard ties submissions to the assignment workspace.
-
-To submit:
+<AnnotatedScreenshot
+  src="/images/user-guide/students/submit-confirmation-annotated.png"
+  alt="Submit confirmation dialog for a student assignment."
+  imageWidth={1440}
+  imageHeight={1400}
+  title="What to notice in the submit confirmation"
+  annotations={[
+    {
+      x: 371,
+      y: 83,
+      width: 698,
+      height: 88,
+      text: "Leopard warns that submitting is final.",
+    },
+    {
+      x: 395,
+      y: 171,
+      width: 650,
+      height: 1180,
+      text: "Review the current work snapshot before locking the submission.",
+    },
+    {
+      x: 880,
+      y: 1351,
+      width: 165,
+      height: 60,
+      text: "Use Confirm Submit only when you are ready to finish.",
+    },
+  ]}
+/>
 
 1. Open the assignment page.
-2. Make sure you have already launched the workspace for that assignment.
+2. Confirm that `Submit Assignment` is available.
 3. Click `Submit Assignment`.
-4. Confirm the submission if prompted.
+4. Review the `Current Work` snapshot in the confirmation dialog.
+5. Click `Confirm Submit`.
 
-After submitting, Leopard records:
-
-- that the assignment was submitted
-- the submission time
-- the workspace attached to the submission
+Leopard records the submission time and links that submission to the workspace for this assignment.
 
 ## Important Submission Rules
 
-### You must launch the workspace first
-
-If you have not launched the workspace for that assignment yet, Leopard will not let you submit.
-
-### Due dates matter
-
-If the due date has passed, normal submission is blocked.
-
-Because of that, do not wait until the last minute to test your code or launch the workspace for the first time.
-
-### Submission is final
-
-After you submit, Leopard currently treats that submission as final in the student UI.
-
-Because of that:
-
-- review your work before submitting
-- make sure you are in the correct assignment workspace
-- use the preview in the confirmation dialog if available
+- If `Submit Assignment` is disabled, launch the workspace first.
+- Leopard submits the workspace tied to the assignment currently on screen.
+- Due dates still control whether normal submission is allowed.
+- The current student UI treats submission as final, so use the confirmation dialog to double-check before you finish.
 
 ## Student Tips
 
-- Launch the workspace early.
-- Make sure you are working in the correct assignment workspace.
-- After submitting, return to the assignment page and check the status panel.
+- Launch the workspace early instead of for the first time right before the deadline.
+- Make sure you are on the correct assignment page before you submit.
+- After submitting, reopen the assignment page and verify the status panel changed to `Submitted`.

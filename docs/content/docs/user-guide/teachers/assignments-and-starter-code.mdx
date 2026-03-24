@@ -5,21 +5,48 @@ description: How teachers create assignments, write instructions, and manage sta
 
 # Assignments and Starter Code
 
+The current assignment creation flow lives inside each classroom and uses one form for the name, schedule, description, and optional starter ZIP.
+
 ## Creating an Assignment
 
-To create a new assignment:
+<AnnotatedScreenshot
+  src="/images/user-guide/teachers/new-assignment-annotated.png"
+  alt="Teacher new assignment form."
+  imageWidth={1440}
+  imageHeight={1400}
+  title="What to notice on the new assignment form"
+  annotations={[
+    {
+      x: 367,
+      y: 194,
+      width: 706,
+      height: 172,
+      text: "Set the assignment name and choose the release and due dates.",
+    },
+    {
+      x: 367,
+      y: 358,
+      width: 706,
+      height: 345,
+      text: "Write the full instructions students will see in the description editor.",
+    },
+    {
+      x: 367,
+      y: 695,
+      width: 706,
+      height: 354,
+      text: "Upload optional starter code as a ZIP file when students should begin from a template.",
+    },
+  ]}
+/>
 
 1. Open the classroom.
-2. Choose the option to create an assignment.
-3. Fill out the form.
-
-The form includes:
-
-- assignment name
-- release date
-- due date
-- description
-- optional starter code
+2. Click `New Assignment`.
+3. Fill in `Name`.
+4. Set `Release Date` and `Due Date`.
+5. Write the instructions in `Description`.
+6. Upload optional starter code.
+7. Click `Create Assignment`.
 
 ## Writing Assignment Instructions
 
@@ -35,16 +62,15 @@ A good assignment description usually explains:
 
 ## Release Date and Due Date
 
-When creating or editing an assignment, you will see:
+Leopard uses these dates directly:
 
-- `Release Date`
-- `Due Date`
-
-The due date is especially important because Leopard uses it when deciding whether students can still submit.
+- `Release Date` controls when the assignment should become available.
+- `Due Date` controls the deadline Leopard uses for student submission.
+- The due date must be after the release date.
 
 ## Starter Code
 
-Leopard lets teachers attach starter code to an assignment as a ZIP file.
+Leopard accepts starter code as a ZIP file.
 
 This is useful when you want students to begin with:
 
@@ -55,44 +81,19 @@ This is useful when you want students to begin with:
 
 ### Uploading Starter Code
 
-During assignment creation:
-
-1. Use the starter code uploader.
-2. Choose a ZIP file.
-3. Complete the upload.
-4. Finish creating the assignment.
-
-After the assignment already exists:
-
-1. Open the assignment.
-2. Find the `Starter Code` section.
-3. Upload a ZIP file there.
+- Upload the ZIP during assignment creation if students should start from a template immediately.
+- After the assignment exists, the assignment page still includes a `Starter Code` section for updates.
 
 ### Replacing or Removing Starter Code
 
-You can also:
-
-- upload new starter code
-- replace older starter code
-- remove starter code entirely
-
-Be careful when changing starter code after students have already started working.
+- You can upload a new ZIP to replace the old one.
+- You can remove starter code entirely from the assignment page.
+- Be careful when changing starter code after students have already started working.
 
 ## Editing an Assignment
 
-You can usually edit:
-
-- assignment name
-- release date
-- due date
-- description
-
-This is useful when:
-
-- the deadline changed
-- instructions need clarification
-- there was a typo
-- the assignment wording needs improvement
+- The assignment detail page lets you edit the name, release date, due date, and description later.
+- This is the right place to fix deadline changes, typos, or missing clarification.
 
 ## Deleting an Assignment
 
@@ -108,4 +109,4 @@ Use it only when:
 
 - Write assignment instructions as if students will only read that one page.
 - Set due dates with a buffer.
-- Upload starter code only when it helps.
+- Upload starter code only when it helps students start faster or more consistently.

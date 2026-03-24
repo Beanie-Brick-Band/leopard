@@ -5,21 +5,9 @@ description: How teachers create and manage classrooms and student rosters in Le
 
 # Classrooms
 
-## Teacher Dashboard
-
-The teacher dashboard is the main entry point for classroom management.
-
-It usually shows:
-
-- your classrooms
-- assignment counts
-- a button to create a classroom
-
-If you have no classrooms yet, Leopard shows an empty state that prompts you to create one.
+Teachers start in `Teacher Dashboard`, create a classroom there, and then manage that classroom from a dedicated page.
 
 ## Creating a Classroom
-
-To create a classroom:
 
 1. Open the teacher dashboard.
 2. Click `Create Classroom`.
@@ -34,45 +22,53 @@ Good classroom names are easy for students to recognize, such as:
 
 ## Managing a Classroom
 
-Inside a classroom, you can usually:
+<AnnotatedScreenshot
+  src="/images/user-guide/teachers/classroom-overview-annotated.png"
+  alt="Teacher classroom page with assignments and enrolled students."
+  imageWidth={1440}
+  imageHeight={1400}
+  title="What to notice on the teacher classroom page"
+  annotations={[
+    {
+      x: 890,
+      y: 84,
+      width: 172,
+      height: 60,
+      text: "Create a new assignment from the classroom header.",
+    },
+    {
+      x: 218,
+      y: 287,
+      width: 1004,
+      height: 305,
+      text: "The Assignments table is the main entry point to each assignment.",
+    },
+    {
+      x: 218,
+      y: 592,
+      width: 1004,
+      height: 305,
+      text: "Use Enrolled Students to review the roster and open student actions.",
+    },
+  ]}
+/>
 
-- view assignments
-- create new assignments
-- view enrolled students
-- promote or remove assistants
-- remove students
-- delete the classroom
+Once the classroom exists, this page becomes the control center for the course:
 
-The classroom page is the main control center for the course.
-
-### Assignment Area
-
-This area usually shows:
-
-- every assignment in the classroom
-- due dates
-- a quick action to open each assignment
-
-### Student Area
-
-This area usually shows:
-
-- enrolled students
-- student names
-- email addresses when available
-- whether a person is a student or TA
+- `New Assignment` creates more work inside the class.
+- `Assignments` lists each assignment and opens its detail page.
+- `Enrolled Students` shows the current roster.
+- `Delete Classroom` removes the class when you no longer need it.
 
 ## Managing Students
 
-Teachers can manage the classroom roster from the classroom page.
+Use the action menu on a student row when you need to:
 
-Typical actions include:
+- promote a student to TA
+- remove TA status
+- remove a student from the classroom
 
-- removing a student from the classroom
-- promoting a student to TA
-- removing TA status
-
-Use these actions carefully, especially in active classes.
+Use these actions carefully once a class is active, because the roster controls who can access assignments.
 
 ## Tips
 

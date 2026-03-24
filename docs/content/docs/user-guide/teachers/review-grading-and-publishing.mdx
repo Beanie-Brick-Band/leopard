@@ -5,50 +5,62 @@ description: How teachers review submissions, use replay, grade work, and publis
 
 # Review, Grading, and Publishing
 
+Teachers grade from two connected screens:
+
+- the assignment page, which lists submissions and statistics
+- the review page, which shows replay and grading controls for one submission
+
 ## Viewing Submissions
 
-The assignment page includes a submissions table.
-
-This helps you quickly see:
-
-- who submitted
-- when they submitted
-- whether the submission is flagged
-- whether it has already been graded
-
-Each row includes a `Review` action.
+Open a classroom, open an assignment, and use the `Submissions` table to jump into individual student work.
 
 ## Reviewing a Submission
 
-The review page is where you inspect a student's work in detail.
+<AnnotatedScreenshot
+  src="/images/user-guide/teachers/review-submission-annotated.png"
+  alt="Teacher submission review page with replay and grading controls."
+  imageWidth={1440}
+  imageHeight={1730}
+  title="What to notice on the review screen"
+  annotations={[
+    {
+      x: 30,
+      y: 184,
+      width: 996,
+      height: 198,
+      text: "Submission Details confirms the student and the linked workspace.",
+    },
+    {
+      x: 30,
+      y: 382,
+      width: 996,
+      height: 1336,
+      text: "Replay lets you scrub through the workspace history before grading.",
+    },
+    {
+      x: 1022,
+      y: 184,
+      width: 388,
+      height: 418,
+      text: "Save the grade and feedback together from the grading panel.",
+    },
+  ]}
+/>
 
-It usually shows:
+This page combines the main grading tools in one place:
 
-- student name
-- current grade
-- linked workspace information
-- replay viewer
-- grade input
-- feedback field
+- `Submission Details` confirms which student and workspace you are reviewing.
+- `Replay` shows how the code changed over time.
+- `Grading` lets you enter the score and written feedback.
 
 ## Using Replay
 
-Replay lets you scrub through the coding history for the submission workspace.
-
-Replay can help you understand:
+Replay is useful for questions like:
 
 - how the student built the solution
-- whether the work was gradual or sudden
-- which files changed
+- whether the work evolved gradually
+- which parts of the project changed during the session
 - whether the student revised and debugged over time
-
-Typical replay use looks like this:
-
-1. Open a student's submission.
-2. Start replay.
-3. Move backward and forward through the timeline.
-4. Watch how files changed.
-5. Use that context while grading.
 
 ## Flagging a Submission
 
@@ -62,11 +74,10 @@ Examples:
 
 ## Grading a Submission
 
-To grade a submission:
-
 1. Open the student's review page.
-2. Enter a grade.
-3. Write feedback.
+2. Use replay if you need more context first.
+3. Enter a grade.
+4. Write feedback.
 4. Click `Save Grade & Feedback`.
 
 You can update the grade or feedback later if needed.
@@ -88,32 +99,47 @@ Useful feedback often explains:
 
 ## Publishing Grades
 
-Saving a grade is not the same as publishing it.
+<AnnotatedScreenshot
+  src="/images/user-guide/teachers/assignment-published-annotated.png"
+  alt="Teacher assignment page after grading is complete."
+  imageWidth={1440}
+  imageHeight={1400}
+  title="What to notice after grading is complete"
+  annotations={[
+    {
+      x: 30,
+      y: 625,
+      width: 1036,
+      height: 313,
+      text: "Use the submissions table to open each student review.",
+    },
+    {
+      x: 1062,
+      y: 535,
+      width: 348,
+      height: 343,
+      text: "Statistics show how many submissions are graded and published.",
+    },
+    {
+      x: 1062,
+      y: 100,
+      width: 348,
+      height: 443,
+      text: "The assignment settings card keeps the key dates and edit actions together.",
+    },
+  ]}
+/>
 
-Publishing is the step that makes grades visible to students.
+Saving a grade is not the same as publishing it. Publishing is the step that makes the results visible to students.
 
-To publish grades:
+Use the assignment page to manage release:
 
-1. Open the assignment page.
-2. Review the statistics.
-3. Click `Publish Grades`.
-4. Confirm the action.
+1. Return to the assignment after grading submissions.
+2. Check the `Statistics` card to see how many submissions are graded.
+3. Use the publish action in that right-hand assignment sidebar when you are ready to release results.
+4. After publishing, Leopard marks the assignment with `Published grades`.
 
-After publishing:
-
-- students can immediately see their grades and feedback
-
-## Assignment Statistics
-
-The teacher assignment page may show:
-
-- total students
-- how many submitted
-- how many were graded
-- average grade
-- how many grades were published
-
-This helps you track progress during grading.
+Once published, students can immediately see their grade and feedback on the assignment page.
 
 ## Tips
 
