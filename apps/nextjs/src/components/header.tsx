@@ -24,23 +24,6 @@ function isAssignmentCrumbWithId(
   return item.type === "assignment" && typeof item.id === "string";
 }
 
-function formatPathLabel(path: string) {
-  if (path === "/") {
-    return "Home";
-  }
-
-  const segments = path.split("/").filter(Boolean);
-  const currentSegment = segments[segments.length - 1];
-
-  if (!currentSegment) {
-    return "Home";
-  }
-
-  return decodeURIComponent(currentSegment)
-    .replace(/[-_]+/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
 function getRole(pathname: string) {
   const [firstSegment] = pathname.split("/").filter(Boolean);
 
@@ -65,13 +48,7 @@ function buildBreadcrumbTrail(pathname: string): BreadcrumbItem[] {
   const role = getRole(pathname);
 
   if (!role) {
-    return [
-      {
-        href: pathname,
-        type: "static",
-        label: formatPathLabel(pathname),
-      },
-    ];
+    return [];
   }
 
   const trail: BreadcrumbItem[] = [
@@ -274,7 +251,7 @@ function Header() {
                   ) : (
                     <Link
                       href={item.href}
-                      className="hover:text-muted-foreground text-white underline decoration-blue-500 decoration-2 underline-offset-4 hover:decoration-blue-600"
+                      className="hover:text-muted-foreground text-foreground underline decoration-blue-500 decoration-2 underline-offset-4 hover:decoration-blue-600"
                     >
                       {item.label}
                     </Link>
