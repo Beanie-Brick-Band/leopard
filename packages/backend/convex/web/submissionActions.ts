@@ -14,7 +14,7 @@ import type { Id } from "../_generated/dataModel";
 import { internal } from "../_generated/api";
 import { action } from "../_generated/server";
 import { authComponent } from "../auth";
-import { ensureWorkspaceRunning } from "../helpers/coder";
+import { ensureUserActive, ensureWorkspaceRunning } from "../helpers/coder";
 import {
   generateDownloadUrl,
   generateUploadUrl,
@@ -138,6 +138,16 @@ export const triggerSubmission = action({
         submissionId,
       });
       throw new Error("Could not find Coder workspace");
+    }
+
+    // Activate the user account to ensure they're not dormant
+    try {
+      await ensureUserActive({ client: coderClient, userId: coderUserId });
+    } catch (err) {
+      await ctx.runMutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
+      throw err;
     }
 
     try {
