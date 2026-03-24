@@ -1,6 +1,7 @@
 "use client";
 
 import type { ColDef, Module } from "ag-grid-community";
+import type { CSSProperties } from "react";
 import { AllCommunityModule } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 
@@ -34,13 +35,31 @@ export function AppDataGrid<TData>({
   rowHeight = 56,
 }: AppDataGridProps<TData>) {
   const theme = useTheme();
+  const isDarkMode = theme.resolvedTheme === "dark";
+  const darkModeGridVars: CSSProperties | undefined = isDarkMode
+    ? ({
+        "--ag-background-color": "var(--card)",
+        "--ag-foreground-color": "var(--foreground)",
+        "--ag-border-color": "var(--border)",
+        "--ag-header-background-color": "var(--muted)",
+        "--ag-header-text-color": "var(--foreground)",
+        "--ag-chrome-background-color": "var(--muted)",
+        "--ag-odd-row-background-color": "var(--card)",
+        "--ag-row-hover-color":
+          "color-mix(in oklch, var(--accent) 72%, transparent)",
+        "--ag-selected-row-background-color":
+          "color-mix(in oklch, var(--primary) 18%, var(--card))",
+        "--ag-input-background-color": "var(--input)",
+        "--ag-input-border-color": "var(--border)",
+        "--ag-accent-color": "var(--primary)",
+      } as CSSProperties)
+    : undefined;
 
   return (
     <div
       className="overflow-x-auto"
-      data-ag-theme-mode={
-        theme.resolvedTheme === "dark" ? "dark-blue" : "light"
-      }
+      data-ag-theme-mode={isDarkMode ? "dark" : "light"}
+      style={darkModeGridVars}
     >
       <AgGridReact<TData>
         animateRows
