@@ -1,9 +1,17 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useCallback, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
-import { ArrowLeft, CheckCircle2, Flag } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  Flag,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
@@ -17,6 +25,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@package/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@package/ui/dropdown-menu";
 import { Input } from "@package/ui/input";
 import { Label } from "@package/ui/label";
 import { Separator } from "@package/ui/separator";
@@ -35,6 +49,10 @@ function ReviewContent({
   submissionId: Id<"submissions">;
 }) {
   const assignment = useQuery(api.web.assignment.getById, { id: assignmentId });
+  const submissions = useQuery(
+    api.web.teacherAssignments.getSubmissionsByAssignment,
+    { assignmentId },
+  );
   const submission = useQuery(api.web.teacherAssignments.getSubmissionById, {
     submissionId,
   });
@@ -49,14 +67,84 @@ function ReviewContent({
     api.web.submission.toggleSubmissionFlag,
   );
 
+  const searchParams = useSearchParams();
   const [newGrade, setNewGrade] = useState<string | null>(null);
   const [newFeedback, setNewFeedback] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [filterMode, setFilterMode] = useState<"all" | "ungraded" | "flagged">(
+    () => {
+      const urlFilter = searchParams.get("filter");
+      return urlFilter === "all" ||
+        urlFilter === "ungraded" ||
+        urlFilter === "flagged"
+        ? urlFilter
+        : "all";
+    },
+  );
 
   const studentDisplayName =
     submission?.studentName ??
     submission?.studentEmail?.split("@")[0] ??
     submission?.studentId;
+
+  const sortedSubmissions = useMemo(
+    () =>
+      submissions?.slice().sort((a, b) => b.submittedAt - a.submittedAt) ?? [],
+    [submissions],
+  );
+
+  const currentSubmissionIndex = sortedSubmissions.findIndex(
+    (item) => item._id === submissionId,
+  );
+
+  const matchesActiveFilter = useCallback(
+    (submissionItem: { grade?: number; flagged?: boolean }) => {
+      switch (filterMode) {
+        case "ungraded":
+          return submissionItem.grade === undefined;
+        case "flagged":
+          return Boolean(submissionItem.flagged);
+        case "all":
+        default:
+          return true;
+      }
+    },
+    [filterMode],
+  );
+
+  const previousSubmission = useMemo(() => {
+    if (currentSubmissionIndex < 0) {
+      return null;
+    }
+
+    for (let index = currentSubmissionIndex - 1; index >= 0; index -= 1) {
+      const candidate = sortedSubmissions[index];
+      if (candidate && matchesActiveFilter(candidate)) {
+        return candidate;
+      }
+    }
+
+    return null;
+  }, [currentSubmissionIndex, matchesActiveFilter, sortedSubmissions]);
+
+  const nextSubmission = useMemo(() => {
+    if (currentSubmissionIndex < 0) {
+      return null;
+    }
+
+    for (
+      let index = currentSubmissionIndex + 1;
+      index < sortedSubmissions.length;
+      index += 1
+    ) {
+      const candidate = sortedSubmissions[index];
+      if (candidate && matchesActiveFilter(candidate)) {
+        return candidate;
+      }
+    }
+
+    return null;
+  }, [currentSubmissionIndex, matchesActiveFilter, sortedSubmissions]);
 
   if (assignment === undefined || submission === undefined) {
     return (
@@ -115,7 +203,7 @@ function ReviewContent({
 
   return (
     <div className="container mx-auto p-6">
-      <div className="mb-4">
+      <div className="mb-4 flex items-center justify-between gap-2">
         <Link
           href={`/teacher/classroom/${classroomId}/assignment/${assignmentId}`}
           className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm transition-colors"
@@ -123,6 +211,92 @@ function ReviewContent({
           <ArrowLeft className="h-4 w-4" />
           Back to Assignment
         </Link>
+      </div>
+
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="default"
+            size="lg"
+            asChild={Boolean(previousSubmission)}
+            disabled={!previousSubmission}
+            className={cn(
+              "w-32 px-6 whitespace-nowrap",
+              !previousSubmission && "opacity-50",
+            )}
+          >
+            {previousSubmission ? (
+              <Link
+                href={`/teacher/classroom/${classroomId}/assignment/${assignmentId}/review/${previousSubmission._id}?filter=${filterMode}`}
+                className="flex items-center gap-2"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Link>
+            ) : (
+              <span className="flex items-center gap-2">
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </span>
+            )}
+          </Button>
+          <Button
+            variant="default"
+            size="lg"
+            asChild={Boolean(nextSubmission)}
+            disabled={!nextSubmission}
+            className={cn(
+              "w-32 px-6 whitespace-nowrap",
+              !nextSubmission && "opacity-50",
+            )}
+          >
+            {nextSubmission ? (
+              <Link
+                href={`/teacher/classroom/${classroomId}/assignment/${assignmentId}/review/${nextSubmission._id}?filter=${filterMode}`}
+                className="flex items-center gap-2"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            ) : (
+              <span className="flex items-center gap-2">
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </span>
+            )}
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant={filterMode === "all" ? "outline" : "default"}
+                size="lg"
+                className="gap-2"
+              >
+                <Filter className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem
+                onClick={() => setFilterMode("all")}
+                className={cn(filterMode === "all" && "bg-muted")}
+              >
+                All Submissions
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setFilterMode("ungraded")}
+                className={cn(filterMode === "ungraded" && "bg-muted")}
+              >
+                Ungraded
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setFilterMode("flagged")}
+                className={cn(filterMode === "flagged" && "bg-muted")}
+              >
+                Flagged
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <div className="mb-6 space-y-1">
