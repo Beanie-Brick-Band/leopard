@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   Authenticated,
@@ -10,6 +10,14 @@ import {
 } from "~/test/convex-auth-test-provider";
 import HeaderAuth from "./header-auth";
 
+const { mockUsePathname } = vi.hoisted(() => ({
+  mockUsePathname: vi.fn(),
+}));
+
+vi.mock("next/navigation", () => ({
+  usePathname: mockUsePathname,
+}));
+
 vi.mock("~/lib/auth", () => ({
   Authenticated,
   Unauthenticated,
@@ -18,8 +26,13 @@ vi.mock("~/lib/auth", () => ({
 }));
 
 describe("HeaderAuth", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUsePathname.mockReturnValue("/teacher");
+  });
+
   describe("when authenticated", () => {
-    it("renders sign out and go to app links", () => {
+    it("renders sign out and dashboard links", () => {
       render(
         <ConvexAuthTestProvider isAuthenticated={true}>
           <HeaderAuth />
@@ -29,8 +42,22 @@ describe("HeaderAuth", () => {
       expect(
         screen.getByRole("link", { name: "Sign Out" }),
       ).toBeInTheDocument();
+    });
+
+    it("hides the dashboard link on the dashboard route", () => {
+      mockUsePathname.mockReturnValue("/app");
+
+      render(
+        <ConvexAuthTestProvider isAuthenticated={true}>
+          <HeaderAuth />
+        </ConvexAuthTestProvider>,
+      );
+
       expect(
-        screen.getByRole("link", { name: "Go to App" }),
+        screen.queryByRole("link", { name: "Open Dashboard" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: "Sign Out" }),
       ).toBeInTheDocument();
     });
 
@@ -57,10 +84,6 @@ describe("HeaderAuth", () => {
         "href",
         "/auth/sign-out",
       );
-      expect(screen.getByRole("link", { name: "Go to App" })).toHaveAttribute(
-        "href",
-        "/app",
-      );
     });
   });
 
@@ -75,7 +98,7 @@ describe("HeaderAuth", () => {
       expect(screen.getByRole("link", { name: "Sign In" })).toBeInTheDocument();
     });
 
-    it("does not render sign out or go to app links", () => {
+    it("does not render sign out or dashboard links", () => {
       render(
         <ConvexAuthTestProvider isAuthenticated={false}>
           <HeaderAuth />
@@ -86,7 +109,7 @@ describe("HeaderAuth", () => {
         screen.queryByRole("link", { name: "Sign Out" }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole("link", { name: "Go to App" }),
+        screen.queryByRole("link", { name: "Open Dashboard" }),
       ).not.toBeInTheDocument();
     });
 
@@ -119,7 +142,7 @@ describe("HeaderAuth", () => {
         screen.queryByRole("link", { name: "Sign Out" }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole("link", { name: "Go to App" }),
+        screen.queryByRole("link", { name: "Open Dashboard" }),
       ).not.toBeInTheDocument();
     });
   });
