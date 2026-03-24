@@ -1,4 +1,5 @@
 import {
+  activateUserAccount,
   createWorkspaceBuild,
   getWorkspaceMetadataByUserAndWorkspaceName,
 } from "@package/coder-sdk";
@@ -6,6 +7,28 @@ import type { Client } from "@package/coder-sdk/client";
 
 const POLL_INTERVAL_MS = 2000;
 const TIMEOUT_MS = 120_000;
+
+/**
+ * Ensures a Coder user account is in the "active" state.
+ * Coder marks accounts as dormant after a period of inactivity and also
+ * defaults new users to dormant. Since our app abstracts Coder away from
+ * end-users, we must always activate accounts before interacting with them.
+ */
+export async function ensureUserActive(opts: {
+  client: Client;
+  userId: string;
+}) {
+  const resp = await activateUserAccount({
+    client: opts.client,
+    path: { user: opts.userId },
+  });
+
+  if (resp.error) {
+    throw new Error(
+      `Failed to activate Coder user account: ${JSON.stringify(resp.error)}`,
+    );
+  }
+}
 
 /**
  * Starts a Coder workspace if it isn't running and polls until the agent
