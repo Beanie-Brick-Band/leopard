@@ -9,8 +9,10 @@ import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
+import type { DateRange } from "@package/ui/calendar";
 import { api } from "@package/backend/convex/_generated/api";
 import { Button } from "@package/ui/button";
+import { Calendar } from "@package/ui/calendar";
 import {
   Card,
   CardContent,
@@ -27,12 +29,6 @@ import { Editor } from "~/components/editor";
 import { StarterCodeUploader } from "~/components/starter-code-uploader";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 
-function formatDateForInput(timestamp: number) {
-  const date = new Date(timestamp);
-  const offset = date.getTimezoneOffset() * 60_000;
-  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
-}
-
 function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
   const router = useRouter();
   const createAssignment = useMutation(
@@ -48,28 +44,25 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [releaseDate, setReleaseDate] = useState(
-    formatDateForInput(Date.now()),
-  );
-  const [dueDate, setDueDate] = useState(
-    formatDateForInput(Date.now() + 24 * 60 * 60 * 1000),
-  );
+  const [dateRange, setDateRange] = useState<DateRange>(defaultDateRange());
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
 
     try {
-      const parsedReleaseDate = Date.parse(releaseDate);
-      const parsedDueDate = Date.parse(dueDate);
-
-      if (Number.isNaN(parsedReleaseDate) || Number.isNaN(parsedDueDate)) {
-        throw new Error("Invalid date values");
-      }
-      if (parsedDueDate <= parsedReleaseDate) {
-        throw new Error("Due date must be after release date");
+      if (!dateRange.from || !dateRange.to) {
+        throw new Error("Please select a date range");
       }
       if (!name.trim()) {
         throw new Error("Assignment name is required");
+      }
+
+      const releaseDateVal = new Date(dateRange.from);
+      const dueDateVal = new Date(dateRange.to);
+
+      if (dueDateVal.getTime() <= releaseDateVal.getTime()) {
+        throw new Error("Due date must be after release date");
       }
 
       // Upload starter code first (if any), before creating the assignment
@@ -82,8 +75,8 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
         classroomId,
         name: name.trim(),
         description: description.trim() || undefined,
-        releaseDate: parsedReleaseDate,
-        dueDate: parsedDueDate,
+        releaseDate: releaseDateVal.getTime(),
+        dueDate: dueDateVal.getTime(),
         starterCodeStorageKey: storageKeyRef.current ?? undefined,
       });
 
@@ -134,25 +127,60 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
                 placeholder="Week 3 - Sorting Algorithms"
               />
             </div>
+            <Label aria-label="availability-period">Availability Period</Label>
+            <Calendar
+              className="w-full"
+              mode="range"
+              defaultMonth={dateRange.from}
+              selected={dateRange}
+              onSelect={(newDateRange) =>
+                setDateRange(updateDateRange(dateRange, newDateRange))
+              }
+              numberOfMonths={2}
+              showOutsideDays={false}
+              required
+            />
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="release-date">Release Date</Label>
+                <Label htmlFor="release-time">
+                  Availability Start Time / Release Time
+                </Label>
                 <Input
-                  id="release-date"
-                  type="datetime-local"
+                  id="release-time"
+                  type="time"
                   required
-                  value={releaseDate}
-                  onChange={(event) => setReleaseDate(event.target.value)}
+                  // can't figure out a proper way to colour this. Colouring the text
+                  // and background don't work, so we'll settle with inverting the colour
+                  className="[&::-webkit-calendar-picker-indicator]:invert"
+                  value={formatTime(dateRange.from)}
+                  onChange={(event) =>
+                    setDateRange(
+                      updateDateRangeTime(
+                        dateRange,
+                        "from",
+                        event.target.value,
+                      ),
+                    )
+                  }
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="due-date">Due Date</Label>
+                <Label htmlFor="due-time">
+                  Availability End Time / Due Time
+                </Label>
                 <Input
-                  id="due-date"
-                  type="datetime-local"
+                  id="due-time"
+                  type="time"
                   required
-                  value={dueDate}
-                  onChange={(event) => setDueDate(event.target.value)}
+                  // can't figure out a proper way to colour this. Colouring the text
+                  // and background don't work, so we'll settle with inverting the colour
+                  className="[&::-webkit-calendar-picker-indicator]:invert"
+                  value={formatTime(dateRange.to)}
+                  onChange={(event) =>
+                    setDateRange(
+                      updateDateRangeTime(dateRange, "to", event.target.value),
+                    )
+                  }
                 />
               </div>
             </div>
@@ -225,4 +253,68 @@ export default function NewAssignmentPage({
       </AuthLoading>
     </main>
   );
+}
+
+function formatTime(date: Date | undefined) {
+  if (!date) return "";
+  return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+}
+
+function defaultDateRange() {
+  const from = new Date();
+  const to = new Date(from);
+  to.setDate(to.getDate() + 7);
+  to.setHours(23, 59, 59, 999);
+  return { from, to };
+}
+
+export function updateDateRange(
+  dateRange: DateRange,
+  newDateRange?: DateRange,
+): DateRange {
+  if (!newDateRange) {
+    return dateRange;
+  }
+
+  let newFrom = undefined;
+  if (newDateRange.from) {
+    newFrom = new Date(newDateRange.from);
+    newFrom.setHours(
+      dateRange.from?.getHours() ?? 0,
+      dateRange.from?.getMinutes() ?? 0,
+    );
+  }
+
+  let newTo = undefined;
+  if (newDateRange.to) {
+    newTo = new Date(newDateRange.to);
+    newTo.setHours(
+      dateRange.to?.getHours() ?? 0,
+      dateRange.to?.getMinutes() ?? 0,
+      59,
+      999,
+    );
+  }
+
+  return { from: newFrom, to: newTo };
+}
+
+function updateDateRangeTime(
+  dateRange: DateRange | undefined,
+  field: "from" | "to",
+  time: string,
+) {
+  if (!dateRange) return defaultDateRange();
+  const currentDate = dateRange[field];
+  if (!currentDate) return dateRange;
+  const [hours, minutes] = time.split(":").map(Number) as [number, number];
+  const newDate = new Date(currentDate);
+  newDate.setHours(
+    hours,
+    minutes,
+    field === "to" ? 59 : 0,
+    field === "to" ? 999 : 0,
+  );
+  console.log(newDate);
+  return { ...dateRange, [field]: newDate };
 }
