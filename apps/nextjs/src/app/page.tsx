@@ -38,7 +38,7 @@ export default async function HomePage() {
             </div>
 
             <h1 className="text-foreground max-w-[440px] text-[3.35rem] leading-[0.97] font-semibold tracking-[-0.07em] sm:text-[4.5rem]">
-              The IDE built for education
+              The <span className="px-1">IDE</span> built for education
             </h1>
 
             <p className="text-muted-foreground mt-8 max-w-[470px] text-[1.08rem] leading-[1.65] sm:text-[1.2rem] sm:leading-[1.6] lg:text-[1.08rem]">
