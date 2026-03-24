@@ -19,12 +19,9 @@ import {
 } from "~/lib/auth-server";
 
 async function getDashboardRole() {
-  try {
-    await fetchAuthQuery(api.web.teacher.getMyClassrooms, {});
-    return "teacher" as const;
-  } catch {
-    return "student" as const;
-  }
+  return (
+    (await fetchAuthQuery(api.web.user.getCurrentUserRole, {})) ?? "student"
+  );
 }
 
 export default async function Page() {
@@ -50,10 +47,15 @@ export default async function Page() {
 
   await fetchAuthMutation(api.web.user.ensureCurrentUserRole, {});
   const role = await getDashboardRole();
+  const isInstructor = role === "teacher" || role === "admin";
 
   return (
     <main>
-      {role === "teacher" ? <TeacherDashboard /> : <StudentDashboard />}
+      {isInstructor ? (
+        <TeacherDashboard isAdmin={role === "admin"} />
+      ) : (
+        <StudentDashboard />
+      )}
     </main>
   );
 }

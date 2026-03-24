@@ -14,7 +14,11 @@ import {
 } from "@package/ui/card";
 import { Spinner } from "@package/ui/spinner";
 
-export default function TeacherDashboard() {
+export default function TeacherDashboard({
+  isAdmin = false,
+}: {
+  isAdmin?: boolean;
+}) {
   const classrooms = useQuery(api.web.teacher.getMyClassrooms);
 
   if (classrooms === undefined) {
@@ -31,12 +35,21 @@ export default function TeacherDashboard() {
         <div>
           <h1 className="text-3xl font-bold">Teacher Dashboard</h1>
           <p className="text-muted-foreground text-sm">
-            Manage classrooms and assignments
+            {isAdmin
+              ? "Manage classrooms, assignments, and user access"
+              : "Manage classrooms and assignments"}
           </p>
         </div>
-        <Button asChild>
-          <Link href="/teacher/classroom/new">Create Classroom</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {isAdmin ? (
+            <Button asChild variant="outline">
+              <Link href="/admin">Manage Users</Link>
+            </Button>
+          ) : null}
+          <Button asChild>
+            <Link href="/teacher/classroom/new">Create Classroom</Link>
+          </Button>
+        </div>
       </div>
 
       {classrooms.length === 0 ? (
