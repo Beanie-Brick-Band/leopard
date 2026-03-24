@@ -84,7 +84,7 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
     isScrubbing?: boolean;
     stickingTo?: number | null;
   }>({
-    value: frozenReplay ? 100 : 0,
+    value: 100,
     state: "None",
     isScrubbing: false,
     stickingTo: null,
