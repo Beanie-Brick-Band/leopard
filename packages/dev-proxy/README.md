@@ -30,4 +30,4 @@ pnpm --filter @package/dev-proxy status
 - `nginx.conf` - Nginx reverse proxy configuration
 - `set-coder-cookie.html` - Cookie-setting bridge page
 
-See `/docs/content/docs/coder-reverse-proxy.mdx` for complete documentation.
+See `/docs/developer-docs/coder-reverse-proxy` for complete documentation.

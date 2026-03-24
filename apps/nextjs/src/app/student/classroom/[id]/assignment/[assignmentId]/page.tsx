@@ -105,9 +105,7 @@ function Content({
         assignmentId,
         workspaceId: assignmentWorkspace._id,
       });
-      toast.success(
-        hasSubmission ? "Assignment re-submitted." : "Assignment submitted.",
-      );
+      toast.success("Assignment submitted.");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to submit assignment",

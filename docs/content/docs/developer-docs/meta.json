@@ -1,0 +1,12 @@
+{
+  "title": "Developer Docs",
+  "root": true,
+  "pages": [
+    "index",
+    "convex-setup",
+    "coder-reverse-proxy",
+    "session-cookie-domain",
+    "replay",
+    "graphite-cheatsheet"
+  ]
+}
