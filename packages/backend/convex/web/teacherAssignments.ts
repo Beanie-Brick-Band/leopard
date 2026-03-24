@@ -130,9 +130,14 @@ export const getAssignmentsByClassroom = query({
       user._id,
     );
 
+    const role = await getUserRole(ctx, user._id);
+
     const assignments = (
       await Promise.all(classroom.assignments.map((id) => ctx.db.get(id)))
-    ).filter((a): a is NonNullable<typeof a> => a !== null);
+    ).filter(
+      (a): a is NonNullable<typeof a> =>
+        a !== null && (role !== "student" || a.releaseDate <= Date.now()),
+    );
 
     return assignments;
   },
