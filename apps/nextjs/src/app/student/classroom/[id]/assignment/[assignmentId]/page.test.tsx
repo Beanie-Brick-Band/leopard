@@ -269,7 +269,7 @@ describe("StudentAssignmentPage", () => {
       ).toBeInTheDocument();
     });
 
-    it("disables submit button when past due", async () => {
+    it("hides submit button and shows open workspace when past due", async () => {
       setupQueryMocks({
         assignment: makeAssignment({ dueDate: PAST_DATE }),
       });
@@ -277,20 +277,33 @@ describe("StudentAssignmentPage", () => {
       await renderPage();
 
       expect(
-        screen.getByRole("button", { name: "Submit Assignment" }),
-      ).toBeDisabled();
+        screen.queryByRole("button", { name: /submit assignment/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Open Workspace" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "This assignment is past due and can no longer be submitted.",
+        ),
+      ).toBeInTheDocument();
     });
 
-    it("disables submit button when no active workspace", async () => {
+    it("hides submit button and shows launch workspace when no workspace exists", async () => {
       setupQueryMocks({ workspace: null });
 
       await renderPage();
 
       expect(
-        screen.getByRole("button", { name: "Submit Assignment" }),
-      ).toBeDisabled();
+        screen.queryByRole("button", { name: /submit assignment/i }),
+      ).not.toBeInTheDocument();
       expect(
-        screen.getByText("Launch a workspace before submitting."),
+        screen.getByRole("button", { name: "Launch Workspace" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "Launch a workspace to start working on this assignment.",
+        ),
       ).toBeInTheDocument();
     });
 
@@ -405,8 +418,20 @@ describe("StudentAssignmentPage", () => {
       await renderPage();
 
       expect(
-        screen.getByText("This assignment is past due."),
+        screen.getByText(
+          "This assignment is past due and can no longer be submitted.",
+        ),
       ).toBeInTheDocument();
+    });
+
+    it("shows status as 'Past due' when overdue and not submitted", async () => {
+      setupQueryMocks({
+        assignment: makeAssignment({ dueDate: PAST_DATE }),
+      });
+
+      await renderPage();
+
+      expect(screen.getByText("Past due")).toBeInTheDocument();
     });
   });
 });

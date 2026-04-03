@@ -449,7 +449,7 @@ function ReviewContent({
                     <Separator />
                     <Button
                       className="w-full"
-                      variant="outline"
+                      variant="default"
                       disabled={isDownloading}
                       onClick={async () => {
                         setIsDownloading(true);
