@@ -30,7 +30,8 @@ function getRole(pathname: string) {
   if (
     firstSegment === "teacher" ||
     firstSegment === "student" ||
-    firstSegment === "app"
+    firstSegment === "app" ||
+    firstSegment === "admin"
   ) {
     return firstSegment;
   }
