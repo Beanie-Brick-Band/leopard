@@ -27,7 +27,7 @@ Bun.serve({
 
           const parsedUrl = URL.parse(body.uploadUrl);
           if (
-            parsedUrl?.hostname !== "minio.nolapse.tech" ||
+            parsedUrl?.hostname !== "minio.tryleopard.dev" ||
             parsedUrl.protocol !== "https:"
           ) {
             return Response.json(

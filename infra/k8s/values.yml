@@ -1,9 +1,9 @@
 coder:
-  serviceURL: "https://coder.nolapse.tech"
-  accessURL: "https://coder.nolapse.tech"
+  serviceURL: "https://coder.tryleopard.dev"
+  accessURL: "https://coder.tryleopard.dev"
   env:
     - name: CODER_ACCESS_URL
-      value: "https://coder.nolapse.tech"
+      value: "https://coder.tryleopard.dev"
     - name: CODER_OAUTH2_GITHUB_ALLOW_SIGNUPS
       value: "true"
     - name: CODER_PG_CONNECTION_URL
@@ -32,7 +32,7 @@ coder:
   ingress:
     enable: true
     className: traefik
-    host: coder.nolapse.tech
+    host: coder.tryleopard.dev
     tls:
       enable: true
       secretName: coder-tls

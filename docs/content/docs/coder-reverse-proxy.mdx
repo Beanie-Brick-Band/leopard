@@ -5,10 +5,10 @@ description: How to use the local reverse proxy to access Coder workspaces in de
 
 ## Overview
 
-For local development, we use a reverse proxy to access Coder workspaces at `coder.nolapse.tech` through a local domain. This allows you to:
+For local development, we use a reverse proxy to access Coder workspaces at `coder.tryleopard.dev` through a local domain. This allows you to:
 
 - Test workspace launching locally without modifying production
-- Set cookies on `localhost` domain instead of `.nolapse.tech`
+- Set cookies on `localhost` domain instead of `.tryleopard.dev`
 - Debug issues with workspace sessions and authentication
 - Access full VS Code functionality including WebSockets for terminals
 
@@ -47,14 +47,14 @@ curl -H "Cookie: coder_session_token=test" http://coder.localhost
 
 In production, when users launch a workspace:
 
-1. A session token is set as a cookie on domain `.nolapse.tech`
-2. The user is redirected to `https://coder.nolapse.tech/workspace/...`
+1. A session token is set as a cookie on domain `.tryleopard.dev`
+2. The user is redirected to `https://coder.tryleopard.dev/workspace/...`
 3. The browser sends the cookie with the request, authenticating the user
 
 In local development, we face several challenges:
 
 - Your app runs on `localhost:3000`
-- You can't set cookies for `.nolapse.tech` from localhost
+- You can't set cookies for `.tryleopard.dev` from localhost
 - Redirecting to production Coder would lose the session context
 - Cookies set on `localhost:3000` won't be sent to `coder.localhost` (different hostname)
 - Coder validates origin headers and expects HTTPS connections
@@ -74,15 +74,15 @@ JavaScript sets cookie on coder.localhost domain
     ↓
 Redirect to http://coder.localhost/workspace/...
     ↓
-Nginx Reverse Proxy (makes it look like HTTPS from coder.nolapse.tech)
+Nginx Reverse Proxy (makes it look like HTTPS from coder.tryleopard.dev)
     ↓
-https://coder.nolapse.tech (actual Coder instance)
+https://coder.tryleopard.dev (actual Coder instance)
 ```
 
 **Architecture Components:**
 
 1. **Docker container** runs nginx on port 80
-2. **nginx** forwards all requests to `https://coder.nolapse.tech`
+2. **nginx** forwards all requests to `https://coder.tryleopard.dev`
 3. **nginx** rewrites headers to make requests appear as HTTPS from the real domain
 4. **Browser** thinks it's talking to `coder.localhost`
 5. **Cookies** are set via an intermediate HTML page served by nginx
@@ -202,7 +202,7 @@ This mapping ensures that:
 
 ```nginx
 proxy_set_header X-Forwarded-Proto https;
-proxy_set_header Origin https://coder.nolapse.tech;
+proxy_set_header Origin https://coder.tryleopard.dev;
 ```
 
 **Why this is critical:**
@@ -210,7 +210,7 @@ proxy_set_header Origin https://coder.nolapse.tech;
 - Coder's signed app tokens validate the request origin and protocol
 - Without these headers, you get 403 Forbidden errors
 - `X-Forwarded-Proto https` makes Coder think the request came over HTTPS
-- `Origin https://coder.nolapse.tech` makes Coder accept the request as legitimate
+- `Origin https://coder.tryleopard.dev` makes Coder accept the request as legitimate
 
 #### 3. Long Timeouts for WebSockets
 
@@ -321,7 +321,7 @@ Look for:
 **Causes:**
 
 1. **Origin header not set correctly**
-   - Check nginx.conf has `proxy_set_header Origin https://coder.nolapse.tech;`
+   - Check nginx.conf has `proxy_set_header Origin https://coder.tryleopard.dev;`
 2. **X-Forwarded-Proto not HTTPS**
    - Check nginx.conf has `proxy_set_header X-Forwarded-Proto https;`
 3. **Connection header hardcoded to "upgrade"**
@@ -350,7 +350,7 @@ docker logs reverse-proxy | grep 403
 
 ```nginx
 proxy_set_header X-Forwarded-Proto https;
-proxy_set_header Origin https://coder.nolapse.tech;
+proxy_set_header Origin https://coder.tryleopard.dev;
 ```
 
 ### Cookie Not Being Set
@@ -478,9 +478,9 @@ This setup is **only for local development**. Never use it in production because
 
 In production (when `NODE_ENV !== "development"`):
 
-- Direct connection to `https://coder.nolapse.tech`
+- Direct connection to `https://coder.tryleopard.dev`
 - Cookies with `secure: true` (HTTPS only)
-- Domain set to `.nolapse.tech`
+- Domain set to `.tryleopard.dev`
 - HttpOnly cookies prevent JavaScript access
 - No reverse proxy needed
 

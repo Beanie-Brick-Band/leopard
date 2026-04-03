@@ -12,7 +12,7 @@ export { getObjectKey } from "./storageKeys";
 
 function getClient() {
   return new S3Client({
-    endpoint: process.env.MINIO_ENDPOINT!, // https://minio.nolapse.tech
+    endpoint: process.env.MINIO_ENDPOINT!, // https://minio.tryleopard.dev
     region: "us-east-1", // MinIO ignores this but SDK requires it
     credentials: {
       accessKeyId: process.env.MINIO_ACCESS_KEY!,

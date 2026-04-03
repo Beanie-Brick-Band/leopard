@@ -209,8 +209,8 @@ metadata:
   namespace: coder
 data:
   # UPDATE THESE VALUES
-  CODER_ACCESS_URL: "https://coder.nolapse.tech"
-  CODER_WILDCARD_ACCESS_URL: "*.coder.nolapse.tech"
+  CODER_ACCESS_URL: "https://coder.tryleopard.dev"
+  CODER_WILDCARD_ACCESS_URL: "*.coder.tryleopard.dev"
   CODER_OAUTH2_GITHUB_ALLOW_SIGNUPS: "true"
   CODER_TELEMETRY_ENABLE: "false"
   CODER_DERP_SERVER_ENABLE: "true"
@@ -336,7 +336,7 @@ metadata:
   namespace: coder
 spec:
   domains:
-    - coder.nolapse.tech
+    - coder.tryleopard.dev
 
 ---
 # GKE: FrontendConfig for HTTPS redirect
@@ -364,7 +364,7 @@ metadata:
     networking.gke.io/v1beta1.FrontendConfig: "coder-frontend-config"
 spec:
   rules:
-    - host: coder.nolapse.tech
+    - host: coder.tryleopard.dev
       http:
         paths:
           - path: /

@@ -20,7 +20,7 @@ pnpm --filter @package/dev-proxy status
 
 ## What it does
 
-- Proxies `http://coder.localhost` to `https://coder.nolapse.tech`
+- Proxies `http://coder.localhost` to `https://coder.tryleopard.dev`
 - Handles cookie setting for local development
 - Supports WebSocket connections for VS Code terminals
 
