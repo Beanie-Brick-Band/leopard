@@ -1,9 +1,9 @@
 "use client";
 
-import { startTransition, use, useActionState } from "react";
+import { startTransition, use, useActionState, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
@@ -75,6 +75,10 @@ function AssignmentCard({
   };
 
   const dueDate = new Date(assignment.dueDate);
+  const [now] = useState(() => Date.now());
+  const isPastDue = now > assignment.dueDate;
+  const isLoaded = submissionResult !== undefined;
+  const hasSubmission = submissionResult?.success === true;
 
   return (
     <Card>
@@ -93,32 +97,44 @@ function AssignmentCard({
             <CardTitle className="text-lg">{assignment.name}</CardTitle>
             <CardDescription>Due {dueDate.toLocaleString()}</CardDescription>
           </div>
-          {submissionResult?.success &&
-          !submissionResult.submission?.gradesReleased ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+          {!isLoaded ? null : submissionResult.success &&
+            submissionResult.submission?.gradesReleased ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/50 dark:text-green-300">
+              <CheckCircle2 className="h-3 w-3" />
+              Graded: {submissionResult.submission.grade}%
+            </span>
+          ) : hasSubmission ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/50 dark:text-green-300">
               <CheckCircle2 className="h-3 w-3" />
               Submitted
             </span>
-          ) : submissionResult?.success &&
-            submissionResult.submission?.gradesReleased ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-              <CheckCircle2 className="h-3 w-3" />
-              Graded: {submissionResult.submission.grade}%
+          ) : isPastDue ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/50 dark:text-amber-300">
+              <AlertTriangle className="h-3 w-3" />
+              Past Due
             </span>
           ) : null}
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent>
         <div className="flex flex-wrap gap-2">
+          {isLoaded && !hasSubmission && !isPastDue && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLaunchWorkspace}
+              disabled={isLaunching}
+            >
+              {isLaunching ? "Launching..." : "Launch Workspace"}
+            </Button>
+          )}
           <Button
-            variant="outline"
             size="sm"
-            onClick={handleLaunchWorkspace}
-            disabled={isLaunching}
+            variant={
+              !isLoaded || hasSubmission || isPastDue ? "outline" : "default"
+            }
+            asChild
           >
-            {isLaunching ? "Launching..." : "Launch Workspace"}
-          </Button>
-          <Button size="sm" asChild>
             <Link
               href={`/student/classroom/${classroomId}/assignment/${assignment._id}`}
             >

@@ -263,7 +263,9 @@ function Content({
                       ? "Submitting..."
                       : hasSubmission
                         ? "Submitted"
-                        : "Not submitted"}
+                        : isPastDue
+                          ? "Past due"
+                          : "Not submitted"}
                 </span>
               </div>
               {submittedAt ? (
@@ -302,17 +304,50 @@ function Content({
                   Assignment submitted successfully. Your workspace has been
                   shut down.
                 </p>
+              ) : assignmentWorkspace === undefined ? (
+                <p className="text-muted-foreground text-xs">
+                  Checking workspace status…
+                </p>
+              ) : isPastDue ? (
+                <>
+                  {assignmentWorkspace ? (
+                    <Button
+                      className="w-full"
+                      variant="outline"
+                      onClick={handleLaunchWorkspace}
+                      disabled={isLaunching}
+                    >
+                      {isLaunching ? "Launching…" : "Open Workspace"}
+                    </Button>
+                  ) : null}
+                  <p className="text-xs text-amber-600 dark:text-amber-400">
+                    This assignment is past due and can no longer be submitted.
+                  </p>
+                </>
+              ) : !assignmentWorkspace ? (
+                <>
+                  <Button
+                    className="w-full"
+                    onClick={handleLaunchWorkspace}
+                    disabled={isLaunching}
+                  >
+                    {isLaunching ? "Launching…" : "Launch Workspace"}
+                  </Button>
+                  <p className="text-muted-foreground text-xs">
+                    Launch a workspace to start working on this assignment.
+                  </p>
+                </>
               ) : (
                 <>
                   <Button
                     className="w-full"
                     onClick={openSubmitConfirm}
-                    disabled={isSubmitting || isPastDue || !assignmentWorkspace}
+                    disabled={isSubmitting}
                   >
                     {isSubmitting ? (
                       <span className="inline-flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Submitting...
+                        Submitting…
                       </span>
                     ) : (
                       "Submit Assignment"
@@ -320,29 +355,16 @@ function Content({
                   </Button>
                   <Button
                     className="w-full"
+                    variant="outline"
                     onClick={handleLaunchWorkspace}
                     disabled={isLaunching}
                   >
-                    {isLaunching ? "Launching..." : "Launch Workspace"}
+                    {isLaunching ? "Launching…" : "Open Workspace"}
                   </Button>
-                  {assignmentWorkspace === undefined ? (
-                    <p className="text-muted-foreground text-xs">
-                      Checking assignment workspace...
-                    </p>
-                  ) : assignmentWorkspace === null ? (
-                    <p className="text-muted-foreground text-xs">
-                      Launch a workspace before submitting.
-                    </p>
-                  ) : isPastDue ? (
-                    <p className="text-muted-foreground text-xs">
-                      This assignment is past due.
-                    </p>
-                  ) : (
-                    <p className="text-muted-foreground text-xs">
-                      Submitting will zip your workspace, upload it, and shut
-                      down the workspace.
-                    </p>
-                  )}
+                  <p className="text-muted-foreground text-xs">
+                    Submitting will zip your workspace, upload it, and shut down
+                    the workspace.
+                  </p>
                 </>
               )}
             </CardContent>

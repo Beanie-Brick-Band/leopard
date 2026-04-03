@@ -280,7 +280,7 @@ function AssignmentContent({
           <div className="flex h-full items-center justify-end gap-2">
             {data.submissionStorageKey ? (
               <Button
-                variant="ghost"
+                variant="default"
                 size="icon"
                 title="Download submission"
                 onClick={async () => {
