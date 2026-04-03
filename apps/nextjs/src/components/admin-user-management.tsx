@@ -1,7 +1,6 @@
 "use client";
 
 import { useDeferredValue, useState } from "react";
-import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 
@@ -17,6 +16,8 @@ import {
 import { Input } from "@package/ui/input";
 import { Label } from "@package/ui/label";
 import { Spinner } from "@package/ui/spinner";
+
+import { useConvexAuth } from "~/lib/auth";
 
 type UserRole = "admin" | "student" | "teacher";
 
@@ -43,10 +44,12 @@ export default function AdminUserManagement() {
     role: UserRole;
     userId: string;
   } | null>(null);
+  const { isAuthenticated } = useConvexAuth();
   const deferredSearchTerm = useDeferredValue(searchTerm.trim());
-  const users = useQuery(api.web.user.searchUsers, {
-    searchTerm: deferredSearchTerm,
-  });
+  const users = useQuery(
+    api.web.user.searchUsers,
+    isAuthenticated ? { searchTerm: deferredSearchTerm } : "skip",
+  );
   const updateUserRole = useMutation(api.web.user.updateUserRole);
 
   const handleRoleChange = async (
@@ -77,14 +80,11 @@ export default function AdminUserManagement() {
   };
 
   return (
-    <div className="container mx-auto max-w-5xl space-y-6 p-6">
+    <div className="space-y-6">
       <div className="space-y-2">
-        <Link href="/app" className="text-muted-foreground text-sm underline">
-          Back to App
-        </Link>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold">Admin User Roles</h1>
+            <h2 className="text-2xl font-bold">User Roles</h2>
             <p className="text-muted-foreground text-sm">
               Search Leopard users and update who can teach or administer the
               app.

@@ -11,6 +11,7 @@ import {
 } from "@package/ui/card";
 
 import AdminUserManagement from "~/components/admin-user-management";
+import AdminWorkspaceSettings from "~/components/admin-workspace-settings";
 import { fetchAuthQuery, isAuthenticated } from "~/lib/auth-server";
 
 export default async function AdminPage() {
@@ -59,7 +60,14 @@ export default async function AdminPage() {
   }
 
   return (
-    <main>
+    <main className="container mx-auto max-w-5xl space-y-6 p-6">
+      <div className="space-y-2">
+        <Link href="/app" className="text-muted-foreground text-sm underline">
+          Back to App
+        </Link>
+        <h1 className="text-3xl font-bold">Admin Settings</h1>
+      </div>
+      <AdminWorkspaceSettings />
       <AdminUserManagement />
     </main>
   );

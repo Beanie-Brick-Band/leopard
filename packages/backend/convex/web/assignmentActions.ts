@@ -88,6 +88,14 @@ export const launchWorkspace = action({
     // Activate the user account to ensure they're not dormant
     await ensureUserActive({ client: coderClient, userId: coderUserId });
 
+    // Determine workspace mode (ephemeral vs persistent)
+    const workspaceMode: string = await ctx.runQuery(
+      internal.web.settings.internalGetWorkspaceMode,
+      {},
+    );
+    const templateName =
+      workspaceMode === "ephemeral" ? "kubernetes-ephermal" : "kubernetes";
+
     // get templates
     const templatesResp = await getTemplatesByOrganization({
       client: coderClient,
@@ -132,7 +140,7 @@ export const launchWorkspace = action({
         body: {
           name: `${args.assignmentId.toString()}`,
           template_id: templatesResp.data?.find(
-            (t) => t.name === "kubernetes",
+            (t) => t.name === templateName,
           )?.id,
           ttl_ms: 3600000,
           rich_parameter_values: richParams,
