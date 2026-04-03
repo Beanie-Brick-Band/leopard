@@ -17,7 +17,8 @@
     "./spinner": "./src/spinner.tsx",
     "./theme": "./src/theme.tsx",
     "./toast": "./src/toast.tsx",
-    "./input-group": "./src/input-group.tsx"
+    "./input-group": "./src/input-group.tsx",
+    "./switch": "./src/switch.tsx"
   },
   "license": "MIT",
   "scripts": {

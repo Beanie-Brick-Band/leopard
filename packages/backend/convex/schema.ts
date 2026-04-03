@@ -60,6 +60,10 @@ export default defineSchema({
     .index("coderWorkspaceId", ["coderWorkspaceId"])
     .index("userId_isActive", ["userId", "isActive"])
     .index("assignmentId_userId", ["assignmentId", "userId"]),
+  settings: defineTable({
+    key: v.string(),
+    value: v.any(),
+  }).index("key", ["key"]),
   users: defineTable({
     uid: v.string(), // map this to betterAuth user id
     role: v.union(
