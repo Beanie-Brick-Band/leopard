@@ -1,39 +1,47 @@
 "use client";
 
 import type { DateRange } from "@package/ui/calendar";
+import { cn } from "@package/ui";
 import { Calendar } from "@package/ui/calendar";
 import { Input } from "@package/ui/input";
 import { Label } from "@package/ui/label";
+
+type DatePickerSize = "wide" | "narrow";
 
 export function DatePickerWithRange({
   className,
   date,
   onDateChange,
   required,
+  size = "wide",
 }: {
   className?: string;
   date: DateRange;
   onDateChange: (dateRange: DateRange) => void;
   required?: boolean;
+  size?: DatePickerSize;
 }) {
+  const numberOfMonths = size === "narrow" ? 1 : 2;
+  const gridCols = size === "narrow" ? "grid-cols-1" : "md:grid-cols-2";
+
   return (
-    <div className={className}>
+    <div className={cn("space-y-4", className)}>
       <Label aria-label="availability-period">Availability Period</Label>
       <Calendar
-        className="w-full"
+        className="w-full p-0"
         mode="range"
         defaultMonth={date.from}
         selected={date}
         onSelect={(newDateRange: DateRange | undefined) =>
           onDateChange(updateDateRange(date, newDateRange))
         }
-        numberOfMonths={2}
+        numberOfMonths={numberOfMonths}
         showOutsideDays={false}
         required={required}
       />
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className={cn("grid gap-4", gridCols)}>
         <div className="space-y-2">
-          <Label htmlFor="release-time">Start Time</Label>
+          <Label htmlFor="release-time">Release Time</Label>
           <Input
             id="release-time"
             type="time"
@@ -50,7 +58,7 @@ export function DatePickerWithRange({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="due-time">End Time</Label>
+          <Label htmlFor="due-time">Due Time</Label>
           <Input
             id="due-time"
             type="time"
