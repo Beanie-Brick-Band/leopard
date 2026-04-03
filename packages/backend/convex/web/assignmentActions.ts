@@ -3,7 +3,6 @@
 import { v } from "convex/values";
 
 import {
-  activateUserAccount,
   createNewSessionKey,
   createNewUser,
   createUserWorkspace,
@@ -18,7 +17,7 @@ import { createClient } from "@package/coder-sdk/client";
 import { internal } from "../_generated/api";
 import { action } from "../_generated/server";
 import { authComponent } from "../auth";
-import { ensureWorkspaceRunning } from "../helpers/coder";
+import { ensureUserActive, ensureWorkspaceRunning } from "../helpers/coder";
 import { generateDownloadUrl } from "../helpers/minio";
 
 export const launchWorkspace = action({
@@ -87,14 +86,7 @@ export const launchWorkspace = action({
     }
 
     // Activate the user account to ensure they're not dormant
-    const activateResp = await activateUserAccount({
-      client: coderClient,
-      path: { user: coderUserId },
-    });
-
-    if (activateResp.error) {
-      // Don't throw here - continue with workspace launch even if activation fails
-    }
+    await ensureUserActive({ client: coderClient, userId: coderUserId });
 
     // get templates
     const templatesResp = await getTemplatesByOrganization({
