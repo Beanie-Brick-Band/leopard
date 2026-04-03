@@ -371,6 +371,15 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
     }
   }, [selectedFilePath]);
 
+  const handlePlayClick = () => {
+    if (state.value >= 100) {
+      setState((s) => ({ ...s, value: 0 }));
+      setIsPlaying(true);
+    } else {
+      setIsPlaying(!isPlaying);
+    }
+  };
+
   if (!selectedWorkspaceId) {
     return (
       <p className="text-muted-foreground text-sm">No workspace ID provided</p>
@@ -440,7 +449,7 @@ export const TextReplayScrubberComponent: React.FC<TextReplayScrubberProps> = ({
       {!frozenReplay && (
         <div className="flex justify-center pb-8">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={handlePlayClick}
             className="flex w-20 items-center justify-center rounded-md bg-blue-500 px-6 py-2 text-white transition-colors hover:bg-blue-600"
             aria-label={isPlaying ? "Pause" : "Play"}
           >
