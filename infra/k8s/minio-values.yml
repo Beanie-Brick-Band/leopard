@@ -21,7 +21,7 @@ resources:
     cpu: 500m
 
 environment:
-  MINIO_CORS_ALLOW_ORIGIN: "https://nolapse.tech,https://*.nolapse.tech,http://localhost:3000"
+  MINIO_CORS_ALLOW_ORIGIN: "https://tryleopard.dev,https://*.tryleopard.dev,http://localhost:3000"
 
 ingress:
   enabled: true
@@ -30,11 +30,11 @@ ingress:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
   hosts:
-    - minio.nolapse.tech
+    - minio.tryleopard.dev
   tls:
     - secretName: minio-tls
       hosts:
-        - minio.nolapse.tech
+        - minio.tryleopard.dev
 
 consoleIngress:
   enabled: true
@@ -43,8 +43,8 @@ consoleIngress:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
   hosts:
-    - minio-console.nolapse.tech
+    - minio-console.tryleopard.dev
   tls:
     - secretName: minio-console-tls
       hosts:
-        - minio-console.nolapse.tech
+        - minio-console.tryleopard.dev

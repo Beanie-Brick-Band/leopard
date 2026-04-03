@@ -78,7 +78,7 @@ export async function launchWorkspace(assignmentId: Id<"assignments">) {
     secure: true,
     httpOnly: true,
     sameSite: "lax",
-    domain: ".nolapse.tech",
+    domain: ".tryleopard.dev",
   });
 
   return result.workspaceUrl;

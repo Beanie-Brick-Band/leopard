@@ -345,10 +345,10 @@ if [ -z "$external_ip" ]; then
     log_warn "Please manually configure DNS to point to your cluster"
 else
     # Check if DNS already configured
-    resolved_ip=$(dig +short coder.nolapse.tech 2>/dev/null | head -1)
+    resolved_ip=$(dig +short coder.tryleopard.dev 2>/dev/null | head -1)
 
     if [ "$resolved_ip" = "$external_ip" ]; then
-        log_skip "DNS already configured correctly (coder.nolapse.tech → $external_ip)"
+        log_skip "DNS already configured correctly (coder.tryleopard.dev → $external_ip)"
     else
         echo ""
         gum style \
@@ -363,8 +363,8 @@ Your cluster IP address is: $(gum style --bold --foreground "$SUCCESS_COLOR" "$e
 
 Please create the following DNS records:
 
-  $(gum style --foreground "$INFO_COLOR" "A record:")  coder.nolapse.tech      →  $(gum style --bold "$external_ip")
-  $(gum style --foreground "$INFO_COLOR" "A record:")  *.coder.nolapse.tech    →  $(gum style --bold "$external_ip")
+  $(gum style --foreground "$INFO_COLOR" "A record:")  coder.tryleopard.dev      →  $(gum style --bold "$external_ip")
+  $(gum style --foreground "$INFO_COLOR" "A record:")  *.coder.tryleopard.dev    →  $(gum style --bold "$external_ip")
 
 $(gum style --faint "These records are required for HTTPS certificates to work correctly.")"
 
@@ -379,17 +379,17 @@ $(gum style --faint "These records are required for HTTPS certificates to work c
             if gum confirm "Would you like to verify DNS propagation?"; then
                 print_section "Verifying DNS propagation"
 
-                gum spin --spinner dot --title "Checking DNS for coder.nolapse.tech..." -- sleep 2
+                gum spin --spinner dot --title "Checking DNS for coder.tryleopard.dev..." -- sleep 2
 
-                resolved_ip=$(dig +short coder.nolapse.tech 2>/dev/null | head -1)
+                resolved_ip=$(dig +short coder.tryleopard.dev 2>/dev/null | head -1)
 
                 if [ "$resolved_ip" = "$external_ip" ]; then
-                    log_success "DNS is correctly configured! coder.nolapse.tech resolves to $resolved_ip"
+                    log_success "DNS is correctly configured! coder.tryleopard.dev resolves to $resolved_ip"
                 elif [ -n "$resolved_ip" ]; then
                     log_warn "DNS resolves to $resolved_ip but expected $external_ip"
                     gum style --foreground "$WARN_COLOR" "DNS may still be propagating. This can take up to 48 hours."
                 else
-                    log_warn "DNS not yet propagated for coder.nolapse.tech"
+                    log_warn "DNS not yet propagated for coder.tryleopard.dev"
                     gum style --foreground "$WARN_COLOR" "DNS propagation can take up to 48 hours."
                 fi
             fi
@@ -427,7 +427,7 @@ gum style \
     "$(gum style --bold "Access Coder")
 
 Once DNS has propagated, access Coder at:
-  $(gum style --foreground "$SUCCESS_COLOR" "https://coder.nolapse.tech")
+  $(gum style --foreground "$SUCCESS_COLOR" "https://coder.tryleopard.dev")
 
 $(gum style --faint "Useful commands:")
   Check certificate: kubectl get certificate -n $CODER_NAMESPACE
