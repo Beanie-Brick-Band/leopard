@@ -12,7 +12,6 @@ import type { Id } from "@package/backend/convex/_generated/dataModel";
 import type { DateRange } from "@package/ui/calendar";
 import { api } from "@package/backend/convex/_generated/api";
 import { Button } from "@package/ui/button";
-import { Calendar } from "@package/ui/calendar";
 import {
   Card,
   CardContent,
@@ -25,6 +24,10 @@ import { Label } from "@package/ui/label";
 import { Spinner } from "@package/ui/spinner";
 
 import type { StarterCodeUploaderHandle } from "~/components/starter-code-uploader";
+import {
+  DatePickerWithRange,
+  defaultDateRange,
+} from "~/components/date-picker-with-range";
 import { Editor } from "~/components/editor";
 import { StarterCodeUploader } from "~/components/starter-code-uploader";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
@@ -127,63 +130,12 @@ function NewAssignmentForm({ classroomId }: { classroomId: Id<"classrooms"> }) {
                 placeholder="Week 3 - Sorting Algorithms"
               />
             </div>
-            <Label aria-label="availability-period">Availability Period</Label>
-            <Calendar
-              className="w-full"
-              mode="range"
-              defaultMonth={dateRange.from}
-              selected={dateRange}
-              onSelect={(newDateRange) =>
-                setDateRange(updateDateRange(dateRange, newDateRange))
-              }
-              numberOfMonths={2}
-              showOutsideDays={false}
+            <DatePickerWithRange
+              className="space-y-4"
+              date={dateRange}
+              onDateChange={setDateRange}
               required
             />
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="release-time">
-                  Availability Start Time / Release Time
-                </Label>
-                <Input
-                  id="release-time"
-                  type="time"
-                  required
-                  // can't figure out a proper way to colour this. Colouring the text
-                  // and background don't work, so we'll settle with inverting the colour
-                  className="[&::-webkit-calendar-picker-indicator]:invert"
-                  value={formatTime(dateRange.from)}
-                  onChange={(event) =>
-                    setDateRange(
-                      updateDateRangeTime(
-                        dateRange,
-                        "from",
-                        event.target.value,
-                      ),
-                    )
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="due-time">
-                  Availability End Time / Due Time
-                </Label>
-                <Input
-                  id="due-time"
-                  type="time"
-                  required
-                  // can't figure out a proper way to colour this. Colouring the text
-                  // and background don't work, so we'll settle with inverting the colour
-                  className="[&::-webkit-calendar-picker-indicator]:invert"
-                  value={formatTime(dateRange.to)}
-                  onChange={(event) =>
-                    setDateRange(
-                      updateDateRangeTime(dateRange, "to", event.target.value),
-                    )
-                  }
-                />
-              </div>
-            </div>
             <div className="space-y-2">
               <Label htmlFor="assignment-description">Description</Label>
               <Editor
@@ -253,68 +205,4 @@ export default function NewAssignmentPage({
       </AuthLoading>
     </main>
   );
-}
-
-function formatTime(date: Date | undefined) {
-  if (!date) return "";
-  return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-}
-
-function defaultDateRange() {
-  const from = new Date();
-  const to = new Date(from);
-  to.setDate(to.getDate() + 7);
-  to.setHours(23, 59, 59, 999);
-  return { from, to };
-}
-
-export function updateDateRange(
-  dateRange: DateRange,
-  newDateRange?: DateRange,
-): DateRange {
-  if (!newDateRange) {
-    return dateRange;
-  }
-
-  let newFrom = undefined;
-  if (newDateRange.from) {
-    newFrom = new Date(newDateRange.from);
-    newFrom.setHours(
-      dateRange.from?.getHours() ?? 0,
-      dateRange.from?.getMinutes() ?? 0,
-    );
-  }
-
-  let newTo = undefined;
-  if (newDateRange.to) {
-    newTo = new Date(newDateRange.to);
-    newTo.setHours(
-      dateRange.to?.getHours() ?? 0,
-      dateRange.to?.getMinutes() ?? 0,
-      59,
-      999,
-    );
-  }
-
-  return { from: newFrom, to: newTo };
-}
-
-function updateDateRangeTime(
-  dateRange: DateRange | undefined,
-  field: "from" | "to",
-  time: string,
-) {
-  if (!dateRange) return defaultDateRange();
-  const currentDate = dateRange[field];
-  if (!currentDate) return dateRange;
-  const [hours, minutes] = time.split(":").map(Number) as [number, number];
-  const newDate = new Date(currentDate);
-  newDate.setHours(
-    hours,
-    minutes,
-    field === "to" ? 59 : 0,
-    field === "to" ? 999 : 0,
-  );
-  console.log(newDate);
-  return { ...dateRange, [field]: newDate };
 }
