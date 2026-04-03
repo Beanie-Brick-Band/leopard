@@ -30,30 +30,6 @@
 
 </div>
 
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li><a href="#about-the-project">About The Project</a></li>
-    <li><a href="#built-with">Built With</a></li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-        <li><a href="#environment-variables">Environment Variables</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#project-structure">Project Structure</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
-
 <!-- ABOUT THE PROJECT -->
 
 ## About The Project
@@ -70,7 +46,9 @@ Leopard is a full-stack educational platform that enables teachers to create cod
 
 ## Demo Video
 
-YouTube: https://youtu.be/clT2PKWQutI
+https://github.com/user-attachments/assets/b54f8a54-52bb-4264-b998-1a6a591b5d52
+
+YouTube (higher quality): https://youtu.be/clT2PKWQutI
 
 ## Built With
 
@@ -158,8 +136,6 @@ Create a `.env` file in the project root (see `.env.example` for reference):
 | `NEXT_PUBLIC_CONVEX_URL`      | Public Convex URL (`https://your-project.convex.cloud`)     |
 | `NEXT_PUBLIC_CONVEX_SITE_URL` | Public Convex site URL (`https://your-project.convex.site`) |
 | `SITE_URL`                    | Your app URL (default: `http://localhost:3000`)             |
-| `AUTH_DISCORD_ID`             | Discord OAuth client ID                                     |
-| `AUTH_DISCORD_SECRET`         | Discord OAuth client secret                                 |
 | `CODER_URL`                   | URL of your Coder deployment                                |
 | `MINIO_ENDPOINT`              | MinIO endpoint URL                                          |
 | `MINIO_ACCESS_KEY`            | MinIO access key                                            |
