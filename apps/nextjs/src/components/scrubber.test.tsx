@@ -428,3 +428,397 @@ describe("rename timeline functionality", () => {
     expect(fileContents.get("src/file1.ts")).not.toContain("oldValue");
   });
 });
+
+describe("insertText edge cases", () => {
+  it("should insert at the last line when position.line exceeds array length", () => {
+    const lines: string[] = [];
+    const position: TextDocumentPosition = { line: 0, column: 0 };
+    insertText(lines, position, "hello");
+
+    expect(lines).toEqual(["hello"]);
+  });
+
+  it("should insert at out-of-bounds line creating new lines", () => {
+    const lines = ["line1", "line2"];
+    const position: TextDocumentPosition = { line: 5, column: 0 };
+    insertText(lines, position, "new");
+
+    expect(lines.length).toBe(6);
+    expect(lines[5]).toBe("new");
+  });
+
+  it("should insert empty string without changing lines", () => {
+    const lines = ["hello world"];
+    const position: TextDocumentPosition = { line: 0, column: 5 };
+    insertText(lines, position, "");
+
+    expect(lines.join("\n")).toBe("hello world");
+  });
+
+  it("should handle column beyond line length", () => {
+    const lines = ["hello"];
+    const position: TextDocumentPosition = { line: 0, column: 100 };
+    insertText(lines, position, " world");
+
+    expect(lines.join("\n")).toBe("hello world");
+  });
+
+  it("should insert text with only newlines", () => {
+    const lines = ["start", "end"];
+    const position: TextDocumentPosition = { line: 0, column: 5 };
+    insertText(lines, position, "\n");
+
+    expect(lines.join("\n")).toBe("start\n\nend");
+  });
+
+  it("should insert text with trailing newlines", () => {
+    const lines = ["start"];
+    const position: TextDocumentPosition = { line: 0, column: 5 };
+    insertText(lines, position, "middle\n");
+
+    expect(lines.join("\n")).toBe("startmiddle\n");
+  });
+
+  it("should insert at beginning of line (column 0)", () => {
+    const lines = ["existing text"];
+    const position: TextDocumentPosition = { line: 0, column: 0 };
+    insertText(lines, position, "prefix ");
+
+    expect(lines.join("\n")).toBe("prefix existing text");
+  });
+});
+
+describe("deleteText edge cases", () => {
+  it("should handle empty array without error", () => {
+    const lines: string[] = [];
+    const range: Range = {
+      start: { line: 0, column: 0 },
+      end: { line: 0, column: 5 },
+    };
+    expect(() => deleteText(lines, range)).not.toThrow();
+  });
+
+  it("should handle deleting with column beyond line length", () => {
+    const lines = ["hello"];
+    const range: Range = {
+      start: { line: 0, column: 0 },
+      end: { line: 0, column: 100 },
+    };
+    deleteText(lines, range);
+
+    expect(lines.join("\n")).toBe("");
+  });
+
+  it("should handle deleting zero-width range (no deletion)", () => {
+    const lines = ["hello world"];
+    const range: Range = {
+      start: { line: 0, column: 5 },
+      end: { line: 0, column: 5 },
+    };
+    deleteText(lines, range);
+
+    expect(lines.join("\n")).toBe("hello world");
+  });
+
+  it("should handle deleting at out-of-bounds line", () => {
+    const lines = ["hello"];
+    const range: Range = {
+      start: { line: 5, column: 0 },
+      end: { line: 6, column: 0 },
+    };
+    expect(() => deleteText(lines, range)).not.toThrow();
+  });
+
+  it("should delete across multiple lines including entire intermediate lines", () => {
+    const lines = ["line1", "line2", "line3", "line4"];
+    const range: Range = {
+      start: { line: 1, column: 0 },
+      end: { line: 3, column: 0 },
+    };
+    deleteText(lines, range);
+
+    expect(lines.join("\n")).toBe("line1\nline4");
+  });
+
+  it("should delete entire file content", () => {
+    const lines = ["const x = 1;", "const y = 2;"];
+    const range: Range = {
+      start: { line: 0, column: 0 },
+      end: { line: 1, column: 14 },
+    };
+    deleteText(lines, range);
+
+    expect(lines.join("\n")).toBe("");
+  });
+
+  it("should handle multi-line delete where end is same as start line", () => {
+    const lines = ["line1", "line2", "line3"];
+    const range: Range = {
+      start: { line: 1, column: 0 },
+      end: { line: 1, column: 5 },
+    };
+    deleteText(lines, range);
+
+    expect(lines.join("\n")).toBe("line1\n\nline3");
+  });
+
+  it("should preserve leading content on start line in multi-line delete", () => {
+    const lines = ["  indented line", "second", "third"];
+    const range: Range = {
+      start: { line: 0, column: 2 },
+      end: { line: 2, column: 6 },
+    };
+    deleteText(lines, range);
+
+    expect(lines.join("\n")).toBe("  ");
+  });
+
+  it("should handle multi-line delete preserving trailing content on end line", () => {
+    const lines = ["first", "middle", "  trailing content here"];
+    const range: Range = {
+      start: { line: 0, column: 3 },
+      end: { line: 2, column: 2 },
+    };
+    deleteText(lines, range);
+
+    expect(lines.join("\n")).toBe("firtrailing content here");
+  });
+});
+
+describe("shouldIgnoreFrozenReplayFilePath", () => {
+  const shouldIgnore = (filePath: string) =>
+    /^\/terminal[1-9]\d*(?:\..*)?$/.test(filePath);
+
+  it("should return true for /terminal1", () => {
+    expect(shouldIgnore("/terminal1")).toBe(true);
+  });
+
+  it("should return true for /terminal2", () => {
+    expect(shouldIgnore("/terminal2")).toBe(true);
+  });
+
+  it("should return true for /terminal10", () => {
+    expect(shouldIgnore("/terminal10")).toBe(true);
+  });
+
+  it("should return true for /terminal1.something", () => {
+    expect(shouldIgnore("/terminal1.something")).toBe(true);
+  });
+
+  it("should return true for /terminal12.log", () => {
+    expect(shouldIgnore("/terminal12.log")).toBe(true);
+  });
+
+  it("should return false for /terminal", () => {
+    expect(shouldIgnore("/terminal")).toBe(false);
+  });
+
+  it("should return false for /terminal0", () => {
+    expect(shouldIgnore("/terminal0")).toBe(false);
+  });
+
+  it("should return false for /terminal01", () => {
+    expect(shouldIgnore("/terminal01")).toBe(false);
+  });
+
+  it("should return false for /path/to/terminal1", () => {
+    expect(shouldIgnore("/path/to/terminal1")).toBe(false);
+  });
+
+  it("should return false for /terminal/1", () => {
+    expect(shouldIgnore("/terminal/1")).toBe(false);
+  });
+
+  it("should return false for regular file paths", () => {
+    expect(shouldIgnore("/src/app.tsx")).toBe(false);
+    expect(shouldIgnore("/components/Button.ts")).toBe(false);
+    expect(shouldIgnore("index.js")).toBe(false);
+  });
+
+  it("should return false for paths with terminal but different format", () => {
+    expect(shouldIgnore("/myterminal1")).toBe(false);
+    expect(shouldIgnore("/terminalfile1")).toBe(false);
+  });
+});
+
+describe("replayFileContents integration", () => {
+  it("should handle sequential edits to the same file", () => {
+    const events: ReplayEvent[] = [
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "test.txt",
+              range: {
+                start: { line: 0, column: 0 },
+                end: { line: 0, column: 0 },
+              },
+              text: "Hello",
+            },
+          ],
+        },
+      }),
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "test.txt",
+              range: {
+                start: { line: 0, column: 5 },
+                end: { line: 0, column: 5 },
+              },
+              text: " World",
+            },
+          ],
+        },
+      }),
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "test.txt",
+              range: {
+                start: { line: 0, column: 0 },
+                end: { line: 0, column: 5 },
+              },
+              text: "Hi",
+            },
+          ],
+        },
+      }),
+    ];
+
+    const fileContents = replayFileContents(events);
+    expect(fileContents.get("test.txt")).toBe("Hi World");
+  });
+
+  it("should handle file rename preserving content", () => {
+    const events: ReplayEvent[] = [
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "old.ts",
+              range: {
+                start: { line: 0, column: 0 },
+                end: { line: 0, column: 0 },
+              },
+              text: "original content",
+            },
+          ],
+        },
+      }),
+      createReplayEvent({
+        eventType: "DID_RENAME_FILES",
+        metadata: {
+          renamedFiles: [
+            {
+              oldFilePath: "old.ts",
+              newFilePath: "new.ts",
+            },
+          ],
+        },
+      }),
+    ];
+
+    const fileContents = replayFileContents(events);
+    expect(fileContents.get("new.ts")).toBe("original content");
+    expect(fileContents.has("old.ts")).toBe(false);
+  });
+
+  it("should handle multiple files with interleaved edits", () => {
+    const events: ReplayEvent[] = [
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "fileA.txt",
+              range: {
+                start: { line: 0, column: 0 },
+                end: { line: 0, column: 0 },
+              },
+              text: "A1",
+            },
+          ],
+        },
+      }),
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "fileB.txt",
+              range: {
+                start: { line: 0, column: 0 },
+                end: { line: 0, column: 0 },
+              },
+              text: "B1",
+            },
+          ],
+        },
+      }),
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "fileA.txt",
+              range: {
+                start: { line: 0, column: 2 },
+                end: { line: 0, column: 2 },
+              },
+              text: "A2",
+            },
+          ],
+        },
+      }),
+    ];
+
+    const fileContents = replayFileContents(events);
+    expect(fileContents.get("fileA.txt")).toBe("A1A2");
+    expect(fileContents.get("fileB.txt")).toBe("B1");
+  });
+
+  it("should handle deletion and insertion in single event", () => {
+    const events: ReplayEvent[] = [
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "code.txt",
+              range: {
+                start: { line: 0, column: 0 },
+                end: { line: 0, column: 0 },
+              },
+              text: "hello world",
+            },
+          ],
+        },
+      }),
+      createReplayEvent({
+        eventType: "DID_CHANGE_TEXT_DOCUMENT",
+        metadata: {
+          contentChanges: [
+            {
+              filePath: "code.txt",
+              range: {
+                start: { line: 0, column: 0 },
+                end: { line: 0, column: 5 },
+              },
+              text: "goodbye",
+            },
+          ],
+        },
+      }),
+    ];
+
+    const fileContents = replayFileContents(events);
+    expect(fileContents.get("code.txt")).toBe("goodbye world");
+  });
+});
