@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CodeXml, History, UsersRound } from "lucide-react";
 
+import { LeopardLogo } from "~/components/leopard-logo";
 import { isAuthenticated } from "~/lib/auth-server";
 
 const featureItems = [
@@ -29,9 +30,10 @@ export default async function HomePage() {
         <div className="grid w-full items-center gap-16 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)] lg:gap-20">
           <section className="max-w-[520px]">
             <div className="mb-12 flex items-center gap-5">
-              <div className="bg-primary text-primary-foreground flex h-[60px] w-[60px] items-center justify-center rounded-[18px] text-[2rem] font-bold shadow-md">
-                L
+              <div className="w-15 overflow-hidden rounded-lg">
+                <LeopardLogo className="h-full w-full" />
               </div>
+
               <div className="text-foreground text-[2rem] font-semibold tracking-[-0.04em]">
                 Leopard
               </div>

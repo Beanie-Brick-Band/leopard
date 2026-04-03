@@ -31,6 +31,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
   },
+  appleWebApp: {
+    title: "Leopard",
+  },
 };
 
 export const viewport: Viewport = {
