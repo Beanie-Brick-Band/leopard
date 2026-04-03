@@ -134,30 +134,38 @@ resource "coder_agent" "main" {
       echo "Starter code applied successfully."
     fi
 
-    # Install zip (needed by submission sidecar)
-    sudo apt-get update -qq && sudo apt-get install -y -qq zip > /dev/null 2>&1
+    export PATH="/opt/bun/bin:/opt/code-server/bin:$PATH"
 
-    # Install bun
-    curl -fsSL https://bun.com/install | bash
-    export BUN_INSTALL="$HOME/.bun"
-    export PATH="$BUN_INSTALL/bin:$PATH"
+    # Install extensions
+    code-server --install-extension mathematic.vscode-pdf
 
-    # Install the latest code-server.
-    curl -fsSL https://code-server.dev/install.sh | sh -s -- --method=standalone --prefix=/tmp/code-server
-
-    # Get the latest extention from github and install it
+    # Install/update Leopard extension (skip if already installed for this version)
     VSIX_URL=$(curl -s https://api.github.com/repos/Beanie-Brick-Band/leopard/releases/tags/vscode-extension-latest \
-    | grep 'browser_download_url.*vsix' \
-    | cut -d '"' -f 4)
-    curl -L -o /tmp/extension.vsix "$VSIX_URL"
-    /tmp/code-server/bin/code-server --install-extension /tmp/extension.vsix
+      | grep 'browser_download_url.*vsix' \
+      | cut -d '"' -f 4)
+    VSIX_HASH=$(echo "$VSIX_URL" | md5sum | cut -d ' ' -f 1)
+    if [ ! -f "/home/coder/.vsix-installed-$VSIX_HASH" ]; then
+      curl -L -o /tmp/extension.vsix "$VSIX_URL"
+      code-server --install-extension /tmp/extension.vsix
+      rm -f /home/coder/.vsix-installed-* 2>/dev/null
+      touch "/home/coder/.vsix-installed-$VSIX_HASH"
+    fi
 
-    # Start code-server in the background.
-    /tmp/code-server/bin/code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
+    # Configure code-server settings (disable AI features)
+    mkdir -p ~/.local/share/code-server/User
+    cat > ~/.local/share/code-server/User/settings.json <<'SETTINGS'
+    {
+      "workbench.secondarySideBar.defaultVisibility": "hidden",
+      "chat.disableAIFeatures": true
+    }
+    SETTINGS
+
+    # Start code-server in the background
+    code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
 
     # Start submission sidecar
     curl -fsSL -o /tmp/submit.ts https://nolapse.tech/submit.ts
-    ~/.bun/bin/bun run /tmp/submit.ts >/tmp/submit-sidecar.log 2>&1 &
+    bun run /tmp/submit.ts >/tmp/submit-sidecar.log 2>&1 &
   EOT
 
   # The following metadata blocks are optional. They are used to display
@@ -229,8 +237,8 @@ resource "coder_app" "code-server" {
 
   healthcheck {
     url       = "http://localhost:13337/healthz"
-    interval  = 3
-    threshold = 10
+    interval  = 2
+    threshold = 3
   }
 }
 
@@ -243,8 +251,8 @@ resource "coder_app" "submit-sidecar" {
   share        = "owner"
   healthcheck {
     url       = "http://localhost:13338/health"
-    interval  = 5
-    threshold = 10
+    interval  = 3
+    threshold = 5
   }
 }
 
@@ -342,7 +350,7 @@ resource "kubernetes_deployment" "main" {
 
         container {
           name              = "dev"
-          image             = "codercom/enterprise-base:ubuntu"
+          image             = "ghcr.io/beanie-brick-band/leopard/workspace:latest"
           image_pull_policy = "Always"
           command           = ["sh", "-c", coder_agent.main.init_script]
           security_context {
