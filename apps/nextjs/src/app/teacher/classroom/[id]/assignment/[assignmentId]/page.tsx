@@ -18,6 +18,7 @@ import {
 import { toast } from "sonner";
 
 import type { Id } from "@package/backend/convex/_generated/dataModel";
+import type { DateRange } from "@package/ui/calendar";
 import { api } from "@package/backend/convex/_generated/api";
 import { Button } from "@package/ui/button";
 import {
@@ -34,16 +35,14 @@ import { Spinner } from "@package/ui/spinner";
 
 import { getSubmissionDownload } from "~/app/app/actions";
 import { AppDataGrid } from "~/components/app-data-grid";
+import {
+  DatePickerWithRange,
+  defaultDateRange,
+} from "~/components/date-picker-with-range";
 import { Editor } from "~/components/editor";
 import { Authenticated, AuthLoading, Unauthenticated } from "~/lib/auth";
 import { triggerDownload } from "~/lib/download";
 import { StarterCodeCard } from "./starter-code-card";
-
-function formatDateForInput(timestamp: number) {
-  const date = new Date(timestamp);
-  const offset = date.getTimezoneOffset() * 60_000;
-  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
-}
 
 function AssignmentContent({
   classroomId,
@@ -71,8 +70,7 @@ function AssignmentContent({
   interface AssignmentDraft {
     name: NonNullable<UpdateAssignmentArgs["name"]>;
     description: NonNullable<UpdateAssignmentArgs["description"]>;
-    releaseDate: string;
-    dueDate: string;
+    dateRange: DateRange;
   }
 
   const [isEditing, setIsEditing] = useState(false);
@@ -95,8 +93,10 @@ function AssignmentContent({
     setDraft({
       name: assignment.name,
       description: assignment.description ?? "",
-      releaseDate: formatDateForInput(assignment.releaseDate),
-      dueDate: formatDateForInput(assignment.dueDate),
+      dateRange: {
+        from: new Date(assignment.releaseDate),
+        to: new Date(assignment.dueDate),
+      },
     });
     setIsEditing(true);
   };
@@ -120,8 +120,11 @@ function AssignmentContent({
     setIsSavingAssignment(true);
 
     try {
-      const parsedReleaseDate = Date.parse(draft.releaseDate);
-      const parsedDueDate = Date.parse(draft.dueDate);
+      if (!draft.dateRange.from || !draft.dateRange.to) {
+        throw new Error("Please select a date range");
+      }
+      const parsedReleaseDate = draft.dateRange.from.getTime();
+      const parsedDueDate = draft.dateRange.to.getTime();
 
       if (Number.isNaN(parsedReleaseDate) || Number.isNaN(parsedDueDate)) {
         throw new Error("Invalid date values");
@@ -391,30 +394,11 @@ function AssignmentContent({
                       }
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="assignment-release-date">
-                      Release Date
-                    </Label>
-                    <Input
-                      id="assignment-release-date"
-                      type="datetime-local"
-                      value={draft?.releaseDate ?? ""}
-                      onChange={(event) =>
-                        updateDraft({ releaseDate: event.target.value })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="assignment-due-date">Due Date</Label>
-                    <Input
-                      id="assignment-due-date"
-                      type="datetime-local"
-                      value={draft?.dueDate ?? ""}
-                      onChange={(event) =>
-                        updateDraft({ dueDate: event.target.value })
-                      }
-                    />
-                  </div>
+                  <DatePickerWithRange
+                    date={draft?.dateRange ?? defaultDateRange()}
+                    onDateChange={(dateRange) => updateDraft({ dateRange })}
+                    size="narrow"
+                  />
                   <div className="flex gap-2">
                     <Button
                       className="flex-1"
@@ -450,14 +434,6 @@ function AssignmentContent({
                     </div>
                     <div>
                       <p className="text-muted-foreground text-xs uppercase">
-                        Due Date
-                      </p>
-                      <p className="font-medium">
-                        {new Date(assignment.dueDate).toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs uppercase">
                         Release Date
                       </p>
                       <p className="font-medium">
@@ -466,9 +442,17 @@ function AssignmentContent({
                     </div>
                     <div>
                       <p className="text-muted-foreground text-xs uppercase">
+                        Due Date
+                      </p>
+                      <p className="font-medium">
+                        {new Date(assignment.dueDate).toLocaleString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs uppercase">
                         Created
                       </p>
-                      <p className="text-sm">
+                      <p className="font-medium">
                         {new Date(assignment._creationTime).toLocaleString()}
                       </p>
                     </div>
