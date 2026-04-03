@@ -7,9 +7,12 @@ This directory contains all submission materials for the Group 18 capstone proje
 - **Group 18 - Capstone Final Poster.pdf** - Final presentation poster
 - **Group 18 - Capstone Final Video.mp4** - Final project demonstration video
 - **Group 18 - Capstone Proof of Concept Video.mp4** - Proof of concept demonstration
+- **Group 18 - Design, Validation and Verification Results.pdf** - Design, validation and verification results
+- **Group 18 - Reflection.pdf** - Team reflection document
 - **Group 18 - SRS & Project Plan.pdf** - Software Requirements Specification and Project Plan
 - **Group 18 - Stakeholder Interview.pdf** - Stakeholder interview documentation
 - **Group 18 - Team Form.pdf** - Team formation document
+- **TA_README.md** - TA-specific documentation
 - **meetings/** - Directory containing meeting notes and documentation
   - **Group 18 - Nov 10, 2025 - UI Prototype.pdf** - UI prototype design and discussion
   - **Group 18 - March 25, 2026 - Poster Exploration.pdf** - Poster design exploration session
