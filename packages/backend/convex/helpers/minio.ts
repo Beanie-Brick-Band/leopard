@@ -12,17 +12,17 @@ export { getObjectKey } from "./storageKeys";
 
 function getClient() {
   return new S3Client({
-    endpoint: process.env.MINIO_ENDPOINT!, // https://minio.tryleopard.dev
-    region: "us-east-1", // MinIO ignores this but SDK requires it
+    endpoint: process.env.R2_ENDPOINT!, // https://<account>.r2.cloudflarestorage.com
+    region: "auto",
     credentials: {
-      accessKeyId: process.env.MINIO_ACCESS_KEY!,
-      secretAccessKey: process.env.MINIO_SECRET_KEY!,
+      accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
     },
-    forcePathStyle: true, // Required for MinIO
+    forcePathStyle: true,
   });
 }
 
-const BUCKET = process.env.MINIO_BUCKET ?? "starter-codes";
+const BUCKET = process.env.R2_BUCKET ?? "leopard";
 
 export async function generateUploadUrl(key: string): Promise<string> {
   const client = getClient();

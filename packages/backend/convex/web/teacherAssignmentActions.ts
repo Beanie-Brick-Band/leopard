@@ -34,7 +34,7 @@ export const generateStarterCodeUploadUrl = action({
       { classroomId: args.classroomId, userId: user._id },
     );
 
-    const key = `${args.classroomId}/${crypto.randomUUID()}/starter-code.zip`;
+    const key = `starter-codes/${args.classroomId}/${crypto.randomUUID()}/starter-code.zip`;
     const uploadUrl = await generateUploadUrl(key);
 
     return { uploadUrl, storageKey: key };

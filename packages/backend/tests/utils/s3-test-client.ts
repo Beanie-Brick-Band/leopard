@@ -11,17 +11,17 @@ const runId = randomUUID().slice(0, 8);
 
 export function createTestS3Client(): S3Client {
   return new S3Client({
-    endpoint: process.env.MINIO_ENDPOINT!,
-    region: "us-east-1",
+    endpoint: process.env.R2_ENDPOINT!,
+    region: "auto",
     credentials: {
-      accessKeyId: process.env.MINIO_ACCESS_KEY!,
-      secretAccessKey: process.env.MINIO_SECRET_KEY!,
+      accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
     },
     forcePathStyle: true,
   });
 }
 
-const BUCKET = process.env.MINIO_BUCKET ?? "starter-codes";
+const BUCKET = process.env.R2_BUCKET ?? "leopard";
 
 export function testKey(label: string): string {
   return `__test__/${runId}/${label}/starter-code.zip`;
