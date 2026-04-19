@@ -70,6 +70,10 @@ export const launchE2BWorkspace = action({
       },
     });
 
+    // Set hostname = sandboxId so the VS Code extension's os.hostname() lets
+    // the backend resolve which workspace to attribute events to.
+    await sandbox.commands.run(`sudo -n hostname ${sandbox.sandboxId}`);
+
     const starterCodeKey = await ctx.runQuery(
       internal.web.assignment.internalGetAssignmentStarterCodeKey,
       { assignmentId: args.assignmentId },

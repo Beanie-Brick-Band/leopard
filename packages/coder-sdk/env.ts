@@ -3,7 +3,7 @@ import { z } from "zod/v4";
 
 export const env = createEnv({
   server: {
-    CODER_URL: z.string().url(),
+    CODER_URL: z.string().url().default("https://coder.invalid"),
   },
   runtimeEnv: process.env,
 });
