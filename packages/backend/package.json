@@ -28,6 +28,7 @@
     "convex": "^1.29.0",
     "convex-helpers": "^0.1.105",
     "date-fns": "^4.1.0",
+    "e2b": "^2.19.0",
     "zod": "catalog:"
   },
   "devDependencies": {

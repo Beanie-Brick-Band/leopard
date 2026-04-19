@@ -52,12 +52,15 @@ export default defineSchema({
     .index("studentId_assignmentId", ["studentId", "assignmentId"])
     .index("assignmentId_studentId", ["assignmentId", "studentId"]),
   workspaces: defineTable({
-    coderWorkspaceId: v.string(),
+    coderWorkspaceId: v.optional(v.string()),
+    e2bSandboxId: v.optional(v.string()),
+    expiresAt: v.optional(v.number()),
     isActive: v.boolean(),
     userId: v.string(), // map this to betterAuth user id
     assignmentId: v.id("assignments"),
   })
     .index("coderWorkspaceId", ["coderWorkspaceId"])
+    .index("e2bSandboxId", ["e2bSandboxId"])
     .index("userId_isActive", ["userId", "isActive"])
     .index("assignmentId_userId", ["assignmentId", "userId"]),
   settings: defineTable({

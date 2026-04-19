@@ -2,6 +2,7 @@
 
 import { v } from "convex/values";
 import { z } from "zod";
+import { Sandbox } from "e2b";
 
 import {
   createNewSessionKey,
@@ -243,6 +244,125 @@ export const triggerSubmission = action({
     }
 
     // Deactivate workspace in DB
+    await ctx.runMutation(internal.web.assignment.deactivateWorkspace, {
+      workspaceId: workspace._id,
+    });
+
+    return { success: true, submissionId };
+  },
+});
+
+export const triggerE2BSubmission = action({
+  args: { assignmentId: v.id("assignments") },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ success: boolean; submissionId: Id<"submissions"> }> => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) {
+      throw new Error("Not authenticated");
+    }
+
+    const workspace = await ctx.runQuery(
+      internal.web.assignment.getWorkspaceByAssignment,
+      {
+        userId: user._id,
+        assignmentId: args.assignmentId,
+      },
+    );
+    if (!workspace || !workspace.e2bSandboxId) {
+      throw new Error(
+        "You have never launched a workspace for this assignment. No work to be submitted.",
+      );
+    }
+
+    const submissionId = await ctx.runMutation(
+      internal.web.submission.internalSubmitAssignment,
+      {
+        assignmentId: args.assignmentId,
+        studentId: user._id,
+        workspaceId: workspace._id,
+      },
+    );
+
+    const assignment = await ctx.runQuery(
+      internal.web.submissionQueries.getAssignment,
+      { assignmentId: args.assignmentId },
+    );
+    if (!assignment) {
+      await ctx.runMutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
+      throw new Error("Assignment not found");
+    }
+
+    const storageKey = getSubmissionObjectKey(
+      assignment.classroomId,
+      args.assignmentId,
+      user._id,
+    );
+    let uploadUrl: string;
+    try {
+      uploadUrl = await generateUploadUrl(storageKey);
+    } catch (err) {
+      await ctx.runMutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
+      throw err;
+    }
+
+    let sandbox;
+    try {
+      sandbox = await Sandbox.connect(workspace.e2bSandboxId);
+    } catch (err) {
+      await ctx.runMutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
+      throw new Error(
+        `Could not connect to sandbox ${workspace.e2bSandboxId}: ${(err as Error).message}`,
+      );
+    }
+
+    const zipResult = await sandbox.commands.run(
+      `cd /home/user/workspace && /usr/bin/zip -r /tmp/submission.zip . -x '*/.*' -x '.*'`,
+    );
+    if (zipResult.exitCode !== 0) {
+      await ctx.runMutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
+      throw new Error(`Zip failed: ${zipResult.stderr}`);
+    }
+
+    // Upload from inside the sandbox so the bytes never round-trip through Convex.
+    const uploadResult = await sandbox.commands.run(
+      `curl -sS -f -X PUT -H 'Content-Type: application/zip' --data-binary @/tmp/submission.zip '${uploadUrl}'`,
+    );
+    if (uploadResult.exitCode !== 0) {
+      await ctx.runMutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
+      throw new Error(`Upload failed: ${uploadResult.stderr}`);
+    }
+
+    const exists = await verifyObjectExists(storageKey);
+    if (!exists) {
+      await ctx.runMutation(internal.web.submission.internalFailSubmission, {
+        submissionId,
+      });
+      throw new Error("Upload verification failed — file not found in storage");
+    }
+
+    await ctx.runMutation(internal.web.submission.internalConfirmSubmission, {
+      submissionId,
+      submissionStorageKey: storageKey,
+    });
+
+    try {
+      await Sandbox.kill(workspace.e2bSandboxId);
+    } catch {
+      // sandbox already gone, ignore
+    }
+
     await ctx.runMutation(internal.web.assignment.deactivateWorkspace, {
       workspaceId: workspace._id,
     });

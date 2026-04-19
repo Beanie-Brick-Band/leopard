@@ -1,6 +1,9 @@
 "use node";
 
+import crypto from "node:crypto";
+
 import { v } from "convex/values";
+import { Sandbox } from "e2b";
 
 import {
   createNewSessionKey,
@@ -19,6 +22,152 @@ import { action } from "../_generated/server";
 import { authComponent } from "../auth";
 import { ensureUserActive, ensureWorkspaceRunning } from "../helpers/coder";
 import { generateDownloadUrl } from "../helpers/minio";
+
+const E2B_TEMPLATE = "leopard-workspace";
+const CODE_SERVER_PORT = 13337;
+const AUTH_PROXY_PORT = 13338;
+const SANDBOX_TIMEOUT_MS = 10 * 60 * 1000;
+const AUTH_TOKEN_TTL_SEC = 10 * 60;
+
+function signAuthToken(secret: string, ttlSec: number): string {
+  const payload = { exp: Math.floor(Date.now() / 1000) + ttlSec };
+  const payloadB64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const sig = crypto
+    .createHmac("sha256", secret)
+    .update(payloadB64)
+    .digest("hex");
+  return `${payloadB64}.${sig}`;
+}
+
+export const launchE2BWorkspace = action({
+  args: { assignmentId: v.id("assignments") },
+  handler: async (ctx, args): Promise<{ workspaceUrl: string }> => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) {
+      throw new Error("Not authenticated");
+    }
+    const userId = user._id.toString();
+
+    // Reuse the live sandbox for this assignment if it hasn't expired.
+    const existingForAssignment = await ctx.runQuery(
+      internal.web.assignment.getWorkspaceByAssignment,
+      { userId, assignmentId: args.assignmentId },
+    );
+    if (
+      existingForAssignment?.e2bSandboxId &&
+      existingForAssignment.expiresAt &&
+      existingForAssignment.expiresAt > Date.now()
+    ) {
+      try {
+        const existingSandbox = await Sandbox.connect(
+          existingForAssignment.e2bSandboxId,
+        );
+        const secretProbe = await existingSandbox.commands.run(
+          "printenv AUTH_PROXY_SECRET",
+        );
+        const existingSecret = secretProbe.stdout.trim();
+        if (existingSecret) {
+          const token = signAuthToken(existingSecret, AUTH_TOKEN_TTL_SEC);
+          const host = existingSandbox.getHost(AUTH_PROXY_PORT);
+          return {
+            workspaceUrl: `https://${host}/?token=${encodeURIComponent(token)}&folder=/home/user/workspace`,
+          };
+        }
+      } catch {
+        // sandbox is gone or unreachable — fall through and make a new one
+      }
+    }
+
+    // Tear down any sandbox for a different assignment (one-at-a-time).
+    const active = await ctx.runQuery(
+      internal.web.assignment.getUserActiveWorkspace,
+      { userId },
+    );
+    if (active?.e2bSandboxId) {
+      try {
+        await Sandbox.kill(active.e2bSandboxId);
+      } catch {
+        // previous sandbox already gone
+      }
+    }
+
+    const authSecret = crypto.randomBytes(32).toString("hex");
+    const authToken = signAuthToken(authSecret, AUTH_TOKEN_TTL_SEC);
+
+    const sandbox = await Sandbox.create(E2B_TEMPLATE, {
+      timeoutMs: SANDBOX_TIMEOUT_MS,
+      envs: {
+        AUTH_PROXY_SECRET: authSecret,
+      },
+    });
+
+    // Set hostname = sandboxId so the VS Code extension's os.hostname() lets
+    // the backend resolve which workspace to attribute events to.
+    await sandbox.commands.run(`sudo -n hostname ${sandbox.sandboxId}`);
+
+    const starterCodeKey = await ctx.runQuery(
+      internal.web.assignment.internalGetAssignmentStarterCodeKey,
+      { assignmentId: args.assignmentId },
+    );
+    if (starterCodeKey) {
+      const downloadUrl = await generateDownloadUrl(starterCodeKey);
+      await sandbox.commands.run(
+        `curl -fsSL -o /tmp/starter.zip "${downloadUrl}" && unzip -o /tmp/starter.zip -d /home/user/workspace && rm /tmp/starter.zip`,
+      );
+    }
+
+    const convexUrl =
+      process.env.CONVEX_URL ?? process.env.NEXT_PUBLIC_CONVEX_URL ?? "";
+    const settings = JSON.stringify(
+      {
+        "workbench.secondarySideBar.defaultVisibility": "hidden",
+        "chat.disableAIFeatures": true,
+        "leopard.convexUrl": convexUrl,
+      },
+      null,
+      2,
+    );
+    await sandbox.commands.run(
+      `mkdir -p /home/user/.local/share/code-server/User`,
+    );
+    await sandbox.files.write(
+      "/home/user/.local/share/code-server/User/settings.json",
+      settings,
+    );
+
+    // code-server binds to loopback; only the auth-proxy is reachable from E2B's public URL.
+    await sandbox.commands.run(
+      `nohup /opt/code-server/bin/code-server --auth none --bind-addr 127.0.0.1:${CODE_SERVER_PORT} --extensions-dir /opt/code-server-extensions /home/user/workspace > /tmp/code-server.log 2>&1 &`,
+      { background: true },
+    );
+
+    await sandbox.commands.run(
+      `cd /opt/auth-proxy && nohup node auth-proxy.mjs > /tmp/auth-proxy.log 2>&1 &`,
+      { background: true },
+    );
+
+    // Poll code-server /healthz over loopback so we don't hand back a URL that 502s
+    for (let i = 0; i < 30; i++) {
+      const probe = await sandbox.commands.run(
+        `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:${CODE_SERVER_PORT}/healthz || true`,
+      );
+      if (probe.stdout.trim() === "200") break;
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+
+    await ctx.runMutation(internal.web.assignment.setUserActiveE2BWorkspace, {
+      userId,
+      e2bSandboxId: sandbox.sandboxId,
+      assignmentId: args.assignmentId,
+      expiresAt: Date.now() + SANDBOX_TIMEOUT_MS,
+    });
+
+    const host = sandbox.getHost(AUTH_PROXY_PORT);
+    const workspaceUrl = `https://${host}/?token=${encodeURIComponent(authToken)}&folder=/home/user/workspace`;
+
+    return { workspaceUrl };
+  },
+});
 
 export const launchWorkspace = action({
   args: { assignmentId: v.id("assignments") },
