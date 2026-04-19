@@ -2,6 +2,11 @@
 
 This directory contains Kubernetes/Helm configurations for deploying Coder.
 
+> **Decommissioning or migrating the cluster?** See [`RESTORE.md`](./RESTORE.md)
+> and run [`./backup.sh`](./backup.sh) first - it captures all manifests, a
+> PostgreSQL dump of Coder's DB, and a mirror of the MinIO `starter-codes`
+> bucket into a single archive you can keep around.
+
 ## Files
 
 - `helmfile.yml` - Production Helmfile configuration
