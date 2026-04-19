@@ -1,0 +1,98 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"Role","metadata":{"annotations":{},"name":"coder-workspace-manager","namespace":"workspaces"},"rules":[{"apiGroups":[""],"resources":["persistentvolumeclaims"],"verbs":["create","get","list","delete","update","patch","watch"]},{"apiGroups":[""],"resources":["pods","pods/log","pods/exec"],"verbs":["create","get","list","delete","update","patch","watch"]},{"apiGroups":[""],"resources":["services"],"verbs":["create","get","list","delete","update","patch","watch"]},{"apiGroups":[""],"resources":["secrets","configmaps"],"verbs":["create","get","list","delete","update","patch"]},{"apiGroups":["apps"],"resources":["deployments"],"verbs":["create","get","list","delete","update","patch","watch"]}]}
+    creationTimestamp: "2026-01-09T17:34:36Z"
+    name: coder-workspace-manager
+    namespace: workspaces
+    resourceVersion: "3692"
+    uid: 5adf4516-96d6-4b22-afe4-2fe6351b00be
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumeclaims
+    verbs:
+    - create
+    - get
+    - list
+    - delete
+    - update
+    - patch
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    - pods/log
+    - pods/exec
+    verbs:
+    - create
+    - get
+    - list
+    - delete
+    - update
+    - patch
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - services
+    verbs:
+    - create
+    - get
+    - list
+    - delete
+    - update
+    - patch
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - secrets
+    - configmaps
+    verbs:
+    - create
+    - get
+    - list
+    - delete
+    - update
+    - patch
+  - apiGroups:
+    - apps
+    resources:
+    - deployments
+    verbs:
+    - create
+    - get
+    - list
+    - delete
+    - update
+    - patch
+    - watch
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"name":"coder-workspace-manager","namespace":"workspaces"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"coder-workspace-manager"},"subjects":[{"kind":"ServiceAccount","name":"coder","namespace":"coder"}]}
+    creationTimestamp: "2026-01-09T17:34:36Z"
+    name: coder-workspace-manager
+    namespace: workspaces
+    resourceVersion: "3693"
+    uid: 04c99d67-eb60-431b-a648-0a84da703e65
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: coder-workspace-manager
+  subjects:
+  - kind: ServiceAccount
+    name: coder
+    namespace: coder
+kind: List
+metadata:
+  resourceVersion: ""

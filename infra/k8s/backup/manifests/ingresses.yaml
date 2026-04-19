@@ -1,0 +1,142 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: coder
+      meta.helm.sh/release-namespace: coder
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    creationTimestamp: "2026-01-09T17:33:40Z"
+    generation: 2
+    labels:
+      app.kubernetes.io/instance: coder
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: coder
+      app.kubernetes.io/part-of: coder
+      app.kubernetes.io/version: 2.28.0
+      helm.sh/chart: coder-2.28.0
+    name: coder
+    namespace: coder
+    resourceVersion: "9582199"
+    uid: a870c766-ea8c-4745-9730-b189bb9559b6
+  spec:
+    ingressClassName: traefik
+    rules:
+    - host: coder.tryleopard.dev
+      http:
+        paths:
+        - backend:
+            service:
+              name: coder
+              port:
+                name: http
+          path: /
+          pathType: Prefix
+    - host: '*.coder.tryleopard.dev'
+      http:
+        paths:
+        - backend:
+            service:
+              name: coder
+              port:
+                name: http
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - coder.tryleopard.dev
+      secretName: coder-tls
+  status:
+    loadBalancer:
+      ingress:
+      - hostname: d99ed1d5-f08b-4d79-8349-9ad72a29954f.k8s.civo.com
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: minio
+      meta.helm.sh/release-namespace: minio
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    creationTimestamp: "2026-02-25T00:08:58Z"
+    generation: 2
+    labels:
+      app: minio
+      app.kubernetes.io/managed-by: Helm
+      chart: minio-5.4.0
+      heritage: Helm
+      release: minio
+    name: minio
+    namespace: minio
+    resourceVersion: "9582006"
+    uid: 30db6d9c-e973-48a6-94a4-0e55b72badc4
+  spec:
+    ingressClassName: traefik
+    rules:
+    - host: minio.tryleopard.dev
+      http:
+        paths:
+        - backend:
+            service:
+              name: minio
+              port:
+                number: 9000
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - minio.tryleopard.dev
+      secretName: minio-tls
+  status:
+    loadBalancer:
+      ingress:
+      - hostname: d99ed1d5-f08b-4d79-8349-9ad72a29954f.k8s.civo.com
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: minio
+      meta.helm.sh/release-namespace: minio
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    creationTimestamp: "2026-02-25T00:08:58Z"
+    generation: 2
+    labels:
+      app: minio
+      app.kubernetes.io/managed-by: Helm
+      chart: minio-5.4.0
+      heritage: Helm
+      release: minio
+    name: minio-console
+    namespace: minio
+    resourceVersion: "9581998"
+    uid: 7094d682-d992-49b9-a577-3489738701b4
+  spec:
+    ingressClassName: traefik
+    rules:
+    - host: minio-console.tryleopard.dev
+      http:
+        paths:
+        - backend:
+            service:
+              name: minio-console
+              port:
+                number: 9001
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - minio-console.tryleopard.dev
+      secretName: minio-console-tls
+  status:
+    loadBalancer:
+      ingress:
+      - hostname: d99ed1d5-f08b-4d79-8349-9ad72a29954f.k8s.civo.com
+kind: List
+metadata:
+  resourceVersion: ""

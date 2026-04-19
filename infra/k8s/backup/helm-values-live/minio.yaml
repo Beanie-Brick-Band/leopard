@@ -1,0 +1,43 @@
+buckets:
+- name: starter-codes
+  policy: none
+  purge: false
+consoleIngress:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  enabled: true
+  hosts:
+  - minio-console.tryleopard.dev
+  tls:
+  - hosts:
+    - minio-console.tryleopard.dev
+    secretName: minio-console-tls
+environment:
+  MINIO_CORS_ALLOW_ORIGIN: https://tryleopard.dev,https://*.tryleopard.dev,http://localhost:3000
+existingSecret: minio-credentials
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  enabled: true
+  hosts:
+  - minio.tryleopard.dev
+  tls:
+  - hosts:
+    - minio.tryleopard.dev
+    secretName: minio-tls
+mode: standalone
+persistence:
+  enabled: true
+  size: 5Gi
+replicas: 1
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi

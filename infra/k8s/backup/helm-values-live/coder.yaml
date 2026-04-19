@@ -1,0 +1,39 @@
+coder:
+  env:
+  - name: CODER_ACCESS_URL
+    value: https://coder.tryleopard.dev
+  - name: CODER_WILDCARD_ACCESS_URL
+    value: '*.coder.tryleopard.dev'
+  - name: CODER_OAUTH2_GITHUB_ALLOW_SIGNUPS
+    value: "true"
+  - name: CODER_MAX_TOKEN_LIFETIME
+    value: 8760h
+  - name: CODER_MAX_ADMIN_TOKEN_LIFETIME
+    value: 8760h
+  - name: CODER_PG_CONNECTION_URL
+    valueFrom:
+      secretKeyRef:
+        key: url
+        name: coder-db-url
+  ingress:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    className: traefik
+    enable: true
+    host: coder.tryleopard.dev
+    tls:
+      enable: true
+      secretName: coder-tls
+    wildcardHost: '*.coder.tryleopard.dev'
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  service:
+    type: ClusterIP

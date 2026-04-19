@@ -25,13 +25,18 @@ releases:
     chart: jetstack/cert-manager
     version: v1.19.1
     values:
+      - ./cert-manager-values.yml
       - ./ssl.yml
 
   # --- PostgreSQL ---
+  # Requires secret `postgresql` in namespace `coder` with keys:
+  #   postgres-password, password, replication-password
   - name: postgresql
     namespace: coder
     chart: bitnami/postgresql
     version: 18.1.8
+    values:
+      - ./postgresql-values.yml
 
   # --- Coder Core ---
   - name: coder

@@ -1,0 +1,4 @@
+auth:
+  database: coder
+  username: coder
+  existingSecret: postgresql

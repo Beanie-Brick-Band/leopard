@@ -1,0 +1,141 @@
+apiVersion: v1
+items:
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    creationTimestamp: "2026-01-09T17:33:40Z"
+    generation: 2
+    labels:
+      app.kubernetes.io/instance: coder
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: coder
+      app.kubernetes.io/part-of: coder
+      app.kubernetes.io/version: 2.28.0
+      helm.sh/chart: coder-2.28.0
+    name: coder-tls
+    namespace: coder
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: coder
+      uid: a870c766-ea8c-4745-9730-b189bb9559b6
+    resourceVersion: "9582414"
+    uid: 160034ea-18a4-433b-ace0-8512aaa71dcb
+  spec:
+    dnsNames:
+    - coder.tryleopard.dev
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: coder-tls
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-03T16:56:19Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 2
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-02T15:57:47Z"
+    notBefore: "2026-04-03T15:57:48Z"
+    renewalTime: "2026-06-02T15:57:47Z"
+    revision: 3
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    creationTimestamp: "2026-02-25T00:19:28Z"
+    generation: 2
+    labels:
+      app: minio
+      app.kubernetes.io/managed-by: Helm
+      chart: minio-5.4.0
+      heritage: Helm
+      release: minio
+    name: minio-console-tls
+    namespace: minio
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: minio-console
+      uid: 7094d682-d992-49b9-a577-3489738701b4
+    resourceVersion: "9582372"
+    uid: deedd47d-4cb7-406f-b561-1e6e9fa437f9
+  spec:
+    dnsNames:
+    - minio-console.tryleopard.dev
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: minio-console-tls
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-03T16:56:11Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 2
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-02T15:57:39Z"
+    notBefore: "2026-04-03T15:57:40Z"
+    renewalTime: "2026-06-02T15:57:39Z"
+    revision: 2
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    creationTimestamp: "2026-02-25T00:19:28Z"
+    generation: 2
+    labels:
+      app: minio
+      app.kubernetes.io/managed-by: Helm
+      chart: minio-5.4.0
+      heritage: Helm
+      release: minio
+    name: minio-tls
+    namespace: minio
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: minio
+      uid: 30db6d9c-e973-48a6-94a4-0e55b72badc4
+    resourceVersion: "9582336"
+    uid: 4dae6dcc-c6eb-41c0-a515-4b349d8d6a02
+  spec:
+    dnsNames:
+    - minio.tryleopard.dev
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: minio-tls
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-03T16:56:09Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 2
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-02T15:57:37Z"
+    notBefore: "2026-04-03T15:57:38Z"
+    renewalTime: "2026-06-02T15:57:37Z"
+    revision: 2
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,129 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"cert-manager"},"spec":{},"status":{}}
+    creationTimestamp: "2026-01-09T17:32:50Z"
+    labels:
+      kubernetes.io/metadata.name: cert-manager
+      name: cert-manager
+    name: cert-manager
+    resourceVersion: "3275"
+    uid: 694002f9-4c00-4669-9e65-bb5e0aed4af1
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"coder"},"spec":{},"status":{}}
+    creationTimestamp: "2026-01-09T17:32:50Z"
+    labels:
+      kubernetes.io/metadata.name: coder
+      name: coder
+    name: coder
+    resourceVersion: "3265"
+    uid: 334c3276-ad98-4fde-be38-d624af0f8792
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    creationTimestamp: "2026-01-09T16:39:04Z"
+    labels:
+      kubernetes.io/metadata.name: default
+    name: default
+    resourceVersion: "22"
+    uid: daec615d-d5f5-4441-8cd8-7eda40662ff4
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    creationTimestamp: "2026-01-09T16:39:04Z"
+    labels:
+      kubernetes.io/metadata.name: kube-node-lease
+    name: kube-node-lease
+    resourceVersion: "30"
+    uid: 210708af-f1ac-4bcd-983b-8fee9ffe5ae5
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    creationTimestamp: "2026-01-09T16:39:04Z"
+    labels:
+      kubernetes.io/metadata.name: kube-public
+    name: kube-public
+    resourceVersion: "13"
+    uid: 60a8f3f0-7039-498f-8357-5177f13293d1
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    creationTimestamp: "2026-01-09T16:39:04Z"
+    labels:
+      kubernetes.io/metadata.name: kube-system
+    name: kube-system
+    resourceVersion: "7"
+    uid: 64c6ae4b-f270-4afe-b628-eaf84a8d4539
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    creationTimestamp: "2026-02-25T00:08:58Z"
+    labels:
+      kubernetes.io/metadata.name: minio
+      name: minio
+    name: minio
+    resourceVersion: "4719737"
+    uid: 67a9c9d6-efbb-4107-9701-d093c083c8fd
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"workspaces"},"spec":{},"status":{}}
+    creationTimestamp: "2026-01-09T17:32:50Z"
+    labels:
+      kubernetes.io/metadata.name: workspaces
+    name: workspaces
+    resourceVersion: "3253"
+    uid: fa2be162-b4c9-4f97-9773-589935e3775c
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+kind: List
+metadata:
+  resourceVersion: ""

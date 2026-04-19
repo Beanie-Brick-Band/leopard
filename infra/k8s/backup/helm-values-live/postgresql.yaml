@@ -1,0 +1,4 @@
+auth:
+  database: coder
+  password: REDACTED
+  username: coder
