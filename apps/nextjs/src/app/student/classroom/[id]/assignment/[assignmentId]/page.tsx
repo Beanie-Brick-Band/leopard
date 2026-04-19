@@ -1,6 +1,12 @@
 "use client";
 
-import { startTransition, use, useActionState, useEffect, useState } from "react";
+import {
+  startTransition,
+  use,
+  useActionState,
+  useEffect,
+  useState,
+} from "react";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import {
@@ -297,40 +303,42 @@ function Content({
                   {new Date(assignment.dueDate).toLocaleString()}
                 </span>
               </div>
-              {assignmentWorkspace ? (
-                (() => {
-                  const expiresAt = assignmentWorkspace.expiresAt;
-                  const remainingMs =
-                    expiresAt != null ? Math.max(0, expiresAt - now) : null;
-                  const expired = remainingMs != null && remainingMs === 0;
-                  const mins =
-                    remainingMs != null ? Math.floor(remainingMs / 60000) : 0;
-                  const secs =
-                    remainingMs != null
-                      ? Math.floor((remainingMs % 60000) / 1000)
-                      : 0;
-                  return (
-                    <>
-                      <div className="flex justify-between gap-4 text-sm">
-                        <span className="text-muted-foreground">Workspace</span>
-                        <span className="text-right font-medium">
-                          {expired ? "Expired" : "Running"}
-                        </span>
-                      </div>
-                      {remainingMs != null && !expired ? (
+              {assignmentWorkspace
+                ? (() => {
+                    const expiresAt = assignmentWorkspace.expiresAt;
+                    const remainingMs =
+                      expiresAt != null ? Math.max(0, expiresAt - now) : null;
+                    const expired = remainingMs != null && remainingMs === 0;
+                    const mins =
+                      remainingMs != null ? Math.floor(remainingMs / 60000) : 0;
+                    const secs =
+                      remainingMs != null
+                        ? Math.floor((remainingMs % 60000) / 1000)
+                        : 0;
+                    return (
+                      <>
                         <div className="flex justify-between gap-4 text-sm">
                           <span className="text-muted-foreground">
-                            Expires in
+                            Workspace
                           </span>
-                          <span className="text-right font-medium tabular-nums">
-                            {mins}m {secs.toString().padStart(2, "0")}s
+                          <span className="text-right font-medium">
+                            {expired ? "Expired" : "Running"}
                           </span>
                         </div>
-                      ) : null}
-                    </>
-                  );
-                })()
-              ) : null}
+                        {remainingMs != null && !expired ? (
+                          <div className="flex justify-between gap-4 text-sm">
+                            <span className="text-muted-foreground">
+                              Expires in
+                            </span>
+                            <span className="text-right font-medium tabular-nums">
+                              {mins}m {secs.toString().padStart(2, "0")}s
+                            </span>
+                          </div>
+                        ) : null}
+                      </>
+                    );
+                  })()
+                : null}
               <Separator />
 
               {submitError ? (
