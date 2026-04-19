@@ -113,6 +113,7 @@ export const getMyWorkspaceForAssignment = query({
       .withIndex("assignmentId_userId", (q) =>
         q.eq("assignmentId", args.assignmentId).eq("userId", user._id),
       )
+      .filter((q) => q.eq(q.field("isActive"), true))
       .first();
   },
 });
@@ -192,6 +193,45 @@ export const deactivateWorkspace = internalMutation({
   },
 });
 
+export const setUserActiveE2BWorkspace = internalMutation({
+  args: {
+    userId: v.string(),
+    e2bSandboxId: v.string(),
+    assignmentId: v.id("assignments"),
+    expiresAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const userWorkspaces = await ctx.db
+      .query("workspaces")
+      .withIndex("userId_isActive", (q) => q.eq("userId", args.userId))
+      .collect();
+
+    let targetWorkspace = null;
+
+    for (const ws of userWorkspaces) {
+      if (ws.e2bSandboxId === args.e2bSandboxId) {
+        targetWorkspace = ws;
+        await ctx.db.patch(ws._id, {
+          isActive: true,
+          expiresAt: args.expiresAt,
+        });
+      } else if (ws.isActive) {
+        await ctx.db.patch(ws._id, { isActive: false });
+      }
+    }
+
+    if (!targetWorkspace) {
+      await ctx.db.insert("workspaces", {
+        userId: args.userId,
+        e2bSandboxId: args.e2bSandboxId,
+        isActive: true,
+        assignmentId: args.assignmentId,
+        expiresAt: args.expiresAt,
+      });
+    }
+  },
+});
+
 export const getUserActiveWorkspace = internalQuery({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
@@ -216,6 +256,7 @@ export const getWorkspaceByAssignment = internalQuery({
       .withIndex("assignmentId_userId", (q) =>
         q.eq("assignmentId", args.assignmentId).eq("userId", args.userId),
       )
+      .filter((q) => q.eq(q.field("isActive"), true))
       .first();
   },
 });

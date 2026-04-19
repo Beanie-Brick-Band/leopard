@@ -22,9 +22,11 @@
     "test": "turbo run test --filter=!./apps/vscode-extension",
     "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add",
-    "sync-templates": "pnpm --filter @package/infra-sync sync"
+    "sync-templates": "pnpm --filter @package/infra-sync sync",
+    "build:e2b-template": "cp apps/vscode-extension/vscode-extension-0.0.1.vsix infra/e2b-template/vscode-extension.vsix && cd infra/e2b-template && e2b template create leopard-workspace --cpu-count 2 --memory-mb 2048"
   },
   "devDependencies": {
+    "@e2b/cli": "^2.9.0",
     "@package/prettier-config": "workspace:*",
     "@turbo/gen": "^2.5.8",
     "@types/node": "catalog:",
