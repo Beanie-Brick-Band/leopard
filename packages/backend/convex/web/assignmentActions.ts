@@ -41,20 +41,51 @@ function signAuthToken(secret: string, ttlSec: number): string {
 
 export const launchE2BWorkspace = action({
   args: { assignmentId: v.id("assignments") },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ workspaceUrl: string }> => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) {
       throw new Error("Not authenticated");
     }
     const userId = user._id.toString();
 
-    const existing = await ctx.runQuery(
+    // Reuse the live sandbox for this assignment if it hasn't expired.
+    const existingForAssignment = await ctx.runQuery(
+      internal.web.assignment.getWorkspaceByAssignment,
+      { userId, assignmentId: args.assignmentId },
+    );
+    if (
+      existingForAssignment?.e2bSandboxId &&
+      existingForAssignment.expiresAt &&
+      existingForAssignment.expiresAt > Date.now()
+    ) {
+      try {
+        const existingSandbox = await Sandbox.connect(
+          existingForAssignment.e2bSandboxId,
+        );
+        const secretProbe = await existingSandbox.commands.run(
+          "printenv AUTH_PROXY_SECRET",
+        );
+        const existingSecret = secretProbe.stdout.trim();
+        if (existingSecret) {
+          const token = signAuthToken(existingSecret, AUTH_TOKEN_TTL_SEC);
+          const host = existingSandbox.getHost(AUTH_PROXY_PORT);
+          return {
+            workspaceUrl: `https://${host}/?token=${encodeURIComponent(token)}&folder=/home/user/workspace`,
+          };
+        }
+      } catch {
+        // sandbox is gone or unreachable — fall through and make a new one
+      }
+    }
+
+    // Tear down any sandbox for a different assignment (one-at-a-time).
+    const active = await ctx.runQuery(
       internal.web.assignment.getUserActiveWorkspace,
       { userId },
     );
-    if (existing?.e2bSandboxId) {
+    if (active?.e2bSandboxId) {
       try {
-        await Sandbox.kill(existing.e2bSandboxId);
+        await Sandbox.kill(active.e2bSandboxId);
       } catch {
         // previous sandbox already gone
       }
